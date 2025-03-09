@@ -1,5 +1,4 @@
 import {getBurnEvents, getMintEvents} from "../api";
-import {Statement} from "better-sqlite3";
 import fs from "fs";
 import {ClBurn, ClMint} from "../types";
 
@@ -19,12 +18,15 @@ export const exportToJson = (
 
 const main = async () => {
   try {
-    let mints: ClMint[] = []
-    let burns: ClBurn[] = []
-    let poolSymbol = 'wS/USDC.e'
-    let blockNumber = 1707308 // Initial block number
+    const mints: ClMint[] = []
+    const burns: ClBurn[] = []
     let continueLoop = true;
     const startTime = Date.now()
+
+    // Filter by specific pool symbol. Example: 'wS/USDC.e'
+    const poolSymbol = ''
+    // Initial block number
+    let blockNumber = 0
 
     console.log('Started fetching events...')
 
@@ -51,7 +53,7 @@ const main = async () => {
       Math.round((Date.now() - startTime) / 1000)
     } seconds`)
 
-    blockNumber = 1707308 // Initial block number
+    blockNumber = 0
     continueLoop = true
 
     do {
@@ -88,8 +90,9 @@ const main = async () => {
       Math.round((Date.now() - startTime) / 1000)
     } seconds, started export...`)
 
-    await exportToJson(`export/shadow_export_${Math.round(Date.now() / 1000)}.jsonl`, events)
-    console.log(`Export complete, total time elapsed=${
+    const exportFileName = `export/shadow_export_${Math.round(Date.now() / 1000)}.jsonl`
+    await exportToJson(exportFileName, events)
+    console.log(`Export complete, check path=${exportFileName}, total time elapsed=${
       Math.round((Date.now() - startTime) / 1000)
     } seconds`)
   } catch (e) {

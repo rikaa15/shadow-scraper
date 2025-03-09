@@ -1,96 +1,104 @@
-import {getBurnEvents, getMintEvents} from "../api";
+import {getBurnEvents, GetEventsParams, getMintEvents} from "../api";
 import fs from "fs";
 import {ClBurn, ClMint} from "../types";
+import {exportToJson} from "../utils";
 
-export const exportToJson = (
-  filename: string,
-  items: any[]
+// Subgraph limitation
+const RequestLimit = 1000
+
+const getEvents = async (
+  type: 'mint' | 'burn',
+  params: GetEventsParams
 ) => {
-  return new Promise((resolve, reject) => {
-    const stream = fs.createWriteStream(filename);
-    for (const item of items) {
-      stream.write(JSON.stringify(item) + '\n');
+  const events: ClMint[] | ClBurn[] = [];
+  let continueLoop = true
+  let blockNumberFrom = params.filter!.blockNumber_gt
+
+  do {
+    const requestParams = {
+      ...params,
+      filter: {
+        ...params.filter,
+        blockNumber_gt: blockNumberFrom
+      }
     }
-    stream.on('error', reject);
-    stream.end(resolve);
-  });
+    const newEvents = type === 'mint'
+      ? await getMintEvents(requestParams)
+      : await getBurnEvents(requestParams)
+
+    events.push(...newEvents)
+
+    if(newEvents.length === RequestLimit) {
+      blockNumberFrom = Number(newEvents[newEvents.length - 1].transaction.blockNumber)
+    } else {
+      continueLoop = false
+    }
+    console.log(`[${type}] blockNumberFrom=${blockNumberFrom}, ${type} total=${events.length}`)
+  } while(continueLoop)
+
+  return events
 }
 
 const main = async () => {
   try {
-    const mints: ClMint[] = []
-    const burns: ClBurn[] = []
-    let continueLoop = true;
-    const startTime = Date.now()
-
     // Filter by specific pool symbol. Example: 'wS/USDC.e'
     const poolSymbol = ''
     // Initial block number
-    let blockNumber = 0
+    let blockNumberFrom = 0
+    let blockNumberTo = 0
 
-    console.log('Started fetching events...')
-
-    do {
-      const newMints = await getMintEvents({
-        first: 1000,
-        filter: {
-          poolSymbol,
-          blockNumber_gt: blockNumber
+    if(blockNumberTo === 0) {
+      const [latestMintEvent] = await getMintEvents({
+        first: 1,
+        sort: {
+          orderDirection: 'desc',
+          orderBy: 'transaction__blockNumber'
         }
       })
-      mints.push(...newMints)
-      if(newMints.length > 0) {
-        blockNumber = Number(newMints[newMints.length - 1].transaction.blockNumber)
-      } else {
-        continueLoop = false
+      if(!latestMintEvent) {
+        console.error('Latest mint event not found, exit')
+        process.exit(1)
       }
-      console.log(`[mints] blockNumber=${blockNumber}, count=${mints.length}`)
-    } while(continueLoop)
+      blockNumberTo = Number(latestMintEvent.transaction.blockNumber)
+    }
 
-    console.log(`Mints fetched, total amount: ${
-      mints.length
-    }, time elapsed=${
-      Math.round((Date.now() - startTime) / 1000)
-    } seconds`)
+    console.log(`Started fetching events, blockNumberFrom=${blockNumberFrom}, blockNumberTo=${blockNumberTo}...`)
 
-    blockNumber = 0
-    continueLoop = true
-
-    do {
-      const newBurns = await getBurnEvents({
-        first: 1000,
-        filter: {
-          poolSymbol,
-          blockNumber_gt: blockNumber
-        }
-      })
-      burns.push(...newBurns)
-      if(newBurns.length > 0) {
-        blockNumber = Number(newBurns[newBurns.length - 1].transaction.blockNumber)
-      } else {
-        continueLoop = false
+    const startTime = Date.now()
+    const requestParams = {
+      first: RequestLimit,
+      filter: {
+        poolSymbol,
+        blockNumber_gt: blockNumberFrom,
+        blockNumber_lte: blockNumberTo
       }
-      console.log(`[burns] blockNumber=${blockNumber}, count=${burns.length}`)
-    } while(continueLoop)
-
-    console.log(`Burns fetched, total amount=${
-      burns.length
-    }, time elapsed=${
-      Math.round((Date.now() - startTime) / 1000)
-    } seconds`)
-    console.log('Started sorting events...')
+    }
+    const [mints, burns] = await Promise.all([
+      getEvents('mint', requestParams),
+      getEvents('burn', requestParams),
+    ])
 
     const events = [
       ...mints.map(event => ({ type: 'mint', ...event,  })),
       ...burns.map(event => ({ type: 'burn', ...event })),
     ];
+
+    console.log(`Events fetched, total amount=${
+      events.length
+    }, mints=${
+      mints.length
+    }, burns=${
+      burns.length
+    }, time elapsed=${
+      Math.round((Date.now() - startTime) / 1000)
+    } seconds`)
+
+    console.log('Started sorting events...')
     events.sort((a, b) => Number(a.transaction.blockNumber) - Number(b.transaction.blockNumber))
 
-    console.log(`Total events count=${events.length}, time elapsed=${
-      Math.round((Date.now() - startTime) / 1000)
-    } seconds, started export...`)
-
     const exportFileName = `export/shadow_export_${Math.round(Date.now() / 1000)}.jsonl`
+    console.log(`Sorting completed, started export to ${exportFileName}...`)
+
     await exportToJson(exportFileName, events)
     console.log(`Export complete, check path=${exportFileName}, total time elapsed=${
       Math.round((Date.now() - startTime) / 1000)

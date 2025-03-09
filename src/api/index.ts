@@ -10,12 +10,19 @@ const client = axios.create({
 export interface GetEventsFilter {
   poolSymbol?: string
   blockNumber_gt?: number
+  blockNumber_lte?: number
+}
+
+export interface GetEventsSort {
+  orderDirection?: 'asc' | 'desc'
+  orderBy?: 'transaction__blockNumber'
 }
 
 export interface GetEventsParams {
   skip?: number
   first?: number
   filter?: GetEventsFilter
+  sort?: GetEventsSort
 }
 
 export const getMintEvents = async (params: GetEventsParams) => {

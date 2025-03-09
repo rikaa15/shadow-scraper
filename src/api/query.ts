@@ -2,6 +2,7 @@ import {GetEventsFilter, GetEventsParams} from "./index";
 
 const buildWhereQuery = (filter: GetEventsFilter) => {
   let where: any = {}
+  let transactionWhere = {}
 
   if(filter.poolSymbol) {
     where = {
@@ -13,12 +14,22 @@ const buildWhereQuery = (filter: GetEventsFilter) => {
   }
 
   if(filter.blockNumber_gt) {
-    where = {
-      ...where,
-      transaction_:{
-        blockNumber_gt: filter.blockNumber_gt
-      }
+    transactionWhere = {
+      ...transactionWhere,
+      blockNumber_gt: filter.blockNumber_gt
     }
+  }
+
+  if(filter.blockNumber_lte) {
+    transactionWhere = {
+      ...transactionWhere,
+      blockNumber_lte: filter.blockNumber_lte
+    }
+  }
+
+  where = {
+    ...where,
+    transaction_: transactionWhere
   }
 
   return buildFilterQuery(where)
@@ -29,16 +40,18 @@ const buildFilterQuery = (filter: Object) => {
 }
 
 export const getMintsQuery = (params: GetEventsParams) => {
-  const { first = 1000, skip = 0, filter = {} } = params
+  const { first = 1000, skip = 0, filter = {}, sort = {} } = params
 
   const whereQuery = buildWhereQuery(filter)
+  const orderDirection = sort.orderDirection || 'asc'
+  const orderBy = sort.orderBy || 'transaction__blockNumber'
 
   return `{
     clMints(
       first: ${first}
       skip: ${skip}
-      orderDirection:asc,
-      orderBy:transaction__blockNumber,
+      orderDirection: ${orderDirection},
+      orderBy: ${orderBy},
       where: ${whereQuery}
     ) {
       id
@@ -74,16 +87,18 @@ export const getMintsQuery = (params: GetEventsParams) => {
 }
 
 export const getBurnsQuery = (params: GetEventsParams) => {
-  const { first = 1000, skip = 0, filter = {} } = params
+  const { first = 1000, skip = 0, filter = {}, sort = {} } = params
 
   const whereQuery = buildWhereQuery(filter)
+  const orderDirection = sort.orderDirection || 'asc'
+  const orderBy = sort.orderBy || 'transaction__blockNumber'
 
   return `{
     clBurns(
       first: ${first}
       skip: ${skip}
-      orderDirection:asc,
-      orderBy:transaction__blockNumber,
+      orderDirection: ${orderDirection},
+      orderBy: ${orderBy},
       where: ${whereQuery}
     ) {
       id

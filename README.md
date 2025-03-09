@@ -24,28 +24,17 @@ npm install
 ### Usage
 1. Run the scraper:
 ```shell
-npm run dev
+npm run jsonl
 ```
 2. The script will:
 - Query the Shadow Exchange subgraph
-- Parse the response data
-- Store the results in a SQLite database file (e.g., /export/shadow_export.db).
+- Export mint and burn events in jsonl file
 3. Check the `/export` folder
-
 
 ### Calculate TVL
 ```shell
 npm install
 npm run tvl
-```
-
-### Export to jsonl
-
-[Read more](https://jsonlines.org/) about jsonl
-
-```shell
-npm install
-npm run jsonl
 ```
 
 ### Subgraph API

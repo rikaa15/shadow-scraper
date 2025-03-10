@@ -1,50 +1,15 @@
 import {getBurnEvents, GetEventsParams, getMintEvents, getSwapEvents} from "../api";
 import {ClBurn, ClMint, ClSwap, EventType} from "../types";
 import {exportToJson} from "../utils";
+import {getEvents} from "./helpers";
 
 // Subgraph limitation
-const RequestLimit = 1000
-
-const getEvents = async (
-  type: EventType,
-  params: GetEventsParams
-) => {
-  const events: ClMint[] | ClBurn[] | ClSwap[] = [];
-  let continueLoop = true
-  let blockNumberFrom = params.filter!.blockNumber_gt
-
-  do {
-    const requestParams = {
-      ...params,
-      filter: {
-        ...params.filter,
-        blockNumber_gt: blockNumberFrom
-      }
-    }
-    const newEvents = type === 'mint'
-      ? await getMintEvents(requestParams)
-      : type === 'burn'
-        ? await getBurnEvents(requestParams)
-        : await getSwapEvents(requestParams)
-
-    // @ts-ignore
-    events.push(...newEvents)
-
-    if(newEvents.length === RequestLimit) {
-      blockNumberFrom = Number(newEvents[newEvents.length - 1].transaction.blockNumber)
-    } else {
-      continueLoop = false
-    }
-    console.log(`[${type}] blockNumberFrom=${blockNumberFrom}, ${type} total=${events.length}`)
-  } while(continueLoop)
-
-  return events
-}
+export const RequestLimit = 1000
 
 const main = async () => {
   try {
     // Filter by specific pool symbol. Example: 'wS/USDC.e'
-    const poolSymbol = ''
+    const poolSymbol = 'wS/USDC.e'
     let blockNumberFrom = 0
     let blockNumberTo = 0
 
@@ -81,13 +46,13 @@ const main = async () => {
     ] = await Promise.all([
       getEvents('mint', requestParams),
       getEvents('burn', requestParams),
-      // getEvents('swap', requestParams),
+      getEvents('swap', requestParams),
     ])
 
     const events = [
       ...mints.map(event => ({ type: 'mint', ...event,  })),
       ...burns.map(event => ({ type: 'burn', ...event })),
-      // ...swaps.map(event => ({ type: 'swap', ...event,  })),
+      ...swaps.map(event => ({ type: 'swap', ...event,  })),
     ];
 
     console.log(`Events fetched, total amount=${

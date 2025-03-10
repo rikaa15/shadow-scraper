@@ -132,3 +132,50 @@ export const getBurnsQuery = (params: GetEventsParams) => {
     }
   }`
 }
+
+export const getSwapsQuery = (params: GetEventsParams) => {
+  const { first = 1000, skip = 0, filter = {}, sort = {} } = params
+
+  const whereQuery = buildWhereQuery(filter)
+  const orderDirection = sort.orderDirection || 'asc'
+  const orderBy = sort.orderBy || 'transaction__blockNumber'
+
+  return `{
+    clSwaps (
+      first: ${first}
+      orderDirection: ${orderDirection},
+      orderBy: ${orderBy},
+      where: ${whereQuery}
+    ) {
+      id
+      transaction {
+        id
+        blockNumber
+        timestamp
+      }
+      sender
+      recipient
+      origin
+      amount0
+      amount1
+      amountUSD
+      sqrtPriceX96
+      tick
+      logIndex
+      token0 {
+        id
+        name
+        symbol
+      }
+      token1 {
+        id
+        name
+        symbol
+      }
+      pool {
+        id
+        symbol
+      }
+    }
+  }`
+}

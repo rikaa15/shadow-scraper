@@ -56,6 +56,10 @@ export interface MappedClMint {
   amount1: string
 }
 
+export interface ClMintExtended extends ClMint {
+  type: 'mint'
+}
+
 export interface ClBurn {
   id: string
   transaction: Transaction
@@ -85,4 +89,31 @@ export interface MappedClBurn {
   amount0: string
   amount1: string
 }
+
+export interface ClBurnExtended extends ClBurn {
+  type: 'burn'
+}
+
+export interface ClSwap {
+  id: string
+  transaction: Transaction
+  pool: ClPool
+  token0: Token
+  token1: Token
+  sender: string
+  recipient: string
+  origin: string
+  amount0: string
+  amount1: string
+  amountUSD: string
+  sqrtPriceX96: string
+  tick: string
+  logIndex: string
+}
+
+export interface ClSwapExtended extends ClSwap {
+  type: 'swap'
+}
+
+export type EventType = 'mint' | 'burn' | 'swap'
 

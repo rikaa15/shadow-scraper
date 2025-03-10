@@ -1,16 +1,15 @@
-import {getBurnEvents, GetEventsParams, getMintEvents} from "../api";
-import fs from "fs";
-import {ClBurn, ClMint} from "../types";
+import {getBurnEvents, GetEventsParams, getMintEvents, getSwapEvents} from "../api";
+import {ClBurn, ClMint, ClSwap, EventType} from "../types";
 import {exportToJson} from "../utils";
 
 // Subgraph limitation
 const RequestLimit = 1000
 
 const getEvents = async (
-  type: 'mint' | 'burn',
+  type: EventType,
   params: GetEventsParams
 ) => {
-  const events: ClMint[] | ClBurn[] = [];
+  const events: ClMint[] | ClBurn[] | ClSwap[] = [];
   let continueLoop = true
   let blockNumberFrom = params.filter!.blockNumber_gt
 
@@ -24,8 +23,11 @@ const getEvents = async (
     }
     const newEvents = type === 'mint'
       ? await getMintEvents(requestParams)
-      : await getBurnEvents(requestParams)
+      : type === 'burn'
+        ? await getBurnEvents(requestParams)
+        : await getSwapEvents(requestParams)
 
+    // @ts-ignore
     events.push(...newEvents)
 
     if(newEvents.length === RequestLimit) {
@@ -43,7 +45,6 @@ const main = async () => {
   try {
     // Filter by specific pool symbol. Example: 'wS/USDC.e'
     const poolSymbol = ''
-    // Initial block number
     let blockNumberFrom = 0
     let blockNumberTo = 0
 
@@ -73,14 +74,20 @@ const main = async () => {
         blockNumber_lte: blockNumberTo
       }
     }
-    const [mints, burns] = await Promise.all([
+    const [
+      mints = [],
+      burns = [],
+      swaps = []
+    ] = await Promise.all([
       getEvents('mint', requestParams),
       getEvents('burn', requestParams),
+      // getEvents('swap', requestParams),
     ])
 
     const events = [
       ...mints.map(event => ({ type: 'mint', ...event,  })),
       ...burns.map(event => ({ type: 'burn', ...event })),
+      // ...swaps.map(event => ({ type: 'swap', ...event,  })),
     ];
 
     console.log(`Events fetched, total amount=${
@@ -89,7 +96,9 @@ const main = async () => {
       mints.length
     }, burns=${
       burns.length
-    }, time elapsed=${
+    }, swaps=${
+      swaps.length
+    } time elapsed=${
       Math.round((Date.now() - startTime) / 1000)
     } seconds`)
 

@@ -1,6 +1,6 @@
 import axios from "axios";
-import {getBurnsQuery, getMintsQuery} from "./query";
-import {ClBurn, ClMint} from "../types";
+import {getBurnsQuery, getMintsQuery, getSwapsQuery} from "./query";
+import {ClBurn, ClMint, ClSwap} from "../types";
 import {appConfig} from "../config";
 
 const client = axios.create({
@@ -45,4 +45,15 @@ export const getBurnEvents = async (params: GetEventsParams) => {
     query: getBurnsQuery(params)
   })
   return data.data.clBurns
+}
+
+export const getSwapEvents = async (params: GetEventsParams) => {
+  const { data } = await client.post<{
+    data: {
+      clSwaps: ClSwap[]
+    }
+  }>('/', {
+    query: getSwapsQuery(params)
+  })
+  return data.data.clSwaps
 }

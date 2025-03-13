@@ -3,7 +3,7 @@ import Decimal from 'decimal.js'
 
 // const subgraphAPI = 'https://api.goldsky.com/api/public/project_clu2walwem1qm01w40v3yhw1f/subgraphs/beefy-clm-sonic/latest/gn'
 // const subgraphQuery = `
-// {
+//   {
 //   clmHarvestEvents(
 //     first:1000
 //     where:{
@@ -14,16 +14,8 @@ import Decimal from 'decimal.js'
 //     orderBy: createdWith__blockNumber
 //     orderDirection:desc
 //   ) {
-//     rewardPoolsTotalSupply
 //     rewardToNativePrices
 //     nativeToUSDPrice
-//     underlyingAmount0
-//     underlyingAmount1
-//     createdWith { blockNumber }
-//     clm {
-//       underlyingToken0 { symbol }
-//       underlyingToken1 { symbol }
-//     }
 //   }
 // }
 // `
@@ -34,17 +26,16 @@ interface HarvestEvent {
 }
 
 const main = async () => {
-  let totalRewards = new Decimal(0);
+  let totalAmountUSD = new Decimal(0);
   (clmHarvestEvents as HarvestEvent[]).forEach(item => {
     if (item.rewardToNativePrices.length === 0) return
+
+    const nativePrice = new Decimal(item.nativeToUSDPrice).div(10 ** 18)
     const rewardUSD = new Decimal(item.rewardToNativePrices[0])
       .div(10**18)
-    totalRewards = totalRewards.add(rewardUSD)
+      .mul(nativePrice)
+    totalAmountUSD = totalAmountUSD.add(rewardUSD)
   })
-  const nativeUSDPrice = new Decimal(clmHarvestEvents[clmHarvestEvents.length - 1].nativeToUSDPrice)
-    .div(10 ** 18)
-  const totalAmountUSD = totalRewards.mul(nativeUSDPrice)
-
   console.log('totalAmountUSD', totalAmountUSD.toString())
   console.log('events count:', clmHarvestEvents.length)
 }

@@ -26,16 +26,17 @@ interface HarvestEvent {
 }
 
 const main = async () => {
-  let totalAmountUSD = new Decimal(0);
+  let totalRewards = new Decimal(0);
   (clmHarvestEvents as HarvestEvent[]).forEach(item => {
     if (item.rewardToNativePrices.length === 0) return
-
-    const nativePrice = new Decimal(item.nativeToUSDPrice).div(10 ** 18)
     const rewardUSD = new Decimal(item.rewardToNativePrices[0])
       .div(10**18)
-      .mul(nativePrice)
-    totalAmountUSD = totalAmountUSD.add(rewardUSD)
+    totalRewards = totalRewards.add(rewardUSD)
   })
+  const nativeUSDPrice = new Decimal(clmHarvestEvents[clmHarvestEvents.length - 1].nativeToUSDPrice)
+    .div(10 ** 18)
+  const totalAmountUSD = totalRewards.mul(nativeUSDPrice)
+
   console.log('totalAmountUSD', totalAmountUSD.toString())
   console.log('events count:', clmHarvestEvents.length)
 }

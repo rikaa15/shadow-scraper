@@ -1,0 +1,596 @@
+{
+  "data": {
+    "clmHarvestEvents": [
+      {
+        "rewardToNativePrices": [
+          "166356459079545366000"
+        ],
+        "nativeToUSDPrice": "440737239392400361"
+      },
+      {
+        "rewardToNativePrices": [
+          "157660800072887724000"
+        ],
+        "nativeToUSDPrice": "421661909327003048"
+      },
+      {
+        "rewardToNativePrices": [
+          "112131560936976500000"
+        ],
+        "nativeToUSDPrice": "413952823163407843"
+      },
+      {
+        "rewardToNativePrices": [
+          "121050722217052853000"
+        ],
+        "nativeToUSDPrice": "479899107122699456"
+      },
+      {
+        "rewardToNativePrices": [
+          "120524083302303554000"
+        ],
+        "nativeToUSDPrice": "506156596118171364"
+      },
+      {
+        "rewardToNativePrices": [
+          "118697399498648338000"
+        ],
+        "nativeToUSDPrice": "506660984002168016"
+      },
+      {
+        "rewardToNativePrices": [
+          "140553237653258776000"
+        ],
+        "nativeToUSDPrice": "518767113779875581"
+      },
+      {
+        "rewardToNativePrices": [
+          "148913930759717862000"
+        ],
+        "nativeToUSDPrice": "576770306610364105"
+      },
+      {
+        "rewardToNativePrices": [
+          "148913930759717862000"
+        ],
+        "nativeToUSDPrice": "576145544761443893"
+      },
+      {
+        "rewardToNativePrices": [
+          "151916785008624719000"
+        ],
+        "nativeToUSDPrice": "567497449272733549"
+      },
+      {
+        "rewardToNativePrices": [
+          "155103344127108515000"
+        ],
+        "nativeToUSDPrice": "761082347385274862"
+      },
+      {
+        "rewardToNativePrices": [
+          "154839214445608535000"
+        ],
+        "nativeToUSDPrice": "724311881647132773"
+      },
+      {
+        "rewardToNativePrices": [
+          "159017112034745624000"
+        ],
+        "nativeToUSDPrice": "728202830212290979"
+      },
+      {
+        "rewardToNativePrices": [
+          "148616578681653063000"
+        ],
+        "nativeToUSDPrice": "718348237207380180"
+      },
+      {
+        "rewardToNativePrices": [
+          "178377829608280404000"
+        ],
+        "nativeToUSDPrice": "836136430706920851"
+      },
+      {
+        "rewardToNativePrices": [
+          "175347786916611805000"
+        ],
+        "nativeToUSDPrice": "823532582804248094"
+      },
+      {
+        "rewardToNativePrices": [
+          "161734933301893570000"
+        ],
+        "nativeToUSDPrice": "807996867813304303"
+      },
+      {
+        "rewardToNativePrices": [
+          "179288783870032367000"
+        ],
+        "nativeToUSDPrice": "868123716419429604"
+      },
+      {
+        "rewardToNativePrices": [
+          "182231824832343755000"
+        ],
+        "nativeToUSDPrice": "899032910324880525"
+      },
+      {
+        "rewardToNativePrices": [
+          "223977090775663158000"
+        ],
+        "nativeToUSDPrice": "866979256669829545"
+      },
+      {
+        "rewardToNativePrices": [
+          "185866274236076816000"
+        ],
+        "nativeToUSDPrice": "719611195359410179"
+      },
+      {
+        "rewardToNativePrices": [
+          "158261856585748751000"
+        ],
+        "nativeToUSDPrice": "603458978521205398"
+      },
+      {
+        "rewardToNativePrices": [
+          "108593805891569365000"
+        ],
+        "nativeToUSDPrice": "587656001859277504"
+      },
+      {
+        "rewardToNativePrices": [
+          "110333628804675266000"
+        ],
+        "nativeToUSDPrice": "602009222531114623"
+      },
+      {
+        "rewardToNativePrices": [
+          "75028576807494065000"
+        ],
+        "nativeToUSDPrice": "535499053123437204"
+      },
+      {
+        "rewardToNativePrices": [
+          "71064746501743637000"
+        ],
+        "nativeToUSDPrice": "511961283839616830"
+      },
+      {
+        "rewardToNativePrices": [
+          "76996114632513464000"
+        ],
+        "nativeToUSDPrice": "524027529207860042"
+      },
+      {
+        "rewardToNativePrices": [
+          "76477469900090507000"
+        ],
+        "nativeToUSDPrice": "544650497422497393"
+      },
+      {
+        "rewardToNativePrices": [
+          "77723811695581315000"
+        ],
+        "nativeToUSDPrice": "549326985600033486"
+      },
+      {
+        "rewardToNativePrices": [
+          "78376467675641446000"
+        ],
+        "nativeToUSDPrice": "542790164909534012"
+      },
+      {
+        "rewardToNativePrices": [
+          "74102582083420863000"
+        ],
+        "nativeToUSDPrice": "536685323377210562"
+      },
+      {
+        "rewardToNativePrices": [
+          "56601968581520092000"
+        ],
+        "nativeToUSDPrice": "473923456320472605"
+      },
+      {
+        "rewardToNativePrices": [
+          "56301071320006326000"
+        ],
+        "nativeToUSDPrice": "452844712637417434"
+      },
+      {
+        "rewardToNativePrices": [
+          "57099789353059364000"
+        ],
+        "nativeToUSDPrice": "462917729917303988"
+      },
+      {
+        "rewardToNativePrices": [
+          "57381489834332278000"
+        ],
+        "nativeToUSDPrice": "438935000260612411"
+      },
+      {
+        "rewardToNativePrices": [
+          "49279137002792054000"
+        ],
+        "nativeToUSDPrice": "419423565172936512"
+      },
+      {
+        "rewardToNativePrices": [
+          "47025965792032896000"
+        ],
+        "nativeToUSDPrice": "408770395668194051"
+      },
+      {
+        "rewardToNativePrices": [
+          "47492524079459014000"
+        ],
+        "nativeToUSDPrice": "414511171048528006"
+      },
+      {
+        "rewardToNativePrices": [
+          "50260042497480442000"
+        ],
+        "nativeToUSDPrice": "410660960010053652"
+      },
+      {
+        "rewardToNativePrices": [
+          "50221187072108972000"
+        ],
+        "nativeToUSDPrice": "415485378440969060"
+      },
+      {
+        "rewardToNativePrices": [
+          "48631354833465052000"
+        ],
+        "nativeToUSDPrice": "407402108716611876"
+      },
+      {
+        "rewardToNativePrices": [
+          "44559752536806318000"
+        ],
+        "nativeToUSDPrice": "415631545509172202"
+      },
+      {
+        "rewardToNativePrices": [
+          "40482588284065405000"
+        ],
+        "nativeToUSDPrice": "409965305090962404"
+      },
+      {
+        "rewardToNativePrices": [
+          "39911453652921554000"
+        ],
+        "nativeToUSDPrice": "383780361616745558"
+      },
+      {
+        "rewardToNativePrices": [
+          "39673970294449725000"
+        ],
+        "nativeToUSDPrice": "392663330111362514"
+      },
+      {
+        "rewardToNativePrices": [
+          "40475579723475193000"
+        ],
+        "nativeToUSDPrice": "388253413324290787"
+      },
+      {
+        "rewardToNativePrices": [
+          "42006611770133712000"
+        ],
+        "nativeToUSDPrice": "424182789350674737"
+      },
+      {
+        "rewardToNativePrices": [
+          "41641209740801079000"
+        ],
+        "nativeToUSDPrice": "427992321486516200"
+      },
+      {
+        "rewardToNativePrices": [
+          "51941274738840318000"
+        ],
+        "nativeToUSDPrice": "456073360218283988"
+      },
+      {
+        "rewardToNativePrices": [
+          "55271054779053582000"
+        ],
+        "nativeToUSDPrice": "465401752172010336"
+      },
+      {
+        "rewardToNativePrices": [
+          "38504054479237816000"
+        ],
+        "nativeToUSDPrice": "434387583159574610"
+      },
+      {
+        "rewardToNativePrices": [
+          "21649473048726809000"
+        ],
+        "nativeToUSDPrice": "433397198036237669"
+      },
+      {
+        "rewardToNativePrices": [
+          "21620692172258805000"
+        ],
+        "nativeToUSDPrice": "434848015346340118"
+      },
+      {
+        "rewardToNativePrices": [
+          "21316692119656110000"
+        ],
+        "nativeToUSDPrice": "431406136623281446"
+      },
+      {
+        "rewardToNativePrices": [
+          "22209564107480894000"
+        ],
+        "nativeToUSDPrice": "468200145246574145"
+      },
+      {
+        "rewardToNativePrices": [
+          "21987701579754882000"
+        ],
+        "nativeToUSDPrice": "422415594231638574"
+      },
+      {
+        "rewardToNativePrices": [
+          "20835849587452948000"
+        ],
+        "nativeToUSDPrice": "509793360989127656"
+      },
+      {
+        "rewardToNativePrices": [
+          "20935028906544029000"
+        ],
+        "nativeToUSDPrice": "496926103188932963"
+      },
+      {
+        "rewardToNativePrices": [
+          "18933069269272809000"
+        ],
+        "nativeToUSDPrice": "506354931725421465"
+      },
+      {
+        "rewardToNativePrices": [
+          "19159517983132216000"
+        ],
+        "nativeToUSDPrice": "557346512128792385"
+      },
+      {
+        "rewardToNativePrices": [
+          "16350687582354065000"
+        ],
+        "nativeToUSDPrice": "521650383778543887"
+      },
+      {
+        "rewardToNativePrices": [
+          "15714217360367663000"
+        ],
+        "nativeToUSDPrice": "496100298183889766"
+      },
+      {
+        "rewardToNativePrices": [
+          "14522888562551459000"
+        ],
+        "nativeToUSDPrice": "438389241530634666"
+      },
+      {
+        "rewardToNativePrices": [
+          "13838357518053708000"
+        ],
+        "nativeToUSDPrice": "467590115354002008"
+      },
+      {
+        "rewardToNativePrices": [
+          "16594082834810114000"
+        ],
+        "nativeToUSDPrice": "541421306427166774"
+      },
+      {
+        "rewardToNativePrices": [
+          "18723440564708599000"
+        ],
+        "nativeToUSDPrice": "542233139559109369"
+      },
+      {
+        "rewardToNativePrices": [
+          "19696724903975108000"
+        ],
+        "nativeToUSDPrice": "557108703905419562"
+      },
+      {
+        "rewardToNativePrices": [
+          "19935541796598424000"
+        ],
+        "nativeToUSDPrice": "588769266844097161"
+      },
+      {
+        "rewardToNativePrices": [
+          "18115496302455914000"
+        ],
+        "nativeToUSDPrice": "610486656002755754"
+      },
+      {
+        "rewardToNativePrices": [
+          "14736819913576763000"
+        ],
+        "nativeToUSDPrice": "620731745055640846"
+      },
+      {
+        "rewardToNativePrices": [
+          "13372171920997584000"
+        ],
+        "nativeToUSDPrice": "545374140606427217"
+      },
+      {
+        "rewardToNativePrices": [
+          "10980320557539714000"
+        ],
+        "nativeToUSDPrice": "692239996078248405"
+      },
+      {
+        "rewardToNativePrices": [
+          "12998740379409731000"
+        ],
+        "nativeToUSDPrice": "780439917041375526"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "725951376171577119"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "711639748153663007"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "703621757884028603"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "691287769921681211"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "679852828808219109"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "641338533614920974"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "642234204041798564"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "660027662305361508"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "690510538977852245"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "705447276015014023"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "710841113898113025"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "697154642062883256"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "704596638705966332"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "712603347277520209"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "719368786234997076"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "707159729753471742"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "715267405532033408"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "703053186703977470"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "695296289729597376"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "707601078635950414"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "696366447357478905"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "680416226630761921"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "689228276324514088"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "687440803311879912"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "656009507118292502"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "645692855849943913"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "653585328692846881"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "657723139011334846"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "658377642467631503"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "626507973340126375"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "668699011288219824"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "711344884289964026"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "782030082930258280"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "789126684320240413"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "830335641583158125"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "840039980956584034"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "824904553709093503"
+      },
+      {
+        "rewardToNativePrices": [],
+        "nativeToUSDPrice": "828136604554192474"
+      }
+    ]
+  }
+}

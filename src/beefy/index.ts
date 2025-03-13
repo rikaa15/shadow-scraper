@@ -3,7 +3,7 @@ import Decimal from 'decimal.js'
 
 // const subgraphAPI = 'https://api.goldsky.com/api/public/project_clu2walwem1qm01w40v3yhw1f/subgraphs/beefy-clm-sonic/latest/gn'
 // const subgraphQuery = `
-//   {
+// {
 //   clmHarvestEvents(
 //     first:1000
 //     where:{
@@ -14,8 +14,16 @@ import Decimal from 'decimal.js'
 //     orderBy: createdWith__blockNumber
 //     orderDirection:desc
 //   ) {
+//     rewardPoolsTotalSupply
 //     rewardToNativePrices
 //     nativeToUSDPrice
+//     underlyingAmount0
+//     underlyingAmount1
+//     createdWith { blockNumber }
+//     clm {
+//       underlyingToken0 { symbol }
+//       underlyingToken1 { symbol }
+//     }
 //   }
 // }
 // `

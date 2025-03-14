@@ -26,14 +26,21 @@ import Decimal from 'decimal.js'
 interface HarvestEvent {
   rewardToNativePrices: string[]
   nativeToUSDPrice: string
+  underlyingAmount0: string
+  underlyingAmount1: string
   createdWith: {
     id: string
     blockNumber: string
     blockTimestamp: string
+    sender: string
+  }
+  clm: {
+    underlyingToken0: { symbol: string }
+    underlyingToken1: { symbol: string }
   }
 }
 
-const exportFilename = 'export/beefy_harvestEvents.csv';
+const exportFilename = 'export/beefy_wS-USDC.e_harvest_events.csv';
 
 const main = async () => {
   let totalAmountUSD = new Decimal(0);
@@ -51,17 +58,26 @@ const main = async () => {
 
   // const flatItems = (clmHarvestEvents as HarvestEvent[])
   //   .map(item => {
-  //     const {rewardToNativePrices, nativeToUSDPrice, createdWith} = item
+  //     const {
+  //       rewardToNativePrices,
+  //       nativeToUSDPrice,
+  //       underlyingAmount0, underlyingAmount1,
+  //       createdWith,
+  //       clm: { underlyingToken0, underlyingToken1 }
+  //     } = item
   //     const rewardAmount = new Decimal(rewardToNativePrices[0] || 0)
   //     const rewardTokenPrice = new Decimal(nativeToUSDPrice).div(10 ** 18);
   //     const rewardAmountUSD = rewardAmount.div(10**18).mul(rewardTokenPrice)
   //     return {
-  //         rewardAmountUSD,
-  //         rewardAmount,
-  //         rewardTokenPrice,
+  //         [`${underlyingToken0.symbol}_reward_amount`]: rewardAmount,
+  //         [`${underlyingToken0.symbol}_token_price`]: rewardTokenPrice,
+  //         [`${underlyingToken0.symbol}_reward_amount_usd`]: rewardAmountUSD,
+  //         [`${underlyingToken0.symbol}_total_balance`]: underlyingAmount0,
+  //         [`${underlyingToken1.symbol}_total_balance`]: underlyingAmount1,
   //         blockNumber: +createdWith.blockNumber,
   //         blockTimestamp: +createdWith.blockTimestamp,
   //         txHash: createdWith.id,
+  //         txSender: createdWith.sender
   //       }
   //   })
   //   .sort((a, b) => {

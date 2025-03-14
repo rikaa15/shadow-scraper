@@ -13,3 +13,22 @@ export const exportToJson = (
     stream.end(resolve);
   });
 }
+
+function arrayToCSV(array: any[]) {
+  const headers = Object.keys(array[0]);
+  const rows = array.map(obj =>
+    headers.map(header => `"${obj[header]}"`).join(',')
+  );
+  return [
+    headers.join(','), // Header row
+    ...rows            // Data rows
+  ].join('\n');
+}
+
+export const exportToCSV = (
+  filename: string,
+  items: any[]
+) => {
+  const csv = arrayToCSV(items)
+  fs.writeFileSync(filename, csv, 'utf8');
+}

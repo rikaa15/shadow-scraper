@@ -1,3 +1,5 @@
+import {exportToCSV} from "../utils";
+
 const { data: { clmHarvestEvents } } = require('./harvests.json')
 import Decimal from 'decimal.js'
 
@@ -16,6 +18,7 @@ import Decimal from 'decimal.js'
 //   ) {
 //     rewardToNativePrices
 //     nativeToUSDPrice
+//     createdWith { id, blockTimestamp, blockNumber }
 //   }
 // }
 // `
@@ -23,7 +26,14 @@ import Decimal from 'decimal.js'
 interface HarvestEvent {
   rewardToNativePrices: string[]
   nativeToUSDPrice: string
+  createdWith: {
+    id: string
+    blockNumber: string
+    blockTimestamp: string
+  }
 }
+
+const exportFilename = 'export/clmHarvestEvents.csv';
 
 const main = async () => {
   let totalAmountUSD = new Decimal(0);
@@ -38,6 +48,26 @@ const main = async () => {
   })
   console.log('totalAmountUSD', totalAmountUSD.toString())
   console.log('events count:', clmHarvestEvents.length)
+
+  // const flatItems = (clmHarvestEvents as HarvestEvent[])
+  //   .map(item => {
+  //     const {rewardToNativePrices, nativeToUSDPrice, createdWith} = item
+  //     const nativePrice = new Decimal(nativeToUSDPrice).div(10 ** 18);
+  //     const rewardUSD = rewardToNativePrices.length > 0
+  //         ? new Decimal(rewardToNativePrices[0]).div(10**18).mul(nativePrice)
+  //         : new Decimal(0)
+  //       return {
+  //         rewardUSD,
+  //         blockNumber: +createdWith.blockNumber,
+  //         blockTimestamp: +createdWith.blockTimestamp,
+  //         txHash: createdWith.id,
+  //       }
+  //   })
+  //   .sort((a, b) => {
+  //     return a.blockNumber - b.blockNumber;
+  //   })
+  // exportToCSV(exportFilename, flatItems)
+  // console.log('File exported to '+exportFilename)
 }
 
 main()

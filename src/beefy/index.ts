@@ -52,12 +52,13 @@ const main = async () => {
   // const flatItems = (clmHarvestEvents as HarvestEvent[])
   //   .map(item => {
   //     const {rewardToNativePrices, nativeToUSDPrice, createdWith} = item
-  //     const nativePrice = new Decimal(nativeToUSDPrice).div(10 ** 18);
-  //     const rewardUSD = rewardToNativePrices.length > 0
-  //         ? new Decimal(rewardToNativePrices[0]).div(10**18).mul(nativePrice)
-  //         : new Decimal(0)
-  //       return {
-  //         rewardUSD,
+  //     const rewardAmount = new Decimal(rewardToNativePrices[0] || 0)
+  //     const rewardTokenPrice = new Decimal(nativeToUSDPrice).div(10 ** 18);
+  //     const rewardAmountUSD = rewardAmount.div(10**18).mul(rewardTokenPrice)
+  //     return {
+  //         rewardAmountUSD,
+  //         rewardAmount,
+  //         rewardTokenPrice,
   //         blockNumber: +createdWith.blockNumber,
   //         blockTimestamp: +createdWith.blockTimestamp,
   //         txHash: createdWith.id,

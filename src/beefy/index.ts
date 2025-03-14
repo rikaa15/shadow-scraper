@@ -33,7 +33,7 @@ interface HarvestEvent {
   }
 }
 
-const exportFilename = 'export/clmHarvestEvents.csv';
+const exportFilename = 'export/beefy_harvestEvents.csv';
 
 const main = async () => {
   let totalAmountUSD = new Decimal(0);

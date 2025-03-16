@@ -9,7 +9,8 @@
     "tvl": "nodemon src/tvl/index.ts",
     "jsonl": "nodemon src/jsonl/index.ts",
     "beefy": "nodemon src/beefy/index.ts",
-    "vfat": "nodemon src/vfat/index.ts"
+    "vfat": "nodemon src/vfat/index.ts",
+    "portfolio": "nodemon src/portfolio-tracker/index.ts"
   },
   "keywords": [],
   "author": "",

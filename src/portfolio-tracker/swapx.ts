@@ -23,6 +23,7 @@ export const getInfo = async (
     .toString()
 
   return {
+    poolAddress,
     rewardsAmount,
     rewardsAmountFormatted,
     rewardTokenAddress,

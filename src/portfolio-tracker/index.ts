@@ -10,7 +10,11 @@ const main = async () => {
     // })
 
     const swapXInfo = await getInfo(userAddress)
-    console.log(`SwapX portfolio: rewards earned: ${
+    console.log(`SwapX portfolio: user address=${
+      userAddress
+    }, pool address=${
+      swapXInfo.poolAddress
+    }, rewards earned: ${
       swapXInfo.rewardsAmountFormatted
     }, rewards token: ${
       swapXInfo.rewardTokenSymbol

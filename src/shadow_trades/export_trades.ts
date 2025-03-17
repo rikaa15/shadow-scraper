@@ -50,7 +50,11 @@ const main = async () => {
     }
   })
 
-  const exportFileName = `export/shadow_swaps_${poolSymbol.replace('/','_')}_${Date.now()}.csv`
+  const exportFileName = `export/shadow_swaps_${
+    poolSymbol.replace('/','_')
+  }_${
+    Math.round(Date.now() / 1000)
+  }.csv`
   console.log(`Exporting to ${exportFileName}...`)
   exportArrayToCSV(exportFileName, csvItems)
   console.log('Export complete! check' + exportFileName)

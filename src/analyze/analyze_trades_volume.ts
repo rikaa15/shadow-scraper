@@ -77,10 +77,10 @@ async function calculateVolumeRange(trades: TradeWithVolume[], targetCenter = 1,
     };
 }
 
-async function analyzePoolVolume(poolName: string) {
+async function analyzePoolVolume(poolName: string, csvFilePath: string) {
     try {
         // Asynchronously read data file
-        const fileData = await fsPromises.readFile(`export/shadow_swaps_${poolName}_1742226431.csv`, 'utf-8');
+        const fileData = await fsPromises.readFile(csvFilePath, 'utf-8');
         
         // Parse CSV file
         const trades = parse(fileData, {
@@ -138,7 +138,11 @@ async function analyzePoolVolume(poolName: string) {
 
 const main = async () => {
     try {
-        await analyzePoolVolume('USDC.e_USDT');
+        await analyzePoolVolume('Shadow: USDC.e_USDT', 'export/shadow_swaps_USDC.e_USDT_1742226431.csv');
+
+        console.log('____________');
+
+        await analyzePoolVolume('SwapX: wstkscUSD/scUSD', 'export/swap_x_wstkscUSD.scUSD_1742246881.csv');
     } catch (error: any) {
         console.error(`Error: ${error?.message}`);
     }

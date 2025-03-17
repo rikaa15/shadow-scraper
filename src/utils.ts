@@ -25,7 +25,7 @@ function arrayToCSV(array: any[]) {
   ].join('\n');
 }
 
-export const exportToCSV = (
+export const exportArrayToCSV = (
   filename: string,
   items: any[]
 ) => {

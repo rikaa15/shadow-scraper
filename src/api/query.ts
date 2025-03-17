@@ -27,6 +27,13 @@ const buildWhereQuery = (filter: GetEventsFilter) => {
     }
   }
 
+  if(filter.timestamp_gt) {
+    transactionWhere = {
+      ...transactionWhere,
+      timestamp_gt: filter.timestamp_gt
+    }
+  }
+
   where = {
     ...where,
     transaction_: transactionWhere

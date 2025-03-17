@@ -11,6 +11,7 @@ export interface GetEventsFilter {
   poolSymbol?: string
   blockNumber_gt?: number
   blockNumber_lte?: number
+  timestamp_gt?: number
 }
 
 export interface GetEventsSort {

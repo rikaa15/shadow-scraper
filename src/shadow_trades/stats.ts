@@ -46,7 +46,7 @@ const main = async () => {
 
   console.log(`Price range for ${
     targetPercentage * 100
-  }% of trades (centered around $1): ${lowerBound.toFixed(6)} - ${upperBound} USDT per USDC.e, range=1+-${percentageDeviation.toFixed(4)}%`)
+  }% of trades (centered around $1) = 1+- ${percentageDeviation.toFixed(4)}%`)
 }
 
 main()

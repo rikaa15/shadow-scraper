@@ -1,6 +1,6 @@
 import moment from 'moment'
 import {ClSwap} from "../types";
-import {exportArrayToCSV} from "../utils";
+import {exportArrayToCSV, exportToJson} from "../utils";
 import {getSwapEvents} from "../api";
 
 const main = async () => {
@@ -33,7 +33,7 @@ const main = async () => {
 
   swaps.sort((a, b) => Number(a.transaction.blockNumber) - Number(b.transaction.blockNumber))
 
-  const csvItems = swaps.map(swap => {
+  const swapsCsv = swaps.map(swap => {
     return {
       txHash: swap.transaction.id,
       blockNumber: swap.transaction.blockNumber,
@@ -54,9 +54,10 @@ const main = async () => {
     poolSymbol.replace('/','_')
   }_${
     Math.round(Date.now() / 1000)
-  }.csv`
-  console.log(`Exporting to ${exportFileName}...`)
-  exportArrayToCSV(exportFileName, csvItems)
+  }`
+  console.log(`Total swaps: ${swaps.length}. Exporting to ${exportFileName}...`)
+  exportArrayToCSV(`${exportFileName}.csv`, swapsCsv)
+  await exportToJson(`${exportFileName}.jsonl`, swaps)
   console.log('Export complete! check' + exportFileName)
 }
 

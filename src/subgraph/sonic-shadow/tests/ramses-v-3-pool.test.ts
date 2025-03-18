@@ -7,10 +7,10 @@ import {
   afterAll
 } from "matchstick-as/assembly/index"
 import { Address, BigInt } from "@graphprotocol/graph-ts"
-import { Approval } from "../generated/schema"
-import { Approval as ApprovalEvent } from "../generated/NonfungiblePositionManager/NonfungiblePositionManager"
-import { handleApproval } from "../src/nonfungible-position-manager"
-import { createApprovalEvent } from "./nonfungible-position-manager-utils"
+import { Burn } from "../generated/schema"
+import { Burn as BurnEvent } from "../generated/RamsesV3Pool/RamsesV3Pool"
+import { handleBurn } from "../src/ramses-v-3-pool"
+import { createBurnEvent } from "./ramses-v-3-pool-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
@@ -18,12 +18,20 @@ import { createApprovalEvent } from "./nonfungible-position-manager-utils"
 describe("Describe entity assertions", () => {
   beforeAll(() => {
     let owner = Address.fromString("0x0000000000000000000000000000000000000001")
-    let approved = Address.fromString(
-      "0x0000000000000000000000000000000000000001"
+    let tickLower = 123
+    let tickUpper = 123
+    let amount = BigInt.fromI32(234)
+    let amount0 = BigInt.fromI32(234)
+    let amount1 = BigInt.fromI32(234)
+    let newBurnEvent = createBurnEvent(
+      owner,
+      tickLower,
+      tickUpper,
+      amount,
+      amount0,
+      amount1
     )
-    let tokenId = BigInt.fromI32(234)
-    let newApprovalEvent = createApprovalEvent(owner, approved, tokenId)
-    handleApproval(newApprovalEvent)
+    handleBurn(newBurnEvent)
   })
 
   afterAll(() => {
@@ -33,26 +41,44 @@ describe("Describe entity assertions", () => {
   // For more test scenarios, see:
   // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
 
-  test("Approval created and stored", () => {
-    assert.entityCount("Approval", 1)
+  test("Burn created and stored", () => {
+    assert.entityCount("Burn", 1)
 
     // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
     assert.fieldEquals(
-      "Approval",
+      "Burn",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "owner",
       "0x0000000000000000000000000000000000000001"
     )
     assert.fieldEquals(
-      "Approval",
+      "Burn",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "approved",
-      "0x0000000000000000000000000000000000000001"
+      "tickLower",
+      "123"
     )
     assert.fieldEquals(
-      "Approval",
+      "Burn",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "tokenId",
+      "tickUpper",
+      "123"
+    )
+    assert.fieldEquals(
+      "Burn",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "amount",
+      "234"
+    )
+    assert.fieldEquals(
+      "Burn",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "amount0",
+      "234"
+    )
+    assert.fieldEquals(
+      "Burn",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "amount1",
       "234"
     )
 

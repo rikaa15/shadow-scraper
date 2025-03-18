@@ -5,37 +5,46 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: NonfungiblePositionManager
+    name: RamsesV3Pool
     network: sonic
     source:
-      address: "0x12e66c8f215ddd5d48d150c8f46ad0c6fb0f4406"
-      abi: NonfungiblePositionManager
-      startBlock: 2141477
+      address: "0x324963c267c354c7660ce8ca3f5f167e05649970"
+      abi: RamsesV3Pool
+      startBlock: 1707308
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
+        - Burn
         - Collect
-        - DecreaseLiquidity
-        - IncreaseLiquidity
-        - Transfer
+        - CollectProtocol
+        - Flash
+        - IncreaseObservationCardinalityNext
+        - Initialize
+        - Mint
+        - SetFeeProtocol
+        - Swap
       abis:
-        - name: NonfungiblePositionManager
-          file: ./abis/NonfungiblePositionManager.json
+        - name: RamsesV3Pool
+          file: ./abis/RamsesV3Pool.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: Collect(indexed uint256,address,uint256,uint256)
+        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleBurn
+        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
           handler: handleCollect
-        - event: DecreaseLiquidity(indexed uint256,uint128,uint256,uint256)
-          handler: handleDecreaseLiquidity
-        - event: IncreaseLiquidity(indexed uint256,uint128,uint256,uint256)
-          handler: handleIncreaseLiquidity
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-      file: ./src/nonfungible-position-manager.ts
+        - event: CollectProtocol(indexed address,indexed address,uint128,uint128)
+          handler: handleCollectProtocol
+        - event: Flash(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleFlash
+        - event: IncreaseObservationCardinalityNext(uint16,uint16)
+          handler: handleIncreaseObservationCardinalityNext
+        - event: Initialize(uint160,int24)
+          handler: handleInitialize
+        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleMint
+        - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
+          handler: handleSetFeeProtocol
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+      file: ./src/ramses-v-3-pool.ts

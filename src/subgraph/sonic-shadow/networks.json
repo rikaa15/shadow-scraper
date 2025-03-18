@@ -1,8 +1,8 @@
 {
   "sonic": {
-    "NonfungiblePositionManager": {
-      "address": "0x12e66c8f215ddd5d48d150c8f46ad0c6fb0f4406",
-      "startBlock": 2141477
+    "RamsesV3Pool": {
+      "address": "0x324963c267c354c7660ce8ca3f5f167e05649970",
+      "startBlock": 1707308
     }
   }
 }

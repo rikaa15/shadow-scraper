@@ -1,0 +1,48 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: RamsesV3Pool
+    network: fantom
+    source:
+      address: "0x6fb30f3fcb864d49cdff15061ed5c6adfee40b40"
+      abi: RamsesV3Pool
+      startBlock: 1949593
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Burn
+        - Collect
+        - CollectProtocol
+        - Flash
+        - IncreaseObservationCardinalityNext
+        - Initialize
+        - Mint
+        - SetFeeProtocol
+        - Swap
+      abis:
+        - name: RamsesV3Pool
+          file: ./abis/RamsesV3Pool.json
+      eventHandlers:
+        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleBurn
+        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
+          handler: handleCollect
+        - event: CollectProtocol(indexed address,indexed address,uint128,uint128)
+          handler: handleCollectProtocol
+        - event: Flash(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleFlash
+        - event: IncreaseObservationCardinalityNext(uint16,uint16)
+          handler: handleIncreaseObservationCardinalityNext
+        - event: Initialize(uint160,int24)
+          handler: handleInitialize
+        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          handler: handleMint
+        - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
+          handler: handleSetFeeProtocol
+        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
+          handler: handleSwap
+      file: ./src/ramses-v-3-pool.ts

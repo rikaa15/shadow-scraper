@@ -29,7 +29,7 @@ type "sonic", select Sonic Mainnet · sonic
 Source ❯ Smart contract · default
 Subgraph slug › sonic-shadow
 Directory to create the subgraph in › sonic-shadow
-Contract address › 0x6Fb30F3FCB864D49cdff15061ed5c6ADFEE40B40
+Contract address › 0x324963c267c354c7660ce8ca3f5f167e05649970
 
  Fetching ABI from contract API...
 ✔ Fetching start block from contract API...
@@ -56,7 +56,7 @@ graph deploy sonic-shadow
 Deployed to https://thegraph.com/studio/subgraph/sonic-shadow
 
 Subgraph endpoints:
-Queries (HTTP):     https://api.studio.thegraph.com/query/91182/sonic-shadow/v0.0.1
+Queries (HTTP):     https://api.studio.thegraph.com/query/91182/sonic-shadow/v0.0.2
 ```
 
 6. Open the subgraph studio dashboard and check sync status

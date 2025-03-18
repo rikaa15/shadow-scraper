@@ -5,46 +5,37 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: RamsesV3Pool
+    name: RamsesV3Factory
     network: sonic
     source:
-      address: "0x6Fb30F3FCB864D49cdff15061ed5c6ADFEE40B40"
-      abi: RamsesV3Pool
-      startBlock: 1949593
+      address: "0xcD2d0637c94fe77C2896BbCBB174cefFb08DE6d7"
+      abi: RamsesV3Factory
+      startBlock: 1705781
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - Burn
-        - Collect
-        - CollectProtocol
-        - Flash
-        - IncreaseObservationCardinalityNext
-        - Initialize
-        - Mint
+        - FeeAdjustment
+        - FeeCollectorChanged
+        - PoolCreated
         - SetFeeProtocol
-        - Swap
+        - SetPoolFeeProtocol
+        - TickSpacingEnabled
       abis:
-        - name: RamsesV3Pool
-          file: ./abis/RamsesV3Pool.json
+        - name: RamsesV3Factory
+          file: ./abis/RamsesV3Factory.json
       eventHandlers:
-        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          handler: handleBurn
-        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
-          handler: handleCollect
-        - event: CollectProtocol(indexed address,indexed address,uint128,uint128)
-          handler: handleCollectProtocol
-        - event: Flash(indexed address,indexed address,uint256,uint256,uint256,uint256)
-          handler: handleFlash
-        - event: IncreaseObservationCardinalityNext(uint16,uint16)
-          handler: handleIncreaseObservationCardinalityNext
-        - event: Initialize(uint160,int24)
-          handler: handleInitialize
-        - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          handler: handleMint
-        - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
+        - event: FeeAdjustment(address,uint24)
+          handler: handleFeeAdjustment
+        - event: FeeCollectorChanged(indexed address,indexed address)
+          handler: handleFeeCollectorChanged
+        - event: PoolCreated(indexed address,indexed address,indexed uint24,int24,address)
+          handler: handlePoolCreated
+        - event: SetFeeProtocol(uint8,uint8)
           handler: handleSetFeeProtocol
-        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
-          handler: handleSwap
-      file: ./src/ramses-v-3-pool.ts
+        - event: SetPoolFeeProtocol(address,uint8,uint8)
+          handler: handleSetPoolFeeProtocol
+        - event: TickSpacingEnabled(indexed int24,indexed uint24)
+          handler: handleTickSpacingEnabled
+      file: ./src/ramses-v-3-factory.ts

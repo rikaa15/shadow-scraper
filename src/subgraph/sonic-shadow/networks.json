@@ -1,8 +1,8 @@
 {
   "sonic": {
-    "RamsesV3Pool": {
-      "address": "0x6Fb30F3FCB864D49cdff15061ed5c6ADFEE40B40",
-      "startBlock": 1949593
+    "RamsesV3Factory": {
+      "address": "0xcD2d0637c94fe77C2896BbCBB174cefFb08DE6d7",
+      "startBlock": 1705781
     }
   }
 }

@@ -5,37 +5,37 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: RamsesV3Factory
+    name: NonfungiblePositionManager
     network: sonic
     source:
-      address: "0xcD2d0637c94fe77C2896BbCBB174cefFb08DE6d7"
-      abi: RamsesV3Factory
-      startBlock: 1705781
+      address: "0x12e66c8f215ddd5d48d150c8f46ad0c6fb0f4406"
+      abi: NonfungiblePositionManager
+      startBlock: 2141477
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - FeeAdjustment
-        - FeeCollectorChanged
-        - PoolCreated
-        - SetFeeProtocol
-        - SetPoolFeeProtocol
-        - TickSpacingEnabled
+        - Approval
+        - ApprovalForAll
+        - Collect
+        - DecreaseLiquidity
+        - IncreaseLiquidity
+        - Transfer
       abis:
-        - name: RamsesV3Factory
-          file: ./abis/RamsesV3Factory.json
+        - name: NonfungiblePositionManager
+          file: ./abis/NonfungiblePositionManager.json
       eventHandlers:
-        - event: FeeAdjustment(address,uint24)
-          handler: handleFeeAdjustment
-        - event: FeeCollectorChanged(indexed address,indexed address)
-          handler: handleFeeCollectorChanged
-        - event: PoolCreated(indexed address,indexed address,indexed uint24,int24,address)
-          handler: handlePoolCreated
-        - event: SetFeeProtocol(uint8,uint8)
-          handler: handleSetFeeProtocol
-        - event: SetPoolFeeProtocol(address,uint8,uint8)
-          handler: handleSetPoolFeeProtocol
-        - event: TickSpacingEnabled(indexed int24,indexed uint24)
-          handler: handleTickSpacingEnabled
-      file: ./src/ramses-v-3-factory.ts
+        - event: Approval(indexed address,indexed address,indexed uint256)
+          handler: handleApproval
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: Collect(indexed uint256,address,uint256,uint256)
+          handler: handleCollect
+        - event: DecreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleDecreaseLiquidity
+        - event: IncreaseLiquidity(indexed uint256,uint128,uint256,uint256)
+          handler: handleIncreaseLiquidity
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/nonfungible-position-manager.ts

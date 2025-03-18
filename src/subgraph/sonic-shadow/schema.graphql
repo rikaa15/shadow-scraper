@@ -1,56 +1,61 @@
-type FeeAdjustment @entity(immutable: true) {
+type Approval @entity(immutable: true) {
   id: Bytes!
-  pool: Bytes! # address
-  newFee: Int! # uint24
+  owner: Bytes! # address
+  approved: Bytes! # address
+  tokenId: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type FeeCollectorChanged @entity(immutable: true) {
+type ApprovalForAll @entity(immutable: true) {
   id: Bytes!
-  oldFeeCollector: Bytes! # address
-  newFeeCollector: Bytes! # address
+  owner: Bytes! # address
+  operator: Bytes! # address
+  approved: Boolean! # bool
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type PoolCreated @entity(immutable: true) {
+type Collect @entity(immutable: true) {
   id: Bytes!
-  token0: Bytes! # address
-  token1: Bytes! # address
-  fee: Int! # uint24
-  tickSpacing: Int! # int24
-  pool: Bytes! # address
+  tokenId: BigInt! # uint256
+  recipient: Bytes! # address
+  amount0: BigInt! # uint256
+  amount1: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type SetFeeProtocol @entity(immutable: true) {
+type DecreaseLiquidity @entity(immutable: true) {
   id: Bytes!
-  feeProtocolOld: Int! # uint8
-  feeProtocolNew: Int! # uint8
+  tokenId: BigInt! # uint256
+  liquidity: BigInt! # uint128
+  amount0: BigInt! # uint256
+  amount1: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type SetPoolFeeProtocol @entity(immutable: true) {
+type IncreaseLiquidity @entity(immutable: true) {
   id: Bytes!
-  pool: Bytes! # address
-  feeProtocolOld: Int! # uint8
-  feeProtocolNew: Int! # uint8
+  tokenId: BigInt! # uint256
+  liquidity: BigInt! # uint128
+  amount0: BigInt! # uint256
+  amount1: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type TickSpacingEnabled @entity(immutable: true) {
+type Transfer @entity(immutable: true) {
   id: Bytes!
-  tickSpacing: Int! # int24
-  fee: Int! # uint24
+  from: Bytes! # address
+  to: Bytes! # address
+  tokenId: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

@@ -168,9 +168,8 @@ export function createIncreaseObservationCardinalityNextEvent(
   observationCardinalityNextOld: i32,
   observationCardinalityNextNew: i32
 ): IncreaseObservationCardinalityNext {
-  let increaseObservationCardinalityNextEvent = changetype<
-    IncreaseObservationCardinalityNext
-  >(newMockEvent())
+  let increaseObservationCardinalityNextEvent =
+    changetype<IncreaseObservationCardinalityNext>(newMockEvent())
 
   increaseObservationCardinalityNextEvent.parameters = new Array()
 

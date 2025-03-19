@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import Decimal from "decimal.js";
+import {PortfolioItem} from "../index";
 const PoolsList = require('./poolsList.json');
 const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
 const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
@@ -33,42 +34,39 @@ export const getInfo = async (
     .flat()
     .filter((item: any) => item.addresss !== '');
 
-  let poolsWithRewards = await Promise.all(
+  let poolsWithRewards: PortfolioItem[] = await Promise.all(
     v3Pools.map(async (v3Pool: any) => {
       try {
         const { address: v3PoolAddress, token0, token1 } = v3Pool
         const poolContract = new ethers.Contract(v3PoolAddress, SwapXPoolABI, provider);
-        const rewardsAmount = await poolContract.earned(userAddress);
-        const rewardTokenAddress = await poolContract.rewardToken()
+        const reward = await poolContract.earned(userAddress);
+        const rewardAddress = await poolContract.rewardToken()
 
-        const rewardTokenContract = new ethers.Contract(rewardTokenAddress, SwapXRewardsTokenABI, provider);
-        const rewardTokenSymbol = await rewardTokenContract.symbol()
+        const rewardTokenContract = new ethers.Contract(rewardAddress, SwapXRewardsTokenABI, provider);
+        const rewardToken = await rewardTokenContract.symbol()
         const decimals = Number(await rewardTokenContract.decimals())
-        const rewardsAmountFormatted = new Decimal(rewardsAmount)
+        const rewardFormatted = new Decimal(reward)
           .div(Math.pow(10, decimals))
           .toString()
 
         const poolName = `${token0.symbol}/${token1.symbol}`
 
         return {
-          poolAddress: v3PoolAddress,
-          poolName,
-          rewardsAmount,
-          rewardsAmountFormatted,
-          rewardTokenAddress,
-          rewardTokenSymbol
+          type: 'SwapX CL',
+          address: v3PoolAddress,
+          name: poolName,
+          rewardAmount: rewardFormatted,
+          rewardAddress,
+          rewardToken
         }
       } catch (e) {
-        // console.error("Error:", e)
-        return {
-          // @ts-ignore
-          rewardsAmount: 0n
-        }
+        return null
       }
     })
   )
-  // @ts-ignore
-  poolsWithRewards = poolsWithRewards.filter((item: any) => item.rewardsAmount > 0n)
+
+  poolsWithRewards = poolsWithRewards
+    .filter((item) => Boolean(item) && Number(item.rewardAmount) > 0)
 
   return poolsWithRewards
 

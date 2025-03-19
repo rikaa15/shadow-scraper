@@ -1,6 +1,17 @@
+import clipboardy from 'clipboardy';
 import {getInfo} from "./swapx";
+import {arrayToTSV} from "../utils";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
+
+export interface PortfolioItem {
+  type: string
+  address: string
+  name: string
+  rewardAmount: string
+  rewardToken: string
+  rewardAddress: string
+}
 
 const main = async () => {
   try {
@@ -10,13 +21,18 @@ const main = async () => {
     // })
 
     const userAddress = process.env.npm_config_useraddress || ''
+    // const headless = Boolean(process.env.npm_config_headless) || false
     if(!userAddress) {
       console.log(`No userAddress set. Usage example: npm run portfolio --userAddress=0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A.`)
       process.exit(1)
     }
 
     const swapXPools = await getInfo(userAddress)
-    console.log(`User address: ${userAddress}, swapX pools with rewards:`, swapXPools)
+    const tsv = arrayToTSV(swapXPools)
+    console.log(tsv)
+    clipboardy.writeSync(tsv);
+
+
   } catch (e) {
     console.error('failed to get portfolio data', e)
   }

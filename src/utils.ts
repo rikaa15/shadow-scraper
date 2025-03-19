@@ -32,3 +32,32 @@ export const exportArrayToCSV = (
   const csv = arrayToCSV(items)
   fs.writeFileSync(filename, csv, 'utf8');
 }
+
+export const arrayToTSV = <T extends Record<string, any>>(
+  data: T[],
+  columns?: string[]
+) => {
+  if (!data || data.length === 0) {
+    return '';
+  }
+  const headers = columns || Object.keys(data[0]);
+  const headerRow = headers.join('\t');
+
+  const rows = data.map((item) => {
+    return headers
+      .map((key) => {
+        const value = item[key] ?? '';
+        let strValue = String(value)
+          .replace(/\t/g, '\\t')
+          .replace(/\n/g, '\\n');
+        if (strValue.includes('"')) {
+          strValue = `"${strValue.replace(/"/g, '""')}"`;
+        }
+        return strValue;
+      })
+      .join('\t');
+  });
+
+  // Combine header and rows with newlines
+  return headerRow + '\n' + rows.join('\n');
+}

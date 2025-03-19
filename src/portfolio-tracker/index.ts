@@ -8,9 +8,10 @@ export interface PortfolioItem {
   type: string
   address: string
   name: string
-  rewardAmount: string
+  balance: string
+  reward: string
   rewardToken: string
-  rewardAddress: string
+  rewardSymbol: string
 }
 
 const main = async () => {
@@ -31,8 +32,6 @@ const main = async () => {
     const tsv = arrayToTSV(swapXPools)
     console.log(tsv)
     clipboardy.writeSync(tsv);
-
-
   } catch (e) {
     console.error('failed to get portfolio data', e)
   }

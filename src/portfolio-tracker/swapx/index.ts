@@ -39,25 +39,22 @@ export const getInfo = async (
       try {
         const { address: v3PoolAddress, token0, token1 } = v3Pool
         const poolContract = new ethers.Contract(v3PoolAddress, SwapXPoolABI, provider);
+        const balance = await poolContract.balanceOf(userAddress);
         const reward = await poolContract.earned(userAddress);
         const rewardAddress = await poolContract.rewardToken()
 
         const rewardTokenContract = new ethers.Contract(rewardAddress, SwapXRewardsTokenABI, provider);
-        const rewardToken = await rewardTokenContract.symbol()
+        const rewardSymbol = await rewardTokenContract.symbol()
         const decimals = Number(await rewardTokenContract.decimals())
-        const rewardFormatted = new Decimal(reward)
-          .div(Math.pow(10, decimals))
-          .toString()
-
         const poolName = `${token0.symbol}/${token1.symbol}`
-
         return {
-          type: 'SwapX CL',
+          type: 'SwapX CL Pool',
           address: v3PoolAddress,
           name: poolName,
-          rewardAmount: rewardFormatted,
+          balance: new Decimal(balance).div(Math.pow(10, 18)).toFixed(),
+          reward: new Decimal(reward).div(Math.pow(10, decimals)).toFixed(),
           rewardAddress,
-          rewardToken
+          rewardSymbol
         }
       } catch (e) {
         return null
@@ -66,7 +63,9 @@ export const getInfo = async (
   )
 
   poolsWithRewards = poolsWithRewards
-    .filter((item) => Boolean(item) && Number(item.rewardAmount) > 0)
+    .filter((item) => Boolean(item)
+      && ((Number(item.balance) > 0) || (Number(item.reward) > 0))
+    )
 
   return poolsWithRewards
 

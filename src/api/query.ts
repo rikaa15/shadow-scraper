@@ -34,6 +34,20 @@ const buildWhereQuery = (filter: GetEventsFilter) => {
     }
   }
 
+  if(filter.owner) {
+    where = {
+      ...where,
+      owner: filter.owner
+    }
+  }
+
+  if(typeof filter.liquidity_gt !== undefined) {
+    where = {
+      ...where,
+      liquidity_gt: filter.liquidity_gt
+    }
+  }
+
   where = {
     ...where,
     transaction_: transactionWhere
@@ -183,6 +197,40 @@ export const getSwapsQuery = (params: GetEventsParams) => {
         id
         symbol
       }
+    }
+  }`
+}
+
+export const getPositionsQuery = (params: GetEventsParams) => {
+  const { first = 1000, skip = 0, filter = {}, sort = {} } = params
+
+  const whereQuery = buildWhereQuery(filter)
+  const orderDirection = sort.orderDirection || 'asc'
+  const orderBy = sort.orderBy || 'transaction__blockNumber'
+
+  return `{
+    clPositions (
+      first: ${first}
+      orderDirection: ${orderDirection},
+      orderBy: ${orderBy},
+      where: ${whereQuery}
+    ) {
+      id
+      feeGrowthInside0LastX128
+      feeGrowthInside1LastX128
+      liquidity
+      tickLower { feeGrowthOutside0X128 feeGrowthOutside1X128 }
+      tickUpper { feeGrowthOutside0X128 feeGrowthOutside1X128 }
+      pool {
+        id
+        symbol
+        token0 { symbol decimals }
+        token1 { symbol decimals }
+        feeGrowthGlobal0X128
+        feeGrowthGlobal1X128
+      }
+      token0 { symbol decimals }
+      token1 { symbol decimals }
     }
   }`
 }

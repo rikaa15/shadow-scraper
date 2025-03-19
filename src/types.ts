@@ -8,7 +8,14 @@ export interface Transaction {
 
 export interface ClPool {
   id: string
+  createdAtTimestamp: string
+  createdAtBlockNumber: string
+  token0: Token
+  token1: Token
   symbol: string
+  liquidity: string
+  feeGrowthGlobal0X128: string
+  feeGrowthGlobal1X128: string
 }
 
 export interface Token {
@@ -117,3 +124,42 @@ export interface ClSwapExtended extends ClSwap {
 
 export type EventType = 'mint' | 'burn' | 'swap'
 
+export interface Tick {
+  id: string
+  poolAddress: string
+  tickIdx: string
+  pool: ClPool
+  liquidityGross: string
+  liquidityNet: string
+  price0: string
+  price1: string
+  volumeToken0: string
+  volumeToken1: string
+  volumeUSD: string
+  untrackedVolumeUSD: string
+  feesUSD: string
+  collectedFeesToken0: string
+  collectedFeesToken1: string
+  collectedFeesUSD: string
+  createdAtTimestamp: string
+  createdAtBlockNumber: string
+  liquidityProviderCount: string
+  feeGrowthOutside0X128: string
+  feeGrowthOutside1X128: string
+}
+
+export interface ClPosition {
+  id: string
+  owner: string
+  pool: ClPool
+  token0: Token
+  token1: Token
+  tickLower: Tick
+  tickUpper: Tick
+  liquidity: string
+  depositedToken0: string
+  depositedToken1: string
+  transaction: Transaction
+  feeGrowthInside0LastX128: string
+  feeGrowthInside1LastX128: string
+}

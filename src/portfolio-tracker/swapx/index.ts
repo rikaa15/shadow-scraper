@@ -13,7 +13,7 @@ const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 // https://subgraph.satsuma-prod.com/fd5b99ed1c6a/swapx--800812/swapx-big/api
 
-export const getInfo = async (
+export const getSwapXInfo = async (
   userAddress: string
 ) => {
   const v3Pools = PoolsList
@@ -44,18 +44,21 @@ export const getInfo = async (
         const rewardAddress = await poolContract.rewardToken()
 
         const rewardTokenContract = new ethers.Contract(rewardAddress, SwapXRewardsTokenABI, provider);
-        const rewardSymbol = await rewardTokenContract.symbol()
+        const token0Symbol = await rewardTokenContract.symbol()
         const decimals = Number(await rewardTokenContract.decimals())
         const poolName = `${token0.symbol}/${token1.symbol}`
-        return {
+        const portfolioItem: PortfolioItem = {
           type: 'SwapX CL Pool',
           address: v3PoolAddress,
           name: poolName,
-          balance: new Decimal(balance).div(Math.pow(10, 18)).toFixed(),
-          reward: new Decimal(reward).div(Math.pow(10, decimals)).toFixed(),
-          rewardAddress,
-          rewardSymbol
+          balance0: new Decimal(balance).div(Math.pow(10, 18)).toFixed(),
+          balance1: '0',
+          token0Reward: new Decimal(reward).div(Math.pow(10, decimals)).toFixed(),
+          token0Symbol,
+          token1Reward: '0',
+          token1Symbol: ''
         }
+        return portfolioItem
       } catch (e) {
         return null
       }
@@ -64,7 +67,7 @@ export const getInfo = async (
 
   poolsWithRewards = poolsWithRewards
     .filter((item) => Boolean(item)
-      && ((Number(item.balance) > 0) || (Number(item.reward) > 0))
+      && ((Number(item.balance0) > 0) || (Number(item.token0Reward) > 0))
     )
 
   return poolsWithRewards

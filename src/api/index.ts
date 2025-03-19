@@ -1,6 +1,6 @@
 import axios from "axios";
-import {getBurnsQuery, getMintsQuery, getSwapsQuery} from "./query";
-import {ClBurn, ClMint, ClSwap} from "../types";
+import {getBurnsQuery, getMintsQuery, getPositionsQuery, getSwapsQuery} from "./query";
+import {ClBurn, ClMint, ClPosition, ClSwap} from "../types";
 import {appConfig} from "../config";
 
 const client = axios.create({
@@ -12,6 +12,8 @@ export interface GetEventsFilter {
   blockNumber_gt?: number
   blockNumber_lte?: number
   timestamp_gt?: number
+  owner?: string
+  liquidity_gt?: number
 }
 
 export interface GetEventsSort {
@@ -57,4 +59,15 @@ export const getSwapEvents = async (params: GetEventsParams) => {
     query: getSwapsQuery(params)
   })
   return data.data.clSwaps
+}
+
+export const getPositions = async (params: GetEventsParams) => {
+  const { data } = await client.post<{
+    data: {
+      clPositions: ClPosition[]
+    }
+  }>('/', {
+    query: getPositionsQuery(params)
+  })
+  return data.data.clPositions
 }

@@ -15,30 +15,40 @@ const tokenAddresses = [
   '0x5050bc082FF4A74Fb6B0B04385dEfdDB114b2424', // xShadow
   '0x3333111A391cC08fa51353E9195526A70b333333', // x33
   '0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70', // SWPx
+  '0x80eede496655fb9047dd39d9f418d5483ed600df', // ftxUSD
+  '0x50c42deacd8fc9773493ed674b675be577f2634b', // WETH
 ]
 
 export const getTokensInfo = async (
   userAddress: string
 ) => {
-  const portfolioItems: PortfolioItem[] = []
   const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
-  for (const tokenAddress of tokenAddresses) {
-    const tokenContract = new ethers.Contract(tokenAddress, ERC20ABI, provider);
-    const balance = await tokenContract.balanceOf(userAddress)
-    if(balance > 0) {
-      const symbol = await tokenContract.symbol()
-      const decimals = Number(await tokenContract.decimals())
-      portfolioItems.push({
-        type: 'ERC20',
-        address: tokenAddress,
-        name: symbol,
-        balance: new Decimal(balance.toString()).div(Math.pow(10, decimals)).toFixed(),
-        rewardAmount: '-',
-        rewardSymbol: '-',
-      })
-    }
-  }
+  const portfolioItems = await Promise.all(
+    tokenAddresses.map(async (tokenAddress) => {
+      try {
+        const tokenContract = new ethers.Contract(tokenAddress, ERC20ABI, provider);
+        const balance = await tokenContract.balanceOf(userAddress)
+        if(balance > 0) {
+          const symbol = await tokenContract.symbol()
+          const decimals = Number(await tokenContract.decimals())
+          return {
+            type: 'ERC20',
+            address: tokenAddress,
+            name: symbol,
+            balance: new Decimal(balance.toString()).div(Math.pow(10, decimals)).toFixed(),
+            rewardAmount: '-',
+            rewardSymbol: '-',
+          }
+        } else {
+          return null
+        }
+      } catch (e) {
+        console.error(`failed to get token ${tokenAddress} info:`, e)
+      }
+    })
+  )
 
   return portfolioItems
+    .filter(_ => _) as PortfolioItem[]
 }

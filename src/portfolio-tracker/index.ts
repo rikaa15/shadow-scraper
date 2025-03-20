@@ -4,6 +4,7 @@ import {arrayToTSV} from "../utils";
 import Decimal from "decimal.js";
 import {getShadowInfo} from "./shadow";
 import {getTokensInfo} from "./tokens";
+import fs from "fs";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -34,6 +35,9 @@ const main = async () => {
     if(copyToClipboard) {
       clipboardy.writeSync(tsv);
     }
+    const filename = `export/portfolio_${userAddress}_${Math.round(Date.now() / 1000)}.tsv`
+    fs.writeFileSync(filename, tsv, 'utf8');
+    console.log(`${filename} created successfully`)
   } catch (e) {
     console.error('failed to get portfolio data', e)
   }

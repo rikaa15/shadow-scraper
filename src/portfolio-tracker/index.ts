@@ -3,6 +3,7 @@ import {getSwapXInfo} from "./swapx";
 import {arrayToTSV} from "../utils";
 import Decimal from "decimal.js";
 import {getShadowInfo} from "./shadow";
+import {getTokensInfo} from "./tokens";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -24,10 +25,11 @@ const main = async () => {
       process.exit(1)
     }
 
-    const swapXInfo = await getSwapXInfo(userAddress)
+    const tokensInfo = await getTokensInfo(userAddress)
     const shadowInfo = await getShadowInfo(userAddress)
+    const swapXInfo = await getSwapXInfo(userAddress)
 
-    const tsv = arrayToTSV([...swapXInfo, ...shadowInfo])
+    const tsv = arrayToTSV([...tokensInfo, ...swapXInfo, ...shadowInfo])
     console.log(tsv)
     if(copyToClipboard) {
       clipboardy.writeSync(tsv);

@@ -49,12 +49,15 @@ export const getShadowInfo = async (
         const rewardTokenContract = new ethers.Contract(rewardToken, ERC20ABI, provider);
         const rewardSymbol = await rewardTokenContract.symbol()
         const rewardDecimals = Number(await rewardTokenContract.decimals())
+        const rewardAmount = new Decimal(earned.toString())
+          .div(Math.pow(10, rewardDecimals))
+          .toFixed()
         portfolioItems.push({
           type: 'Shadow CL Pool',
           address: pool.id,
           name: pool.symbol,
           balance: '0',
-          rewardAmount: new Decimal(earned.toString()).div(Math.pow(10, rewardDecimals)).toFixed(),
+          rewardAmount,
           rewardSymbol: rewardSymbol,
         })
       }

@@ -10,12 +10,9 @@ export interface PortfolioItem {
   type: string
   address: string
   name: string
-  balance0: string
-  balance1: string
-  token0Reward: string
-  token0Symbol: string
-  token1Reward: string
-  token1Symbol: string
+  balance: string
+  rewardAmount: string
+  rewardSymbol: string
 }
 
 const main = async () => {

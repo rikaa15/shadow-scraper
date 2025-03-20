@@ -231,6 +231,8 @@ export const getPositionsQuery = (params: GetEventsParams) => {
       }
       token0 { symbol decimals }
       token1 { symbol decimals }
+      tickLower { tickIdx }
+      tickUpper { tickIdx }
     }
   }`
 }

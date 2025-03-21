@@ -34,11 +34,14 @@ export const getTokensInfo = async (
           const decimals = Number(await tokenContract.decimals())
           return {
             type: 'ERC20',
+            asset: `${symbol}`,
             address: tokenAddress,
-            name: symbol,
-            balance: new Decimal(balance.toString()).div(Math.pow(10, decimals)).toFixed(),
-            rewardAmount: '-',
-            rewardSymbol: '-',
+            balance: new Decimal(balance.toString())
+              .div(Math.pow(10, decimals))
+              .toDecimalPlaces(6)
+              .toString(),
+            value: '',
+            price: ''
           }
         } else {
           return null

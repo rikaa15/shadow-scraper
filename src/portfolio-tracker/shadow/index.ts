@@ -42,11 +42,11 @@ export const getShadowInfo = async (
     const { id: positionId, pool } = position
 
     const rewardTokens = (await gaugeContract.getRewardTokens()) as string[]
-    for(const rewardToken of rewardTokens) {
-      const earned = await gaugeContract.earned(rewardToken, positionId) as bigint
+    for(const tokenAddress of rewardTokens) {
+      const earned = await gaugeContract.earned(tokenAddress, positionId) as bigint
 
       if(earned > 0) {
-        const rewardTokenContract = new ethers.Contract(rewardToken, ERC20ABI, provider);
+        const rewardTokenContract = new ethers.Contract(tokenAddress, ERC20ABI, provider);
         const symbol = await rewardTokenContract.symbol()
         const decimals = Number(await rewardTokenContract.decimals())
         const balance = new Decimal(earned.toString())
@@ -56,10 +56,11 @@ export const getShadowInfo = async (
         portfolioItems.push({
           type: `Pending Reward (Shadow ${pool.symbol})`,
           asset: symbol,
-          address: rewardToken,
+          address: tokenAddress,
           balance,
           price: '',
           value: '',
+          link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
         })
       }
     }

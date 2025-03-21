@@ -41,19 +41,20 @@ export const getSwapXInfo = async (
         const poolContract = new ethers.Contract(v3PoolAddress, SwapXPoolABI, provider);
         // const balance = await poolContract.balanceOf(userAddress);
         const reward = await poolContract.earned(userAddress);
-        const rewardAddress = await poolContract.rewardToken()
+        const tokenAddress = await poolContract.rewardToken()
 
-        const rewardTokenContract = new ethers.Contract(rewardAddress, SwapXRewardsTokenABI, provider);
+        const rewardTokenContract = new ethers.Contract(tokenAddress, SwapXRewardsTokenABI, provider);
         const symbol = await rewardTokenContract.symbol()
         const decimals = Number(await rewardTokenContract.decimals())
         const poolName = `${token0.symbol}/${token1.symbol}`
         const portfolioItem: PortfolioItem = {
           type: `Pending Reward (SwapX ${poolName})`,
           asset: symbol,
-          address: rewardAddress,
+          address: tokenAddress,
           balance: new Decimal(reward).div(Math.pow(10, decimals)).toDecimalPlaces(6).toString(),
           price: '',
           value: '',
+          link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
         }
         return portfolioItem
       } catch (e) {

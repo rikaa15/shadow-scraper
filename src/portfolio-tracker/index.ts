@@ -15,10 +15,11 @@ export interface PortfolioItem {
   price: string // USD price
   value: string // value in USD
   type: string
+  link: string
 }
 
 const portfolioItemsOrder: Array<keyof PortfolioItem> = [
-  'asset', 'address',  'price', 'balance', 'value', 'type'
+  'asset', 'address',  'price', 'balance', 'value', 'type', 'link'
 ]
 
 const main = async () => {

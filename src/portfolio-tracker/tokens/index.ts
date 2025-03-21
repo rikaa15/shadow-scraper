@@ -41,7 +41,8 @@ export const getTokensInfo = async (
               .toDecimalPlaces(6)
               .toString(),
             value: '',
-            price: ''
+            price: '',
+            link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
           }
         } else {
           return null

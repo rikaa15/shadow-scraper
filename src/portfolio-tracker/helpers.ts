@@ -10,6 +10,8 @@ const CoinGeckoTokenIdsMap: Record<string, string> = {
   'scusd': 'rings-scusd',
   'shadow': 'shadow-2',
   'x33': 'shadow-liquid-staking-token',
+  'frxusd': 'frax-usd',
+  'weth': 'weth'
 }
 
 export const setUSDValues = async (

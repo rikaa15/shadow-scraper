@@ -1,7 +1,7 @@
 // https://ethereum.stackexchange.com/questions/101955/trying-to-make-sense-of-uniswap-v3-fees-feegrowthinside0lastx128-feegrowthglob
 import axios from "axios";
 import Decimal from "decimal.js";
-import {getPositions} from "../../api";
+import {getPositions, getGaugeRewardClaims} from "../../api";
 import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
@@ -34,12 +34,45 @@ export const getShadowInfo = async (
     }
   })
 
+  // const rewardClaims = await getGaugeRewardClaims({
+  //   filter: {
+  //     transaction_from: userAddress,
+  //     gauge_isAlive: true
+  //   }
+  // })
+
+  const portfolioItems: PortfolioItem[] = []
   const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
   const gaugeContract = new ethers.Contract('0xe879d0e44e6873cf4ab71686055a4f6817685f02', GaugeV3ABI, provider);
-  const portfolioItems: PortfolioItem[] = []
+
+  // let portfolioFromRewards: Record<string, PortfolioItem> = {}
+  //
+  // for(const rewardClaim of rewardClaims) {
+  //   const { nfpPositionHash, rewardAmount, rewardToken, gauge: { pool } } = rewardClaim
+  //
+  //   const key = `${nfpPositionHash}_${rewardToken.id}`
+  //   const existedItem = portfolioFromRewards[key]
+  //   if(!existedItem) {
+  //     portfolioFromRewards[key] = {
+  //       asset: `CL${pool.symbol}`,
+  //       address: rewardToken.id,
+  //       balance: rewardAmount,
+  //       price: '', // USD price
+  //       value: '', // value in USD
+  //       time: '', // only for pools
+  //       type: `Liquidity (Shadow)`,
+  //       link: `https://vfat.io/token?chainId=146&tokenAddress=${rewardToken.id}`
+  //     }
+  //   } else {
+  //     portfolioFromRewards[key] = {
+  //       ...existedItem,
+  //       balance: new Decimal(existedItem.balance).add(rewardAmount).toFixed()
+  //     }
+  //   }
+  // }
 
   for (const position of positions) {
-    const { id: positionId, pool } = position
+    const { id: positionId, pool, transaction } = position
 
     const rewardTokens = (await gaugeContract.getRewardTokens()) as string[]
     for(const tokenAddress of rewardTokens) {
@@ -60,6 +93,7 @@ export const getShadowInfo = async (
           balance,
           price: '',
           value: '',
+          time: transaction.timestamp,
           link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
         })
       }

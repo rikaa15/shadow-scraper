@@ -14,6 +14,7 @@ export interface PortfolioItem {
   balance: string
   price: string // USD price
   value: string // value in USD
+  time: string // only for pools
   type: string
   link: string
 }

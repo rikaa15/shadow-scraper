@@ -42,6 +42,7 @@ export const getTokensInfo = async (
               .toString(),
             value: '',
             price: '',
+            time: '',
             link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
           }
         } else {

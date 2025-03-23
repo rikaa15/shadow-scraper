@@ -3,6 +3,7 @@ import {GetEventsFilter, GetEventsParams} from "./index";
 const buildWhereQuery = (filter: GetEventsFilter) => {
   let where: any = {}
   let transactionWhere = {}
+  let gaugeWhere = {}
 
   if(filter.poolSymbol) {
     where = {
@@ -34,6 +35,20 @@ const buildWhereQuery = (filter: GetEventsFilter) => {
     }
   }
 
+  if(filter.transaction_from) {
+    transactionWhere = {
+      ...transactionWhere,
+      from: filter.transaction_from
+    }
+  }
+
+  if(filter.gauge_isAlive) {
+    gaugeWhere = {
+      ...gaugeWhere,
+      isAlive: filter.gauge_isAlive
+    }
+  }
+
   if(filter.owner) {
     where = {
       ...where,
@@ -50,7 +65,14 @@ const buildWhereQuery = (filter: GetEventsFilter) => {
 
   where = {
     ...where,
-    transaction_: transactionWhere
+    transaction_: transactionWhere,
+  }
+
+  if(Object.keys(gaugeWhere).length > 0) {
+    where = {
+      ...where,
+      gauge_: gaugeWhere
+    }
   }
 
   return buildFilterQuery(where)
@@ -216,6 +238,7 @@ export const getPositionsQuery = (params: GetEventsParams) => {
       where: ${whereQuery}
     ) {
       id
+      transaction { id from to blockNumber timestamp }
       feeGrowthInside0LastX128
       feeGrowthInside1LastX128
       liquidity
@@ -233,6 +256,37 @@ export const getPositionsQuery = (params: GetEventsParams) => {
       token1 { symbol decimals }
       tickLower { tickIdx }
       tickUpper { tickIdx }
+    }
+  }`
+}
+
+export const getGaugeRewardClaimsQuery = (params: GetEventsParams) => {
+  const { first = 1000, skip = 0, filter = {}, sort = {} } = params
+
+  const whereQuery = buildWhereQuery(filter)
+  const orderDirection = sort.orderDirection || 'asc'
+  const orderBy = sort.orderBy || 'transaction__blockNumber'
+
+  return `{
+    gaugeRewardClaims (
+      first: ${first}
+      orderDirection: ${orderDirection},
+      orderBy: ${orderBy},
+      where: ${whereQuery}
+    ) {
+      id
+      gauge {
+        clPool {
+          id symbol
+          token0 { id symbol name } token1 { id symbol name }
+        }
+      }
+      transaction { id from to blockNumber timestamp }
+      nfpPositionHash
+      rewardToken { id symbol name }
+      rewardAmount
+      period
+      timestamp
     }
   }`
 }

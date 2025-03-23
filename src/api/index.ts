@@ -1,6 +1,6 @@
 import axios from "axios";
-import {getBurnsQuery, getMintsQuery, getPositionsQuery, getSwapsQuery} from "./query";
-import {ClBurn, ClMint, ClPosition, ClSwap} from "../types";
+import {getBurnsQuery, getGaugeRewardClaimsQuery, getMintsQuery, getPositionsQuery, getSwapsQuery} from "./query";
+import {ClBurn, ClMint, ClPosition, ClSwap, GaugeRewardClaim} from "../types";
 import {appConfig} from "../config";
 
 const client = axios.create({
@@ -14,6 +14,8 @@ export interface GetEventsFilter {
   timestamp_gt?: number
   owner?: string
   liquidity_gt?: number
+  transaction_from?: string
+  gauge_isAlive?: boolean
 }
 
 export interface GetEventsSort {
@@ -70,4 +72,15 @@ export const getPositions = async (params: GetEventsParams) => {
     query: getPositionsQuery(params)
   })
   return data.data.clPositions
+}
+
+export const getGaugeRewardClaims = async (params: GetEventsParams) => {
+  const { data } = await client.post<{
+    data: {
+      gaugeRewardClaims: GaugeRewardClaim[]
+    }
+  }>('/', {
+    query: getGaugeRewardClaimsQuery(params)
+  })
+  return data.data.gaugeRewardClaims
 }

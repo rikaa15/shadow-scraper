@@ -54,6 +54,7 @@ export const getSwapXInfo = async (
           balance: new Decimal(reward).div(Math.pow(10, decimals)).toDecimalPlaces(6).toString(),
           price: '',
           value: '',
+          time: '',
           link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
         }
         return portfolioItem

@@ -163,3 +163,17 @@ export interface ClPosition {
   feeGrowthInside0LastX128: string
   feeGrowthInside1LastX128: string
 }
+
+export interface Gauge {
+  pool: ClPool
+}
+
+export interface GaugeRewardClaim {
+  id: string
+  gauge: Gauge
+  transaction: Transaction
+  nfpPositionHash: string
+  rewardToken: Token
+  rewardAmount: string
+  timestamp: string
+}

@@ -2,8 +2,8 @@ import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
-import {calculateAPR, CoinGeckoTokenIdsMap} from "../helpers";
-import {getTokenPrice, getTokenPrices} from "../../api/coingecko";
+import {calculateAPR} from "../helpers";
+import {CoinGeckoTokenIdsMap, getTokenPrice, getTokenPrices} from "../../api/coingecko";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
 const ERC20ABI = require('../../abi/ERC20.json');
 import moment from 'moment'
@@ -29,11 +29,11 @@ const getPoolClaimedRewardsUSD = async (
     const exchangeTokenId = CoinGeckoTokenIdsMap[rewardToken.symbol.toLowerCase()]
     let tokenPrice = 0
     if(rewardToken.symbol.toLowerCase() === 'xshadow') {
-      // tokenPrice = 100
+      tokenPrice = 100
     }
     if(exchangeTokenId) {
       tokenPrice = await getTokenPrice(exchangeTokenId)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // await new Promise(resolve => setTimeout(resolve, 1000))
     }
     const rewardValueUSD = Decimal(reward.rewardAmount).mul(tokenPrice).toNumber()
     // console.log(`${reward.rewardToken.symbol}, rewardAmount=${rewardAmount}, USD value=${rewardValueUSD}`)
@@ -72,6 +72,7 @@ export const getShadowInfo = async (
     const { id: positionId, pool, transaction } = position
 
     let unclaimedRewardsUSD = 0
+    const launchTimestamp = Number(position.transaction.timestamp) * 1000
 
     const rewardTokens = (await gaugeContract.getRewardTokens()) as string[]
     for(const tokenAddress of rewardTokens) {
@@ -84,7 +85,7 @@ export const getShadowInfo = async (
         const exchangeTokenId = CoinGeckoTokenIdsMap[symbol.toLowerCase()]
         if(exchangeTokenId) {
           const price =  await getTokenPrice(exchangeTokenId)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          // await new Promise(resolve => setTimeout(resolve, 1000))
           if(price > 0) {
             const decimals = Number(await rewardTokenContract.decimals())
             const balance = new Decimal(earned.toString()).div(Math.pow(10, decimals))
@@ -105,6 +106,7 @@ export const getShadowInfo = async (
       const exchangeToken1Id = CoinGeckoTokenIdsMap[pool.token1.symbol.toLowerCase()]
 
       let apr = 0
+      let depositedTotalUSD = 0
       if(exchangeToken0Id && exchangeToken1Id) {
         const tokenPrices = await getTokenPrices([exchangeToken0Id, exchangeToken1Id])
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -112,23 +114,26 @@ export const getShadowInfo = async (
         const token1Price = tokenPrices[exchangeToken1Id]['usd']
         const depositedToken0USD = token0Price * Number(depositedToken0)
         const depositedToken1USD = token1Price * Number(depositedToken1)
-        const depositedTotalUSD = depositedToken0USD + depositedToken1USD
+        depositedTotalUSD = depositedToken0USD + depositedToken1USD
 
-        const launchTimestamp = Number(position.transaction.timestamp) * 1000
         apr = calculateAPR(depositedTotalUSD, totalRewardsUSD, launchTimestamp)
       }
 
-      portfolioItems.push({
-        type: `Liquidity (Shadow ${pool.symbol})`,
-        asset: pool.symbol,
-        address: pool.id,
-        balance: '1',
-        price: new Decimal(totalRewardsUSD).toFixed(),
-        value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
-        time: transaction.timestamp,
-        apr: `${apr.toFixed(2)}%`,
-        link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
-      })
+      // console.log(pool.symbol, 'APR:', apr, apr > 0, 'depositedTotalUSD', depositedTotalUSD,'totalRewardsUSD', totalRewardsUSD,  'launchTimestamp', launchTimestamp)
+
+      if(apr > 0) {
+        portfolioItems.push({
+          type: `Pool Reward (Shadow ${pool.symbol})`,
+          asset: pool.symbol,
+          address: pool.id,
+          balance: '1',
+          price: `$${new Decimal(totalRewardsUSD).toFixed()}`,
+          value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
+          time: transaction.timestamp,
+          apr: `${moment(launchTimestamp).format('DD MMM YYYY')} / ${apr.toString()}%`,
+          link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
+        })
+      }
     }
   }
 

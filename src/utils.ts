@@ -35,18 +35,22 @@ export const exportArrayToCSV = (
 
 export const arrayToTSV = <T extends Record<string, any>>(
   data: T[],
-  columns?: string[]
+  columns?: string[],
+  columnTitles?: Record<string, string>
 ) => {
   if (!data || data.length === 0) {
     return '';
   }
-  const headers = columns || Object.keys(data[0]);
+  let headers = columns || Object.keys(data[0]);
+  if(columnTitles) {
+    headers = headers.map(header => columnTitles[header] || header)
+  }
   const headerRow = headers.join('\t');
 
   const rows = data.map((item) => {
     return headers
       .map((key) => {
-        const value = item[key] ?? '';
+        let value = item[key] ?? '';
         let strValue = String(value)
           .replace(/\t/g, '\\t')
           .replace(/\n/g, '\\n');

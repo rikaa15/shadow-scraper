@@ -1,8 +1,0 @@
-asset	address	price	balance	value	type	link
-USDC.e	0x29219dd400f2bf60e5a23d13be72b486d4038894	$0.999563	0.000001	$0.000001	ERC20	https://vfat.io/token?chainId=146&tokenAddress=0x29219dd400f2bf60e5a23d13be72b486d4038894
-wS	0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38	$0.488749	56.213609	$27.474345	ERC20	https://vfat.io/token?chainId=146&tokenAddress=0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38
-scUSD	0xd3DCe716f3eF535C5Ff8d041c1A41C3bd89b97aE	$0.998698	9.540546	$9.528124	ERC20	https://vfat.io/token?chainId=146&tokenAddress=0xd3DCe716f3eF535C5Ff8d041c1A41C3bd89b97aE
-USDT	0x6047828dc181963ba44974801ff68e538da5eaf9	$0.999452	45.219872	$45.195092	ERC20	https://vfat.io/token?chainId=146&tokenAddress=0x6047828dc181963ba44974801ff68e538da5eaf9
-frxUSD	0x80eede496655fb9047dd39d9f418d5483ed600df	$0.99866	10.028054	$10.014616	ERC20	https://vfat.io/token?chainId=146&tokenAddress=0x80eede496655fb9047dd39d9f418d5483ed600df
-WETH	0x50c42deacd8fc9773493ed674b675be577f2634b	$1948.46	0.000001	$0.001948	ERC20	https://vfat.io/token?chainId=146&tokenAddress=0x50c42deacd8fc9773493ed674b675be577f2634b
-SWPx	0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70	$0.25672	0.031987	$0.008212	Pending Reward (SwapX USDC.e/scUSD)	https://vfat.io/token?chainId=146&tokenAddress=0xA04BC7140c26fc9BB1F36B1A604C7A5a88fb0E70

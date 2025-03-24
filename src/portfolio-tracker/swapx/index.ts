@@ -1,9 +1,11 @@
 import { ethers } from "ethers";
 import Decimal from "decimal.js";
 import {PortfolioItem} from "../index";
+import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
 const PoolsList = require('./poolsList.json');
 const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
 const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
+const ERC20ABI = require('../../abi/ERC20.json');
 
 // https://sonicscan.org/address/0xdce26623440b34a93e748e131577049a8d84dded#readContract
 // query: "query ConcPools...
@@ -39,26 +41,50 @@ export const getSwapXInfo = async (
       try {
         const { address: v3PoolAddress, token0, token1 } = v3Pool
         const poolContract = new ethers.Contract(v3PoolAddress, SwapXPoolABI, provider);
-        // const balance = await poolContract.balanceOf(userAddress);
         const reward = await poolContract.earned(userAddress);
-        const tokenAddress = await poolContract.rewardToken()
 
-        const rewardTokenContract = new ethers.Contract(tokenAddress, SwapXRewardsTokenABI, provider);
-        const symbol = await rewardTokenContract.symbol()
-        const decimals = Number(await rewardTokenContract.decimals())
-        const poolName = `${token0.symbol}/${token1.symbol}`
-        const portfolioItem: PortfolioItem = {
-          type: `Pending Reward (SwapX ${poolName})`,
-          asset: symbol,
-          address: tokenAddress,
-          balance: new Decimal(reward).div(Math.pow(10, decimals)).toDecimalPlaces(6).toString(),
-          price: '',
-          value: '',
-          time: '',
-          apr: '',
-          link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
+        if(reward > 0) {
+          const lpToken = await poolContract.TOKEN();
+          const lpTokenContract = new ethers.Contract(lpToken, ERC20ABI, provider);
+          const gaugeLPSupply = await poolContract.totalSupply();
+          const totalLPSupply = await lpTokenContract.totalSupply()
+
+          const balance = await poolContract.balanceOf(userAddress);
+          const tokenAddress = await poolContract.rewardToken()
+          const rewardTokenContract = new ethers.Contract(tokenAddress, SwapXRewardsTokenABI, provider);
+          const symbol = await rewardTokenContract.symbol()
+          const decimals = Number(await rewardTokenContract.decimals())
+          const poolName = `${token0.symbol}/${token1.symbol}`
+          const value = new Decimal(reward).div(Math.pow(10, decimals)).toNumber()
+          let totalRewardsUSD = 0
+          const exchangeTokenId = CoinGeckoTokenIdsMap[symbol.toLowerCase()]
+          if(exchangeTokenId) {
+            const tokenPrice = await getTokenPrice(exchangeTokenId)
+            totalRewardsUSD = tokenPrice * value
+          }
+
+          let depositedTotalUSD = 0
+          const depositedToken0Id = CoinGeckoTokenIdsMap[token0.symbol.toLowerCase()]
+          const depositedToken1Id = CoinGeckoTokenIdsMap[token1.symbol.toLowerCase()]
+          if(depositedToken0Id && depositedToken1Id) {
+            const token0Price = await getTokenPrice(depositedToken0Id)
+            const token1Price = await getTokenPrice(depositedToken1Id)
+          }
+
+          const portfolioItem: PortfolioItem = {
+            type: `Pool Reward (SwapX ${poolName})`,
+            asset: poolName,
+            address: v3PoolAddress,
+            balance: '1',
+            price: `$${totalRewardsUSD}`,
+            value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
+            time: '',
+            apr: '',
+            link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
+          }
+          return portfolioItem
         }
-        return portfolioItem
+        return null
       } catch (e) {
         return null
       }
@@ -67,7 +93,7 @@ export const getSwapXInfo = async (
 
   poolsWithRewards = poolsWithRewards
     .filter((item) => Boolean(item)
-      && (Number(item.balance) > 0)
+      && (Number(item.value.replace('$', '')) > 0)
     )
 
   return poolsWithRewards

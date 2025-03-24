@@ -1,6 +1,7 @@
 import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
 import Decimal from "decimal.js";
+import {portfolioItemFactory} from "../helpers";
 const ERC20ABI = require('../../abi/ERC20.json');
 
 const tokenAddresses = [
@@ -33,6 +34,7 @@ export const getTokensInfo = async (
           const symbol = await tokenContract.symbol()
           const decimals = Number(await tokenContract.decimals())
           return {
+            ...portfolioItemFactory(),
             type: 'ERC20',
             asset: `${symbol}`,
             address: tokenAddress,
@@ -40,9 +42,6 @@ export const getTokensInfo = async (
               .div(Math.pow(10, decimals))
               .toDecimalPlaces(6)
               .toString(),
-            value: '',
-            price: '',
-            time: '',
             link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
           }
         } else {

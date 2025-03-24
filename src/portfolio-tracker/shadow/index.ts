@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
-import {calculateAPR} from "../helpers";
+import {calculateAPR, portfolioItemFactory} from "../helpers";
 import {CoinGeckoTokenIdsMap, getTokenPrice, getTokenPrices} from "../../api/coingecko";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
 const ERC20ABI = require('../../abi/ERC20.json');
@@ -29,7 +29,7 @@ const getPoolClaimedRewardsUSD = async (
     const exchangeTokenId = CoinGeckoTokenIdsMap[rewardToken.symbol.toLowerCase()]
     let tokenPrice = 0
     if(rewardToken.symbol.toLowerCase() === 'xshadow') {
-      tokenPrice = 100
+      tokenPrice = (await getTokenPrice('shadow-2')) / 2
     }
     if(exchangeTokenId) {
       tokenPrice = await getTokenPrice(exchangeTokenId)
@@ -123,13 +123,14 @@ export const getShadowInfo = async (
 
       if(apr > 0) {
         portfolioItems.push({
-          type: `Pool Reward (Shadow ${pool.symbol})`,
-          asset: pool.symbol,
+          ...portfolioItemFactory(),
+          type: `Liquidity`,
+          asset: `${pool.symbol} (Shadow Pool)`,
           address: pool.id,
           balance: '1',
-          price: `$${new Decimal(totalRewardsUSD).toFixed()}`,
-          value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
-          time: transaction.timestamp,
+          price: `$${new Decimal(depositedTotalUSD).toFixed()}`,
+          value: `$${new Decimal(depositedTotalUSD).toFixed()}`,
+          rewards: `$${new Decimal(totalRewardsUSD).toFixed()}`,
           apr: `${moment(launchTimestamp).format('DD MMM YYYY')} / ${apr.toString()}%`,
           link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
         })

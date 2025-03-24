@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import Decimal from "decimal.js";
 import {PortfolioItem} from "../index";
 import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
+import {portfolioItemFactory} from "../helpers";
 const PoolsList = require('./poolsList.json');
 const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
 const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
@@ -72,14 +73,13 @@ export const getSwapXInfo = async (
           }
 
           const portfolioItem: PortfolioItem = {
-            type: `Pool Reward (SwapX ${poolName})`,
+            ...portfolioItemFactory(),
+            type: `Liquidity`,
             asset: poolName,
             address: v3PoolAddress,
             balance: '1',
             price: `$${totalRewardsUSD}`,
             value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
-            time: '',
-            apr: '',
             link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
           }
           return portfolioItem

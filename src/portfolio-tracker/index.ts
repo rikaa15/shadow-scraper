@@ -14,14 +14,14 @@ export interface PortfolioItem {
   balance: string
   price: string // USD price
   value: string // value in USD
-  time: string // only for pools
+  rewards: string
   apr: string // only for pools
   type: string
   link: string
 }
 
 const portfolioItemsOrder: Array<keyof PortfolioItem> = [
-  'asset', 'address',  'price', 'balance', 'value', 'apr', 'type', 'link'
+  'asset', 'address',  'price', 'balance', 'value', 'rewards', 'apr', 'type', 'link'
 ]
 const columnTitles: Record<string, string> = {
   'apr': 'time /  apy since deposit'
@@ -37,14 +37,11 @@ const main = async () => {
       process.exit(1)
     }
 
-    const tokensInfo = await getTokensInfo(userAddress)
+    let tokensInfo = await getTokensInfo(userAddress)
+    tokensInfo = await setUSDValues(tokensInfo)
     const shadowInfo = await getShadowInfo(userAddress)
     // const swapXInfo = await getSwapXInfo(userAddress)
-    // let items = await setUSDValues(
-    //   [...tokensInfo, ...shadowInfo]
-    // )
-    let tokenItems = await setUSDValues(tokensInfo)
-    const items = [...tokenItems, ...shadowInfo]
+    const items = [...tokensInfo, ...shadowInfo]
 
     const tsv = arrayToTSV(items, portfolioItemsOrder)
     console.log(tsv)

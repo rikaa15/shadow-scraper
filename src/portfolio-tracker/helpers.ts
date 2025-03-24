@@ -14,11 +14,13 @@ export const setUSDValues = async (
 
   return items.map(item => {
     const key = item.asset.toLowerCase()
+    const isXShadow = key.includes('xSHADOW'.toLowerCase())
     const tokenId = CoinGeckoTokenIdsMap[key]
-    if(tokenId) {
-      const tokenPrice = tokenPrices[tokenId]
-      if(tokenPrice) {
-        const price = tokenPrice['usd']
+    if(tokenId || isXShadow) {
+      if(tokenPrices[tokenId] || isXShadow) {
+        const price = isXShadow
+          ? (tokenPrices['shadow-2'].usd / 2)
+          : tokenPrices[tokenId]['usd']
         if(price) {
           const value = new Decimal(item.balance)
             .mul(price)
@@ -65,4 +67,18 @@ export const calculateAPR = (
   const apr = annualizedRate * 100;
 
   return Number(apr.toFixed(2));
+}
+
+export const portfolioItemFactory = (): PortfolioItem => {
+  return {
+    asset: '',
+    address: '',
+    balance: '',
+    price: '',
+    value: '',
+    rewards: '',
+    apr: '',
+    type: '',
+    link: '',
+  }
 }

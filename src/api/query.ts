@@ -239,6 +239,8 @@ export const getPositionsQuery = (params: GetEventsParams) => {
     ) {
       id
       transaction { id from to blockNumber timestamp }
+      depositedToken0
+      depositedToken1
       feeGrowthInside0LastX128
       feeGrowthInside1LastX128
       liquidity

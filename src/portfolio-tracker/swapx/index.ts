@@ -55,6 +55,7 @@ export const getSwapXInfo = async (
           price: '',
           value: '',
           time: '',
+          apy: '',
           link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
         }
         return portfolioItem

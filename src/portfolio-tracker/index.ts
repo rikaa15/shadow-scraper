@@ -15,6 +15,7 @@ export interface PortfolioItem {
   price: string // USD price
   value: string // value in USD
   time: string // only for pools
+  apy: string // only for pools
   type: string
   link: string
 }
@@ -36,9 +37,11 @@ const main = async () => {
     const tokensInfo = await getTokensInfo(userAddress)
     const shadowInfo = await getShadowInfo(userAddress)
     const swapXInfo = await getSwapXInfo(userAddress)
-    let items = await setUSDValues(
-      [...tokensInfo, ...swapXInfo, ...shadowInfo]
-    )
+    // let items = await setUSDValues(
+    //   [...tokensInfo, ...swapXInfo, ...shadowInfo]
+    // )
+
+    let items = [...tokensInfo, ...shadowInfo]
 
     const tsv = arrayToTSV(items, portfolioItemsOrder)
     console.log(tsv)
@@ -51,7 +54,7 @@ const main = async () => {
       console.log(`${filename} created successfully`)
     }
   } catch (e) {
-    console.error('failed to get portfolio data', e)
+    console.error('failed to get portfolio data', (e as Error).message)
   }
 }
 

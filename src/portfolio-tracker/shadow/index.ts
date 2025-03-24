@@ -1,28 +1,47 @@
-// https://ethereum.stackexchange.com/questions/101955/trying-to-make-sense-of-uniswap-v3-fees-feegrowthinside0lastx128-feegrowthglob
-import axios from "axios";
 import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
+import {CoinGeckoTokenIdsMap} from "../helpers";
+import {getTokenPrice, getTokenPrices} from "../../api/coingecko";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
 const ERC20ABI = require('../../abi/ERC20.json');
+import moment from 'moment'
+import {ClPosition, GaugeRewardClaim} from "../../types";
 
-// const calculateTokenFees = (
-//   feeGrowthOutside0X128Upper: string,
-//   feeGrowthOutside0X128Lower: string,
-//   liquidity: string,
-//   decimals: string
-// ) => {
-//   const feeGrowthOutside0X128_upper = new Decimal(feeGrowthOutside0X128Upper)
-//   const feeGrowthOutside0X128_lower = new Decimal(feeGrowthOutside0X128Lower)
-//
-//   const feeGrowthInside0 = feeGrowthOutside0X128_lower.sub(feeGrowthOutside0X128_upper)
-//
-//   return (feeGrowthInside0.mul(new Decimal(liquidity)))
-//     .div(new Decimal(2).pow(128))
-//     .div(Math.pow(10, Number(decimals)))
-//     .toString()
-// }
+// https://ethereum.stackexchange.com/questions/101955/trying-to-make-sense-of-uniswap-v3-fees-feegrowthinside0lastx128-feegrowthglob
+
+const getPoolClaimedRewardsUSD = async (
+  position: ClPosition,
+  rewardClaims: GaugeRewardClaim[]
+) => {
+  const { pool } = position
+  let totalRewardsUSD = 0
+
+  let poolRewards = rewardClaims
+    .filter((item) => {
+      return item.gauge.clPool.symbol.toLowerCase() === pool.symbol.toLowerCase()
+      && item.transaction.timestamp > position.transaction.timestamp
+    })
+
+  for(const reward of poolRewards) {
+    const {rewardToken, rewardAmount} = reward
+    const exchangeTokenId = CoinGeckoTokenIdsMap[rewardToken.symbol.toLowerCase()]
+    let tokenPrice = 0
+    if(rewardToken.symbol.toLowerCase() === 'xshadow') {
+      tokenPrice = 100
+    }
+    if(exchangeTokenId) {
+      tokenPrice = await getTokenPrice(exchangeTokenId)
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+    const rewardValueUSD = Decimal(reward.rewardAmount).mul(tokenPrice).toNumber()
+    console.log(`${reward.rewardToken.symbol}, rewardAmount=${rewardAmount}, USD value=${rewardValueUSD}`)
+    totalRewardsUSD += rewardValueUSD
+  }
+
+  return totalRewardsUSD
+}
 
 export const getShadowInfo = async (
   userAddress: string
@@ -34,45 +53,25 @@ export const getShadowInfo = async (
     }
   })
 
-  // const rewardClaims = await getGaugeRewardClaims({
-  //   filter: {
-  //     transaction_from: userAddress,
-  //     gauge_isAlive: true
-  //   }
-  // })
+  const rewardClaims = await getGaugeRewardClaims({
+    filter: {
+      transaction_from: userAddress,
+      gauge_isAlive: true
+    },
+    sort: {
+      orderBy: 'transaction__blockNumber',
+      orderDirection: 'desc'
+    }
+  })
 
   const portfolioItems: PortfolioItem[] = []
   const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
   const gaugeContract = new ethers.Contract('0xe879d0e44e6873cf4ab71686055a4f6817685f02', GaugeV3ABI, provider);
 
-  // let portfolioFromRewards: Record<string, PortfolioItem> = {}
-  //
-  // for(const rewardClaim of rewardClaims) {
-  //   const { nfpPositionHash, rewardAmount, rewardToken, gauge: { pool } } = rewardClaim
-  //
-  //   const key = `${nfpPositionHash}_${rewardToken.id}`
-  //   const existedItem = portfolioFromRewards[key]
-  //   if(!existedItem) {
-  //     portfolioFromRewards[key] = {
-  //       asset: `CL${pool.symbol}`,
-  //       address: rewardToken.id,
-  //       balance: rewardAmount,
-  //       price: '', // USD price
-  //       value: '', // value in USD
-  //       time: '', // only for pools
-  //       type: `Liquidity (Shadow)`,
-  //       link: `https://vfat.io/token?chainId=146&tokenAddress=${rewardToken.id}`
-  //     }
-  //   } else {
-  //     portfolioFromRewards[key] = {
-  //       ...existedItem,
-  //       balance: new Decimal(existedItem.balance).add(rewardAmount).toFixed()
-  //     }
-  //   }
-  // }
-
   for (const position of positions) {
     const { id: positionId, pool, transaction } = position
+
+    let unclaimedRewardsUSD = 0
 
     const rewardTokens = (await gaugeContract.getRewardTokens()) as string[]
     for(const tokenAddress of rewardTokens) {
@@ -81,22 +80,56 @@ export const getShadowInfo = async (
       if(earned > 0) {
         const rewardTokenContract = new ethers.Contract(tokenAddress, ERC20ABI, provider);
         const symbol = await rewardTokenContract.symbol()
-        const decimals = Number(await rewardTokenContract.decimals())
-        const balance = new Decimal(earned.toString())
-          .div(Math.pow(10, decimals))
-          .toDecimalPlaces(6)
-          .toString()
-        portfolioItems.push({
-          type: `Pending Reward (Shadow ${pool.symbol})`,
-          asset: symbol,
-          address: tokenAddress,
-          balance,
-          price: '',
-          value: '',
-          time: transaction.timestamp,
-          link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
-        })
+
+        const exchangeTokenId = CoinGeckoTokenIdsMap[symbol.toLowerCase()]
+        if(exchangeTokenId) {
+          const price =  await getTokenPrice(exchangeTokenId)
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          if(price > 0) {
+            const decimals = Number(await rewardTokenContract.decimals())
+            const balance = new Decimal(earned.toString()).div(Math.pow(10, decimals))
+            const balanceUSD = balance.mul(price)
+            unclaimedRewardsUSD += balanceUSD.toNumber()
+          }
+        }
       }
+    }
+
+    if(unclaimedRewardsUSD > 0) {
+      const claimedRewardsUSD = await getPoolClaimedRewardsUSD(position, rewardClaims)
+      const totalRewardsUSD = claimedRewardsUSD + unclaimedRewardsUSD
+      // console.log('unclaimedRewardsUSD', unclaimedRewardsUSD, 'claimedRewardsUSD', claimedRewardsUSD, 'totalRewards', totalRewards)
+
+      const { depositedToken0, depositedToken1 } = position
+      const exchangeToken0Id = CoinGeckoTokenIdsMap[pool.token0.symbol.toLowerCase()]
+      const exchangeToken1Id = CoinGeckoTokenIdsMap[pool.token1.symbol.toLowerCase()]
+
+      if(exchangeToken0Id && exchangeToken1Id) {
+        const tokenPrices = await getTokenPrices([exchangeToken0Id, exchangeToken1Id])
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const token0Price = tokenPrices[exchangeToken0Id]['usd']
+        const token1Price = tokenPrices[exchangeToken1Id]['usd']
+        const depositedToken0USD = token0Price * Number(depositedToken0)
+        const depositedToken1USD = token1Price * Number(depositedToken1)
+        const depositedTotalUSD = depositedToken0USD + depositedToken1USD
+
+        const timestamp = position.transaction.timestamp
+        const date = moment(+timestamp * 1000).format('DD-MM-YYYY')
+
+        console.log('depositedTotalUSD:', depositedTotalUSD, 'pool launched:', date, 'totalRewardsUSD:', totalRewardsUSD)
+      }
+
+      portfolioItems.push({
+        type: `Liquidity (Shadow ${pool.symbol})`,
+        asset: pool.symbol,
+        address: pool.id,
+        balance: '1',
+        price: new Decimal(totalRewardsUSD).toFixed(),
+        value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
+        time: transaction.timestamp,
+        apy: '',
+        link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
+      })
     }
   }
 

@@ -165,7 +165,7 @@ export interface ClPosition {
 }
 
 export interface Gauge {
-  pool: ClPool
+  clPool: ClPool
 }
 
 export interface GaugeRewardClaim {

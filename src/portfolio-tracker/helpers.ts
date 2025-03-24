@@ -2,7 +2,7 @@ import {getTokenPrices} from "../api/coingecko";
 import {PortfolioItem} from "./index";
 import Decimal from 'decimal.js'
 
-const CoinGeckoTokenIdsMap: Record<string, string> = {
+export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'swpx': 'swapx-2',
   'usdt': 'tether',
   'usdc.e': 'sonic-bridged-usdc-e-sonic',

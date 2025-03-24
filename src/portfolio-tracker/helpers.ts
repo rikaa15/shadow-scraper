@@ -51,3 +51,30 @@ export const setUSDValues = async (
     }
   })
 }
+
+export const calculateAPR = (
+  depositedTotalUSD: number,
+  totalRewardsUSD: number,
+  poolLaunchTimestamp: number
+) => {
+  if (depositedTotalUSD <= 0 || totalRewardsUSD < 0) {
+    throw new Error("Deposited total must be positive and rewards cannot be negative.");
+  }
+
+  const start = new Date(poolLaunchTimestamp)
+  const end = new Date();
+
+  const millisecondsPerDay = 1000 * 60 * 60 * 24;
+  const timeElapsedMs = end.getTime() - start.getTime();
+  const daysElapsed = Math.ceil(timeElapsedMs / millisecondsPerDay);
+
+  if (daysElapsed <= 0) {
+    throw new Error("End date must be after the pool launch date.");
+  }
+
+  const returnRate = totalRewardsUSD / depositedTotalUSD;
+  const annualizedRate = returnRate * (365 / daysElapsed);
+  const apr = annualizedRate * 100;
+
+  return Number(apr.toFixed(2));
+}

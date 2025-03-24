@@ -15,13 +15,13 @@ export interface PortfolioItem {
   price: string // USD price
   value: string // value in USD
   time: string // only for pools
-  apy: string // only for pools
+  apr: string // only for pools
   type: string
   link: string
 }
 
 const portfolioItemsOrder: Array<keyof PortfolioItem> = [
-  'asset', 'address',  'price', 'balance', 'value', 'type', 'link'
+  'asset', 'address',  'price', 'balance', 'value', 'apr', 'type', 'link'
 ]
 
 const main = async () => {

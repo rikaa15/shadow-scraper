@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
-import {CoinGeckoTokenIdsMap} from "../helpers";
+import {calculateAPR, CoinGeckoTokenIdsMap} from "../helpers";
 import {getTokenPrice, getTokenPrices} from "../../api/coingecko";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
 const ERC20ABI = require('../../abi/ERC20.json');
@@ -18,10 +18,10 @@ const getPoolClaimedRewardsUSD = async (
   const { pool } = position
   let totalRewardsUSD = 0
 
-  let poolRewards = rewardClaims
+  const poolRewards = rewardClaims
     .filter((item) => {
       return item.gauge.clPool.symbol.toLowerCase() === pool.symbol.toLowerCase()
-      && item.transaction.timestamp > position.transaction.timestamp
+      && Number(item.transaction.timestamp) > Number(position.transaction.timestamp)
     })
 
   for(const reward of poolRewards) {
@@ -29,14 +29,14 @@ const getPoolClaimedRewardsUSD = async (
     const exchangeTokenId = CoinGeckoTokenIdsMap[rewardToken.symbol.toLowerCase()]
     let tokenPrice = 0
     if(rewardToken.symbol.toLowerCase() === 'xshadow') {
-      tokenPrice = 100
+      // tokenPrice = 100
     }
     if(exchangeTokenId) {
       tokenPrice = await getTokenPrice(exchangeTokenId)
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
     const rewardValueUSD = Decimal(reward.rewardAmount).mul(tokenPrice).toNumber()
-    console.log(`${reward.rewardToken.symbol}, rewardAmount=${rewardAmount}, USD value=${rewardValueUSD}`)
+    // console.log(`${reward.rewardToken.symbol}, rewardAmount=${rewardAmount}, USD value=${rewardValueUSD}`)
     totalRewardsUSD += rewardValueUSD
   }
 
@@ -104,6 +104,7 @@ export const getShadowInfo = async (
       const exchangeToken0Id = CoinGeckoTokenIdsMap[pool.token0.symbol.toLowerCase()]
       const exchangeToken1Id = CoinGeckoTokenIdsMap[pool.token1.symbol.toLowerCase()]
 
+      let apr = 0
       if(exchangeToken0Id && exchangeToken1Id) {
         const tokenPrices = await getTokenPrices([exchangeToken0Id, exchangeToken1Id])
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -113,10 +114,8 @@ export const getShadowInfo = async (
         const depositedToken1USD = token1Price * Number(depositedToken1)
         const depositedTotalUSD = depositedToken0USD + depositedToken1USD
 
-        const timestamp = position.transaction.timestamp
-        const date = moment(+timestamp * 1000).format('DD-MM-YYYY')
-
-        console.log('depositedTotalUSD:', depositedTotalUSD, 'pool launched:', date, 'totalRewardsUSD:', totalRewardsUSD)
+        const launchTimestamp = Number(position.transaction.timestamp) * 1000
+        apr = calculateAPR(depositedTotalUSD, totalRewardsUSD, launchTimestamp)
       }
 
       portfolioItems.push({
@@ -127,7 +126,7 @@ export const getShadowInfo = async (
         price: new Decimal(totalRewardsUSD).toFixed(),
         value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
         time: transaction.timestamp,
-        apy: '',
+        apr: `${apr.toFixed(2)}%`,
         link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
       })
     }

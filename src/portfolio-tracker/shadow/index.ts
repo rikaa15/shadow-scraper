@@ -128,9 +128,9 @@ export const getShadowInfo = async (
           asset: `${pool.symbol} (Shadow Pool)`,
           address: pool.id,
           balance: '1',
-          price: `$${new Decimal(depositedTotalUSD).toFixed()}`,
-          value: `$${new Decimal(depositedTotalUSD).toFixed()}`,
-          rewards: `$${new Decimal(totalRewardsUSD).toFixed()}`,
+          price: `$${new Decimal(depositedTotalUSD).toFixed(2)}`,
+          value: `$${new Decimal(depositedTotalUSD).toFixed(2)}`,
+          rewards: `$${new Decimal(totalRewardsUSD).toFixed(2)}`,
           apr: `${moment(launchTimestamp).format('DD MMM YYYY')} / ${apr.toString()}%`,
           link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
         })

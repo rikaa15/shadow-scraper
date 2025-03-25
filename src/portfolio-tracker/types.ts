@@ -8,12 +8,14 @@ export interface PortfolioItem {
   depositAmount1: string
   depositValue0: string
   depositValue1: string
+  depositValue: string
   rewardAsset0: string
   rewardAsset1: string
   rewardAmount0: string
   rewardAmount1: string
   rewardValue0: string
   rewardValue1: string
+  rewardValue: string
   totalDays: string
   totalBlocks: string
   apr: string

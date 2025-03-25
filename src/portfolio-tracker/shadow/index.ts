@@ -158,12 +158,18 @@ export const getShadowInfo = async (
         depositAmount1: new Decimal(position.depositedToken1).toDecimalPlaces(6).toFixed(6) || '0',
         depositValue0: new Decimal(deposit0Value).toDecimalPlaces(2).toFixed(2) || '0',
         depositValue1: new Decimal(deposit1Value).toDecimalPlaces(2).toFixed(2) || '0',
+        depositValue: new Decimal(deposit0Value)
+          .add(new Decimal(deposit1Value))
+          .toDecimalPlaces(2).toFixed(2) || '0',
         rewardAsset0: rewards[0].asset || '',
         rewardAsset1: rewards[1].asset || '',
         rewardAmount0: new Decimal(rewards[0].amount).toDecimalPlaces(6).toFixed(6) || '0',
         rewardAmount1: new Decimal(rewards[1].amount).toDecimalPlaces(6).toFixed(6) || '0',
         rewardValue0: new Decimal(rewards[0].value).toDecimalPlaces(2).toFixed(2) || '0',
         rewardValue1: new Decimal(rewards[1].value).toDecimalPlaces(2).toFixed(2) || '0',
+        rewardValue: new Decimal(rewards[0].value)
+          .add(new Decimal(rewards[1].value))
+          .toDecimalPlaces(2).toFixed(2) || '0',
         totalDays: moment().diff(moment(launchTimestamp), 'days').toString(),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
         apr: `${apr.toString()}`,

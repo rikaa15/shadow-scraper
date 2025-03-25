@@ -119,3 +119,19 @@ export const mergeRewards = (
 
   return Array.from(rewardMap.values());
 }
+
+export const formatFinancialValue = (
+  valueStr: string,
+  breakpoint = '0.000001',
+  dp = 6
+) => {
+  const value = new Decimal(valueStr);
+  const breakValue = new Decimal(breakpoint)
+
+  if(value.eq(0)) {
+    return '0'
+  } else if(value.lt(breakValue)) {
+    return `<${breakValue.toString()}`
+  }
+  return value.toDecimalPlaces(dp).toFixed()
+}

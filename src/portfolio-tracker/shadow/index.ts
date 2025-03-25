@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {ethers} from "ethers";
-import {calculateAPR, mergeRewards, portfolioItemFactory} from "../helpers";
+import {calculateAPR, formatFinancialValue, mergeRewards, portfolioItemFactory} from "../helpers";
 import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
 const ERC20ABI = require('../../abi/ERC20.json');
@@ -154,8 +154,8 @@ export const getShadowInfo = async (
         depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
         depositAsset0: position.pool.token0.symbol,
         depositAsset1: position.pool.token1.symbol,
-        depositAmount0: new Decimal(position.depositedToken0).toDecimalPlaces(6).toFixed(6) || '0',
-        depositAmount1: new Decimal(position.depositedToken1).toDecimalPlaces(6).toFixed(6) || '0',
+        depositAmount0: formatFinancialValue(position.depositedToken0),
+        depositAmount1: formatFinancialValue(position.depositedToken1),
         depositValue0: new Decimal(deposit0Value).toDecimalPlaces(2).toFixed(2) || '0',
         depositValue1: new Decimal(deposit1Value).toDecimalPlaces(2).toFixed(2) || '0',
         depositValue: new Decimal(deposit0Value)
@@ -163,13 +163,14 @@ export const getShadowInfo = async (
           .toDecimalPlaces(2).toFixed(2) || '0',
         rewardAsset0: rewards[0].asset || '',
         rewardAsset1: rewards[1].asset || '',
-        rewardAmount0: new Decimal(rewards[0].amount).toDecimalPlaces(6).toFixed(6) || '0',
-        rewardAmount1: new Decimal(rewards[1].amount).toDecimalPlaces(6).toFixed(6) || '0',
-        rewardValue0: new Decimal(rewards[0].value).toDecimalPlaces(2).toFixed(2) || '0',
-        rewardValue1: new Decimal(rewards[1].value).toDecimalPlaces(2).toFixed(2) || '0',
-        rewardValue: new Decimal(rewards[0].value)
-          .add(new Decimal(rewards[1].value))
-          .toDecimalPlaces(2).toFixed(2) || '0',
+        rewardAmount0: formatFinancialValue(rewards[0].amount),
+        rewardAmount1: formatFinancialValue(rewards[1].amount),
+        rewardValue0: formatFinancialValue(rewards[0].value, '0.01', 2),
+        rewardValue1: formatFinancialValue(rewards[1].value, '0.01', 2),
+        rewardValue: formatFinancialValue(
+          (new Decimal(rewards[0].value).add(new Decimal(rewards[1].value))).toFixed(),
+          '0.01', 2
+        ),
         totalDays: moment().diff(moment(launchTimestamp), 'days').toString(),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
         apr: `${apr.toString()}`,

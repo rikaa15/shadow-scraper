@@ -2,18 +2,18 @@ export interface PortfolioItem {
   asset: string
   address: string
   depositTime: string
-  deposit0Asset: string
-  deposit1Asset: string
-  deposit0Amount: string
-  deposit1Amount: string
-  deposit0Value: string
-  deposit1Value: string
-  reward0Asset: string
-  reward1Asset: string
-  reward0Amount: string
-  reward1Amount: string
-  reward0Value: string
-  reward1Value: string
+  depositAsset0: string
+  depositAsset1: string
+  depositAmount0: string
+  depositAmount1: string
+  depositValue0: string
+  depositValue1: string
+  rewardAsset0: string
+  rewardAsset1: string
+  rewardAmount0: string
+  rewardAmount1: string
+  rewardValue0: string
+  rewardValue1: string
   totalDays: string
   totalBlocks: string
   apr: string
@@ -23,8 +23,8 @@ export interface PortfolioItem {
 
 export const PortfolioItemsOrder: Array<keyof PortfolioItem> = [
   'depositTime',
-  'deposit0Asset',
-  'deposit1Asset'
+  'depositAsset0',
+  'depositAsset1'
 ]
 
 export const ColumnTitles: Record<string, string> = {

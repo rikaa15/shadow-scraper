@@ -2,30 +2,11 @@ import clipboardy from 'clipboardy';
 import {getSwapXInfo} from "./swapx";
 import {arrayToTSV} from "../utils";
 import {getShadowInfo} from "./shadow";
-import {getTokensInfo} from "./tokens";
+// import {getTokensInfo} from "./tokens";
 import fs from "fs";
 import { setUSDValues } from './helpers'
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
-
-export interface PortfolioItem {
-  asset: string
-  address: string
-  balance: string
-  price: string // USD price
-  value: string // value in USD
-  rewards: string
-  apr: string // only for pools
-  type: string
-  link: string
-}
-
-const portfolioItemsOrder: Array<keyof PortfolioItem> = [
-  'asset', 'address',  'price', 'balance', 'value', 'rewards', 'apr', 'type', 'link'
-]
-const columnTitles: Record<string, string> = {
-  'apr': 'time /  apy since deposit'
-}
 
 const main = async () => {
   try {
@@ -37,13 +18,13 @@ const main = async () => {
       process.exit(1)
     }
 
-    let tokensInfo = await getTokensInfo(userAddress)
-    tokensInfo = await setUSDValues(tokensInfo)
+    // let tokensInfo = await getTokensInfo(userAddress)
+    // tokensInfo = await setUSDValues(tokensInfo)
     const shadowInfo = await getShadowInfo(userAddress)
     // const swapXInfo = await getSwapXInfo(userAddress)
-    const items = [...tokensInfo, ...shadowInfo]
+    const items = [...shadowInfo]
 
-    const tsv = arrayToTSV(items, portfolioItemsOrder)
+    const tsv = arrayToTSV(items)
     console.log(tsv)
     if(copyToClipboard) {
       clipboardy.writeSync(tsv);

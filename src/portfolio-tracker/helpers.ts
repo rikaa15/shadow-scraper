@@ -1,45 +1,46 @@
 import {CoinGeckoTokenIdsMap, getTokenPrices} from "../api/coingecko";
-import {PortfolioItem} from "./index";
 import Decimal from 'decimal.js'
+import {PortfolioItem, PositionReward} from "./types";
 
 export const setUSDValues = async (
   items: PortfolioItem[]
 ) => {
-  const exchangeTokenIds = items.map(item => {
-    const key = item.asset.toLowerCase()
-    return CoinGeckoTokenIdsMap[key]
-  }).filter(_ => _)
-
-  const tokenPrices = await getTokenPrices(exchangeTokenIds)
-
-  return items.map(item => {
-    const key = item.asset.toLowerCase()
-    const isXShadow = key.includes('xSHADOW'.toLowerCase())
-    const tokenId = CoinGeckoTokenIdsMap[key]
-    if(tokenId || isXShadow) {
-      if(tokenPrices[tokenId] || isXShadow) {
-        const price = isXShadow
-          ? (tokenPrices['shadow-2'].usd / 2)
-          : tokenPrices[tokenId]['usd']
-        if(price) {
-          const value = new Decimal(item.balance)
-            .mul(price)
-            .toDecimalPlaces(6)
-            .toString()
-          return {
-            ...item,
-            price: `$${price}`,
-            value: `$${value}`
-          }
-        }
-      }
-    }
-    return {
-      ...item,
-      price: '0',
-      value: '0'
-    }
-  })
+  return items
+  // const exchangeTokenIds = items.map(item => {
+  //   const key = item.asset.toLowerCase()
+  //   return CoinGeckoTokenIdsMap[key]
+  // }).filter(_ => _)
+  //
+  // const tokenPrices = await getTokenPrices(exchangeTokenIds)
+  //
+  // return items.map(item => {
+  //   const key = item.asset.toLowerCase()
+  //   const isXShadow = key.includes('xSHADOW'.toLowerCase())
+  //   const tokenId = CoinGeckoTokenIdsMap[key]
+  //   if(tokenId || isXShadow) {
+  //     if(tokenPrices[tokenId] || isXShadow) {
+  //       const price = isXShadow
+  //         ? (tokenPrices['shadow-2'].usd / 2)
+  //         : tokenPrices[tokenId]['usd']
+  //       if(price) {
+  //         const value = new Decimal(item.balance)
+  //           .mul(price)
+  //           .toDecimalPlaces(6)
+  //           .toString()
+  //         return {
+  //           ...item,
+  //           price: `$${price}`,
+  //           value: `$${value}`
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return {
+  //     ...item,
+  //     price: '0',
+  //     value: '0'
+  //   }
+  // })
 }
 
 export const calculateAPR = (
@@ -73,12 +74,46 @@ export const portfolioItemFactory = (): PortfolioItem => {
   return {
     asset: '',
     address: '',
-    balance: '',
-    price: '',
-    value: '',
-    rewards: '',
+    depositTime: '',
+    deposit0Asset: '',
+    deposit1Asset: '',
+    deposit0Amount: '',
+    deposit1Amount: '',
+    deposit0Value: '',
+    deposit1Value: '',
+    reward0Asset: '',
+    reward1Asset: '',
+    reward0Amount: '',
+    reward1Amount: '',
+    reward0Value: '',
+    reward1Value: '',
+    totalDays: '',
+    totalBlocks: '',
     apr: '',
     type: '',
     link: '',
   }
+}
+
+export const mergeRewards = (
+  rewards1: PositionReward[],
+  rewards2: PositionReward[],
+): PositionReward[] => {
+  const rewardMap = new Map<string, PositionReward>();
+
+  rewards1.forEach(reward => {
+    rewardMap.set(reward.asset, { ...reward });
+  });
+
+  rewards2.forEach(reward => {
+    const existing = rewardMap.get(reward.asset);
+    if (existing) {
+      existing.amount = (parseFloat(existing.amount) + parseFloat(reward.amount)).toString();
+      existing.value = (parseFloat(existing.value) + parseFloat(reward.value)).toString();
+    } else {
+      rewardMap.set(reward.asset, { ...reward });
+    }
+  });
+
+  return Array.from(rewardMap.values());
 }

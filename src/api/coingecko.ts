@@ -14,9 +14,9 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
 
 // For test purposes
 export const CoinGeckoRates: Record<string, number> = {
-  'swapx-2': 0.2928,
-  'shadow-2': 92.50,
-  'shadow-liquid-staking-token': 64.50
+  'swapx-2': 0.2948,
+  'shadow-2': 93.33,
+  'shadow-liquid-staking-token': 63.50
 }
 
 interface CoinGeckoPriceResponse {

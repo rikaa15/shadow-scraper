@@ -9,6 +9,8 @@ import moment from 'moment'
 import {ClPosition, GaugeRewardClaim} from "../../types";
 import {PortfolioItem, PositionReward} from "../types";
 
+const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
+
 // https://ethereum.stackexchange.com/questions/101955/trying-to-make-sense-of-uniswap-v3-fees-feegrowthinside0lastx128-feegrowthglob
 
 const getClaimedRewardsBySymbol = async (
@@ -72,7 +74,6 @@ export const getShadowInfo = async (
   })
 
   const portfolioItems: PortfolioItem[] = []
-  const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
   const gaugeContract = new ethers.Contract('0xe879d0e44e6873cf4ab71686055a4f6817685f02', GaugeV3ABI, provider);
 
   for (const position of positions) {
@@ -90,8 +91,9 @@ export const getShadowInfo = async (
       const rewardSymbol = await rewardContract.symbol();
 
       // claimed rewards
-      const claimedReward = await getClaimedRewardsBySymbol(position, rewardClaims, rewardSymbol)
-      claimedRewards.push(claimedReward)
+      const claimedReward = []
+      // const claimedReward = await getClaimedRewardsBySymbol(position, rewardClaims, rewardSymbol)
+      // claimedRewards.push(claimedReward)
 
       // unclaimed rewards
       if(earned > 0) {
@@ -140,6 +142,7 @@ export const getShadowInfo = async (
     console.log(pool.symbol, 'APR:', apr, 'totalDepositedValue', totalDepositedValue,'totalRewardsValue', totalRewardsValue)
 
     if(totalDepositedValue > 0) {
+      const currentBlockNumber = await provider.getBlockNumber()
       portfolioItems.push({
         ...portfolioItemFactory(),
         type: `Liquidity`,
@@ -158,7 +161,9 @@ export const getShadowInfo = async (
         reward1Amount: rewards[1].amount || '0',
         reward0Value: rewards[0].value || '0',
         reward1Value: rewards[1].value || '0',
-        apr: `${moment(launchTimestamp).format('DD MMM YYYY')} / ${apr.toString()}%`,
+        totalDays: moment().diff(moment(launchTimestamp), 'days').toString(),
+        totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
+        apr: `${apr.toString()}`,
         link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
       })
     }

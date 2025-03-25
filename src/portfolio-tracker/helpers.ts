@@ -108,8 +108,8 @@ export const mergeRewards = (
   rewards2.forEach(reward => {
     const existing = rewardMap.get(reward.asset);
     if (existing) {
-      existing.amount = (parseFloat(existing.amount) + parseFloat(reward.amount)).toString();
-      existing.value = (parseFloat(existing.value) + parseFloat(reward.value)).toString();
+      existing.amount = (new Decimal(existing.amount).add(new Decimal(reward.amount))).toFixed();
+      existing.value = (new Decimal(existing.value).add(new Decimal(reward.value))).toFixed();
     } else {
       rewardMap.set(reward.asset, { ...reward });
     }

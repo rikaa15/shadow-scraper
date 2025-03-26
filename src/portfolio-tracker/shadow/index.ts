@@ -79,6 +79,8 @@ export const getShadowInfo = async (
   })
 
   const portfolioItems: PortfolioItem[] = []
+  // USDC.e/scUSD - 0xf8440c989c72751c3a36419e61b6f62dfeb7630e
+  // TODO: support multiple gauge contracts
   const gaugeContract = new ethers.Contract('0xe879d0e44e6873cf4ab71686055a4f6817685f02', GaugeV3ABI, provider);
 
   for (const position of positions) {
@@ -157,10 +159,10 @@ export const getShadowInfo = async (
         depositAsset1: position.pool.token1.symbol,
         depositAmount0: roundToSignificantDigits(position.depositedToken0),
         depositAmount1: roundToSignificantDigits(position.depositedToken1),
-        depositValue0: roundToSignificantDigits(deposit0Value.toFixed()),
-        depositValue1: roundToSignificantDigits(deposit1Value.toFixed()),
+        depositValue0: roundToSignificantDigits(deposit0Value.toString()),
+        depositValue1: roundToSignificantDigits(deposit1Value.toString()),
         depositValue: roundToSignificantDigits(
-          (deposit0Value + deposit1Value).toFixed()
+          (deposit0Value + deposit1Value).toString()
         ),
         rewardAsset0: rewards[0].asset || '',
         rewardAsset1: rewards[1].asset || '',
@@ -169,7 +171,7 @@ export const getShadowInfo = async (
         rewardValue0: roundToSignificantDigits(rewards[0].value),
         rewardValue1: roundToSignificantDigits(rewards[1].value),
         rewardValue: roundToSignificantDigits(
-          (new Decimal(rewards[0].value).add(new Decimal(rewards[1].value))).toFixed()
+          (Number(rewards[0].value) + Number(rewards[1].value)).toString()
         ),
         totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
@@ -181,7 +183,7 @@ export const getShadowInfo = async (
         Number(portfolioItem.rewardValue),
         Number(portfolioItem.totalDays)
       )
-      portfolioItem.apr = roundToSignificantDigits(apr.toString(), 2)
+      portfolioItem.apr = roundToSignificantDigits(apr.toString(), 4)
       portfolioItems.push(portfolioItem)
     }
   }

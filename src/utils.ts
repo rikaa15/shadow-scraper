@@ -33,19 +33,32 @@ export const exportArrayToCSV = (
   fs.writeFileSync(filename, csv, 'utf8');
 }
 
+export const camelToUnderscore = (str: string) => {
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
+
+  return str
+    // Add underscore before uppercase letter following lowercase letter
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    // Handle acronyms (uppercase followed by uppercase then lowercase)
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
+    // Add underscore before number following letter
+    .replace(/([a-zA-Z])(\d)/g, '$1_$2')
+    // Add underscore before letter following number
+    .replace(/(\d)([a-zA-Z])/g, '$1_$2')
+    // Convert all to lowercase
+    .toLowerCase();
+}
+
 export const arrayToTSV = <T extends Record<string, any>>(
   data: T[],
   columns?: string[],
-  columnTitles?: Record<string, string>
 ) => {
   if (!data || data.length === 0) {
     return '';
   }
-  let headers = columns || Object.keys(data[0]);
-  if(columnTitles) {
-    headers = headers.map(header => columnTitles[header] || header)
-  }
-  const headerRow = headers.join('\t');
+  const headers = columns || Object.keys(data[0])
 
   const rows = data.map((item) => {
     return headers
@@ -61,6 +74,10 @@ export const arrayToTSV = <T extends Record<string, any>>(
       })
       .join('\t');
   });
+
+  const headerRow = headers
+    .map(camelToUnderscore)
+    .join('\t');
 
   // Combine header and rows with newlines
   return headerRow + '\n' + rows.join('\n');

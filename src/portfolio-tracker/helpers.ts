@@ -46,18 +46,11 @@ export const setUSDValues = async (
 export const calculateAPR = (
   depositedTotalUSD: number,
   totalRewardsUSD: number,
-  poolLaunchTimestamp: number
+  daysElapsed: number
 ) => {
   if (depositedTotalUSD <= 0 || totalRewardsUSD < 0) {
     throw new Error("Deposited total must be positive and rewards cannot be negative.");
   }
-
-  const start = new Date(poolLaunchTimestamp)
-  const end = new Date();
-
-  const millisecondsPerDay = 1000 * 60 * 60 * 24;
-  const timeElapsedMs = end.getTime() - start.getTime();
-  const daysElapsed = Math.ceil(timeElapsedMs / millisecondsPerDay);
 
   if (daysElapsed <= 0) {
     throw new Error("End date must be after the pool launch date.");
@@ -122,32 +115,25 @@ export const mergeRewards = (
 
 export const roundToSignificantDigits = (
   numStr: string,
-  n: number
+  n = 6
 ) => {
-  // Validate inputs
   if (!numStr || isNaN(Number(numStr)) || !Number.isInteger(n) || n <= 0) {
     throw new Error('Invalid input: numStr must be a valid number string and n must be a positive integer');
   }
 
-  // Convert string to number
   const num = Number(numStr);
 
-  // Handle zero case
   if (num === 0) {
     return '0.' + '0'.repeat(n); // Returns "0.000..." with n zeros after decimal
   }
 
-  // Get the absolute value and calculate magnitude
   const absNum = Math.abs(num);
   const magnitude = Math.floor(Math.log10(absNum));
 
-  // Calculate the scaling factor
   const scale = Math.pow(10, n - magnitude - 1);
 
-  // Round the number
   const rounded = Math.round(absNum * scale) / scale;
 
-  // Apply original sign
   const result = num < 0 ? -rounded : rounded;
 
   // Convert to full decimal string
@@ -160,4 +146,18 @@ export const roundToSignificantDigits = (
     const decimalPlaces = Math.abs(magnitude) + n - 1;
     return result.toFixed(decimalPlaces);
   }
+}
+
+export const calculateDaysDifference = (
+  date1: Date,
+  date2: Date,
+  significantDigits: number
+) => {
+  if (!(date1 instanceof Date) || !(date2 instanceof Date) ||
+    isNaN(date1.getTime()) || isNaN(date2.getTime())) {
+    throw new Error('Invalid input: Both arguments must be valid Date objects');
+  }
+  const msDiff = Math.abs(date2.getTime() - date1.getTime());
+  const daysDiff = msDiff / (1000 * 60 * 60 * 24);
+  return roundToSignificantDigits(daysDiff.toString(), significantDigits);
 }

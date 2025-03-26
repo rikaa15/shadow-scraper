@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {ethers} from "ethers";
 import {
-  calculateAPR,
+  calculateAPR, calculateDaysDifference,
   mergeRewards,
   portfolioItemFactory,
   roundToSignificantDigits
@@ -155,23 +155,23 @@ export const getShadowInfo = async (
         depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
         depositAsset0: position.pool.token0.symbol,
         depositAsset1: position.pool.token1.symbol,
-        depositAmount0: roundToSignificantDigits(position.depositedToken0, 6),
-        depositAmount1: roundToSignificantDigits(position.depositedToken1, 6),
-        depositValue0: roundToSignificantDigits(deposit0Value.toFixed(), 2),
-        depositValue1: roundToSignificantDigits(deposit1Value.toFixed(), 2),
+        depositAmount0: roundToSignificantDigits(position.depositedToken0),
+        depositAmount1: roundToSignificantDigits(position.depositedToken1),
+        depositValue0: roundToSignificantDigits(deposit0Value.toFixed()),
+        depositValue1: roundToSignificantDigits(deposit1Value.toFixed()),
         depositValue: roundToSignificantDigits(
-          new Decimal(deposit0Value).add(new Decimal(deposit1Value)).toFixed(), 2
+          (deposit0Value + deposit1Value).toFixed()
         ),
         rewardAsset0: rewards[0].asset || '',
         rewardAsset1: rewards[1].asset || '',
-        rewardAmount0: roundToSignificantDigits(rewards[0].amount, 6),
-        rewardAmount1: roundToSignificantDigits(rewards[1].amount, 6),
-        rewardValue0: roundToSignificantDigits(rewards[0].value, 2),
-        rewardValue1: roundToSignificantDigits(rewards[1].value, 2),
+        rewardAmount0: roundToSignificantDigits(rewards[0].amount),
+        rewardAmount1: roundToSignificantDigits(rewards[1].amount),
+        rewardValue0: roundToSignificantDigits(rewards[0].value),
+        rewardValue1: roundToSignificantDigits(rewards[1].value),
         rewardValue: roundToSignificantDigits(
-          (new Decimal(rewards[0].value).add(new Decimal(rewards[1].value))).toFixed(), 2
+          (new Decimal(rewards[0].value).add(new Decimal(rewards[1].value))).toFixed()
         ),
-        totalDays: moment().diff(moment(launchTimestamp), 'days').toString(),
+        totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
         link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
       }
@@ -179,7 +179,7 @@ export const getShadowInfo = async (
       apr = calculateAPR(
         Number(portfolioItem.depositValue),
         Number(portfolioItem.rewardValue),
-        launchTimestamp
+        Number(portfolioItem.totalDays)
       )
       portfolioItem.apr = roundToSignificantDigits(apr.toString(), 2)
       portfolioItems.push(portfolioItem)

@@ -1,7 +1,12 @@
 import Decimal from "decimal.js";
 import {getPositions, getGaugeRewardClaims} from "../../api";
 import {ethers} from "ethers";
-import {calculateAPR, formatFinancialValue, mergeRewards, portfolioItemFactory} from "../helpers";
+import {
+  calculateAPR,
+  mergeRewards,
+  portfolioItemFactory,
+  roundToSignificantDigits
+} from "../helpers";
 import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
 const GaugeV3ABI = require('../../abi/GaugeV3.json');
 const ERC20ABI = require('../../abi/ERC20.json');
@@ -138,15 +143,11 @@ export const getShadowInfo = async (
     const rewards = mergeRewards(claimedRewards, unclaimedRewards)
     const totalRewardsValue = rewards.reduce((acc, item) => acc + Number(item.value), 0)
 
-    if(totalDepositedValue > 0 && totalRewardsValue > 0) {
-      apr = calculateAPR(totalDepositedValue, totalRewardsValue, launchTimestamp)
-    }
-
     // console.log(pool.symbol, 'APR:', apr, 'totalDepositedValue', totalDepositedValue,'totalRewardsValue', totalRewardsValue.toFixed())
 
     if(totalDepositedValue > 0) {
       const currentBlockNumber = await provider.getBlockNumber()
-      portfolioItems.push({
+      const portfolioItem = {
         ...portfolioItemFactory(),
         type: `Liquidity`,
         asset: pool.symbol,
@@ -154,28 +155,34 @@ export const getShadowInfo = async (
         depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
         depositAsset0: position.pool.token0.symbol,
         depositAsset1: position.pool.token1.symbol,
-        depositAmount0: formatFinancialValue(position.depositedToken0),
-        depositAmount1: formatFinancialValue(position.depositedToken1),
-        depositValue0: new Decimal(deposit0Value).toDecimalPlaces(2).toFixed(2) || '0',
-        depositValue1: new Decimal(deposit1Value).toDecimalPlaces(2).toFixed(2) || '0',
-        depositValue: new Decimal(deposit0Value)
-          .add(new Decimal(deposit1Value))
-          .toDecimalPlaces(2).toFixed(2) || '0',
+        depositAmount0: roundToSignificantDigits(position.depositedToken0, 6),
+        depositAmount1: roundToSignificantDigits(position.depositedToken1, 6),
+        depositValue0: roundToSignificantDigits(deposit0Value.toFixed(), 2),
+        depositValue1: roundToSignificantDigits(deposit1Value.toFixed(), 2),
+        depositValue: roundToSignificantDigits(
+          new Decimal(deposit0Value).add(new Decimal(deposit1Value)).toFixed(), 2
+        ),
         rewardAsset0: rewards[0].asset || '',
         rewardAsset1: rewards[1].asset || '',
-        rewardAmount0: formatFinancialValue(rewards[0].amount),
-        rewardAmount1: formatFinancialValue(rewards[1].amount),
-        rewardValue0: formatFinancialValue(rewards[0].value, '0.01', 2),
-        rewardValue1: formatFinancialValue(rewards[1].value, '0.01', 2),
-        rewardValue: formatFinancialValue(
-          (new Decimal(rewards[0].value).add(new Decimal(rewards[1].value))).toFixed(),
-          '0.01', 2
+        rewardAmount0: roundToSignificantDigits(rewards[0].amount, 6),
+        rewardAmount1: roundToSignificantDigits(rewards[1].amount, 6),
+        rewardValue0: roundToSignificantDigits(rewards[0].value, 2),
+        rewardValue1: roundToSignificantDigits(rewards[1].value, 2),
+        rewardValue: roundToSignificantDigits(
+          (new Decimal(rewards[0].value).add(new Decimal(rewards[1].value))).toFixed(), 2
         ),
         totalDays: moment().diff(moment(launchTimestamp), 'days').toString(),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
-        apr: `${apr.toString()}`,
         link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
-      })
+      }
+
+      apr = calculateAPR(
+        Number(portfolioItem.depositValue),
+        Number(portfolioItem.rewardValue),
+        launchTimestamp
+      )
+      portfolioItem.apr = roundToSignificantDigits(apr.toString(), 2)
+      portfolioItems.push(portfolioItem)
     }
   }
 

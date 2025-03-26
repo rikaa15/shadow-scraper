@@ -120,18 +120,44 @@ export const mergeRewards = (
   return Array.from(rewardMap.values());
 }
 
-export const formatFinancialValue = (
-  valueStr: string,
-  breakpoint = '0.000001',
-  dp = 6
+export const roundToSignificantDigits = (
+  numStr: string,
+  n: number
 ) => {
-  const value = new Decimal(valueStr);
-  const breakValue = new Decimal(breakpoint)
-
-  if(value.eq(0)) {
-    return '0'
-  } else if(value.lt(breakValue)) {
-    return `<${breakValue.toString()}`
+  // Validate inputs
+  if (!numStr || isNaN(Number(numStr)) || !Number.isInteger(n) || n <= 0) {
+    throw new Error('Invalid input: numStr must be a valid number string and n must be a positive integer');
   }
-  return value.toDecimalPlaces(dp).toFixed()
+
+  // Convert string to number
+  const num = Number(numStr);
+
+  // Handle zero case
+  if (num === 0) {
+    return '0.' + '0'.repeat(n); // Returns "0.000..." with n zeros after decimal
+  }
+
+  // Get the absolute value and calculate magnitude
+  const absNum = Math.abs(num);
+  const magnitude = Math.floor(Math.log10(absNum));
+
+  // Calculate the scaling factor
+  const scale = Math.pow(10, n - magnitude - 1);
+
+  // Round the number
+  const rounded = Math.round(absNum * scale) / scale;
+
+  // Apply original sign
+  const result = num < 0 ? -rounded : rounded;
+
+  // Convert to full decimal string
+  if (magnitude >= 0) {
+    // For numbers >= 1
+    const decimalPlaces = n - magnitude - 1;
+    return result.toFixed(Math.max(0, decimalPlaces));
+  } else {
+    // For numbers < 1
+    const decimalPlaces = Math.abs(magnitude) + n - 1;
+    return result.toFixed(decimalPlaces);
+  }
 }

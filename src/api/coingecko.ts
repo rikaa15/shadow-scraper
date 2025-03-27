@@ -19,7 +19,8 @@ export const CoinGeckoRates: Record<string, number> = {
   'shadow-liquid-staking-token': 63.50,
   'wrapped-sonic': 0.6159,
   'sonic-bridged-usdc-e-sonic': 1,
-  'rings-scusd': 1
+  'rings-scusd': 1,
+  'tether': 1
 }
 
 interface CoinGeckoPriceResponse {

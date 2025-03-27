@@ -248,6 +248,8 @@ export const getPositionsQuery = (params: GetEventsParams) => {
       tickUpper { feeGrowthOutside0X128 feeGrowthOutside1X128 }
       pool {
         id
+        gauge { id }
+        gaugeV2 { id }
         symbol
         token0 { symbol decimals }
         token1 { symbol decimals }

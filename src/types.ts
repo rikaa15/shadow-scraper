@@ -8,6 +8,8 @@ export interface Transaction {
 
 export interface ClPool {
   id: string
+  gauge: Gauge
+  gaugeV2: Gauge
   createdAtTimestamp: string
   createdAtBlockNumber: string
   token0: Token
@@ -165,6 +167,7 @@ export interface ClPosition {
 }
 
 export interface Gauge {
+  id: string
   clPool: ClPool
 }
 

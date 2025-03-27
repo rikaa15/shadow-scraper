@@ -79,12 +79,11 @@ export const getShadowInfo = async (
   })
 
   const portfolioItems: PortfolioItem[] = []
-  // USDC.e/scUSD - 0xf8440c989c72751c3a36419e61b6f62dfeb7630e
-  // TODO: support multiple gauge contracts
-  const gaugeContract = new ethers.Contract('0xe879d0e44e6873cf4ab71686055a4f6817685f02', GaugeV3ABI, provider);
 
   for (const position of positions) {
     const { id: positionId, pool } = position
+
+    const gaugeContract = new ethers.Contract(pool.gaugeV2.id, GaugeV3ABI, provider);
 
     const launchTimestamp = Number(position.transaction.timestamp) * 1000
 
@@ -143,9 +142,6 @@ export const getShadowInfo = async (
     }
 
     const rewards = mergeRewards(claimedRewards, unclaimedRewards)
-    const totalRewardsValue = rewards.reduce((acc, item) => acc + Number(item.value), 0)
-
-    // console.log(pool.symbol, 'APR:', apr, 'totalDepositedValue', totalDepositedValue,'totalRewardsValue', totalRewardsValue.toFixed())
 
     if(totalDepositedValue > 0) {
       const currentBlockNumber = await provider.getBlockNumber()

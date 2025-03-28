@@ -1,12 +1,13 @@
 import { ethers } from "ethers";
 import Decimal from "decimal.js";
-import {PortfolioItem} from "../index";
 import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
-import {portfolioItemFactory} from "../helpers";
+import {calculateAPR, calculateDaysDifference, portfolioItemFactory, roundToSignificantDigits} from "../helpers";
+import {PortfolioItem} from "../types";
+import moment from "moment/moment";
 const PoolsList = require('./poolsList.json');
 const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
 const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
-const ERC20ABI = require('../../abi/ERC20.json');
+const ICHIVaultABI = require('../../abi/ICHIVault.json');
 
 // https://sonicscan.org/address/0xdce26623440b34a93e748e131577049a8d84dded#readContract
 // query: "query ConcPools...
@@ -40,48 +41,100 @@ export const getSwapXInfo = async (
   let poolsWithRewards: PortfolioItem[] = await Promise.all(
     v3Pools.map(async (v3Pool: any) => {
       try {
-        const { address: v3PoolAddress, token0, token1 } = v3Pool
-        const poolContract = new ethers.Contract(v3PoolAddress, SwapXPoolABI, provider);
-        const reward = await poolContract.earned(userAddress);
+        const { address: poolAddress, token0, token1 } = v3Pool
+        const gaugeContract = new ethers.Contract(poolAddress, SwapXPoolABI, provider);
+        const balanceOf = await gaugeContract.balanceOf(userAddress) as bigint;
+        if(balanceOf === 0n) {
+          return
+        }
 
-        if(reward > 0) {
-          const lpToken = await poolContract.TOKEN();
-          const lpTokenContract = new ethers.Contract(lpToken, ERC20ABI, provider);
-          const gaugeLPSupply = await poolContract.totalSupply();
-          const totalLPSupply = await lpTokenContract.totalSupply()
+        const reward = await gaugeContract.earned(userAddress);
+        const rewardAddress = await gaugeContract.rewardToken()
+        const rewardTokenContract = new ethers.Contract(rewardAddress, SwapXRewardsTokenABI, provider);
+        const rewardSymbol = await rewardTokenContract.symbol()
+        const decimals = Number(await rewardTokenContract.decimals())
+        const poolSymbol = `${token0.symbol}/${token1.symbol}`
+        const token0Decimals = Number(token0.decimals)
+        const token1Decimals = Number(token1.decimals)
 
-          const balance = await poolContract.balanceOf(userAddress);
-          const tokenAddress = await poolContract.rewardToken()
-          const rewardTokenContract = new ethers.Contract(tokenAddress, SwapXRewardsTokenABI, provider);
-          const symbol = await rewardTokenContract.symbol()
-          const decimals = Number(await rewardTokenContract.decimals())
-          const poolName = `${token0.symbol}/${token1.symbol}`
-          const value = new Decimal(reward).div(Math.pow(10, decimals)).toNumber()
-          let totalRewardsUSD = 0
-          const exchangeTokenId = CoinGeckoTokenIdsMap[symbol.toLowerCase()]
-          if(exchangeTokenId) {
-            const tokenPrice = await getTokenPrice(exchangeTokenId)
-            totalRewardsUSD = tokenPrice * value
-          }
+        // Get deposit amounts
+        const launchTimestamp = Date.now()
+        const ICHIVaultAddress = await gaugeContract.TOKEN();
+        const ICHIVaultContract = new ethers.Contract(ICHIVaultAddress, ICHIVaultABI, provider);
+        const gaugeTotalSupply = await gaugeContract.totalSupply() as bigint
+        const ichiTotalSupply = await ICHIVaultContract.totalSupply() as bigint
+        const [ichiTotal0, ichiTotal1] = await ICHIVaultContract.getTotalAmounts() as [bigint, bigint]
+        const userGaugeShare = new Decimal(balanceOf.toString())
+          .div(new Decimal(gaugeTotalSupply.toString()))
+        const gaugePoolShare = new Decimal(gaugeTotalSupply.toString())
+          .div(new Decimal(ichiTotalSupply.toString()))
+        const userPoolShare = userGaugeShare.mul(gaugePoolShare)
+        const depositAmount0 = userPoolShare.mul(new Decimal(ichiTotal0.toString()))
+          .div(10 ** token0Decimals)
+          .toNumber()
+        const depositAmount1 = userPoolShare.mul(new Decimal(ichiTotal1.toString()))
+          .div(10 ** token0Decimals)
+          .toNumber()
 
-          let depositedTotalUSD = 0
-          const depositedToken0Id = CoinGeckoTokenIdsMap[token0.symbol.toLowerCase()]
-          const depositedToken1Id = CoinGeckoTokenIdsMap[token1.symbol.toLowerCase()]
-          if(depositedToken0Id && depositedToken1Id) {
-            const token0Price = await getTokenPrice(depositedToken0Id)
-            const token1Price = await getTokenPrice(depositedToken1Id)
-          }
+        const rewardAmount0 = new Decimal(reward).div(Math.pow(10, decimals)).toNumber()
+        let depositValue0 = 0
+        let depositValue1 = 0
+        let rewardValue0 = 0
 
-          const portfolioItem: PortfolioItem = {
+        // deposit value in USD
+        const depositedToken0Id = CoinGeckoTokenIdsMap[token0.symbol.toLowerCase()]
+        const depositedToken1Id = CoinGeckoTokenIdsMap[token1.symbol.toLowerCase()]
+        if(depositedToken0Id && depositedToken1Id) {
+          const token0Price = await getTokenPrice(depositedToken0Id)
+          const token1Price = await getTokenPrice(depositedToken1Id)
+          depositValue0 = token0Price * depositAmount0
+          depositValue1 = token1Price * depositAmount1
+        }
+
+        // Reward value
+        const exchangeTokenId = CoinGeckoTokenIdsMap[rewardSymbol.toLowerCase()]
+        if(exchangeTokenId) {
+          const token0Price = await getTokenPrice(exchangeTokenId)
+          rewardValue0 = token0Price * rewardAmount0
+        }
+
+        let apr = 0
+
+        if(depositValue0 + depositValue1 > 0) {
+          const currentBlockNumber = await provider.getBlockNumber()
+          const portfolioItem = {
             ...portfolioItemFactory(),
             type: `Liquidity`,
-            asset: poolName,
-            address: v3PoolAddress,
-            balance: '1',
-            price: `$${totalRewardsUSD}`,
-            value: `$${new Decimal(totalRewardsUSD).toFixed()}`,
-            link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
+            asset: poolSymbol,
+            address: poolAddress,
+            depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
+            depositAsset0: token0.symbol,
+            depositAsset1: token1.symbol,
+            depositAmount0: roundToSignificantDigits(depositAmount0.toString()),
+            depositAmount1: roundToSignificantDigits(depositAmount1.toString()),
+            depositValue0: roundToSignificantDigits(depositValue0.toString()),
+            depositValue1: roundToSignificantDigits(depositValue1.toString()),
+            depositValue: roundToSignificantDigits(
+              (depositValue0 + depositValue1).toString()
+            ),
+            rewardAsset0: rewardSymbol,
+            rewardAsset1: '',
+            rewardAmount0: roundToSignificantDigits(rewardAmount0.toString()),
+            rewardAmount1: '',
+            rewardValue0: roundToSignificantDigits(rewardValue0.toString()),
+            rewardValue1: '',
+            rewardValue: roundToSignificantDigits(rewardAmount0.toString()),
+            totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
+            totalBlocks: (currentBlockNumber - Number(0)).toString(),
+            link: `https://vfat.io/token?chainId=146&tokenAddress=${poolAddress}`
           }
+
+          apr = calculateAPR(
+            Number(portfolioItem.depositValue),
+            Number(portfolioItem.rewardValue),
+            Number(portfolioItem.totalDays)
+          )
+          portfolioItem.apr = roundToSignificantDigits(apr.toString(), 4)
           return portfolioItem
         }
         return null
@@ -93,7 +146,7 @@ export const getSwapXInfo = async (
 
   poolsWithRewards = poolsWithRewards
     .filter((item) => Boolean(item)
-      && (Number(item.value.replace('$', '')) > 0)
+      && (Number(item.depositValue) > 0)
     )
 
   return poolsWithRewards

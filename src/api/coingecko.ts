@@ -20,7 +20,9 @@ export const CoinGeckoRates: Record<string, number> = {
   'wrapped-sonic': 0.6159,
   'sonic-bridged-usdc-e-sonic': 1,
   'rings-scusd': 1,
-  'tether': 1
+  'tether': 1,
+  'frax-usd': 1,
+  'weth': 1888.22
 }
 
 interface CoinGeckoPriceResponse {

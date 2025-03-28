@@ -40,7 +40,7 @@ const getClaimedRewardBySymbol = async (
     const exchangeTokenId = CoinGeckoTokenIdsMap[rewardToken.symbol.toLowerCase()]
     let tokenPrice = 0
     if(rewardToken.symbol.toLowerCase() === 'xshadow') {
-      tokenPrice = (await getTokenPrice('shadow-2')) / 2
+      tokenPrice = (await getTokenPrice('shadow-2'))
     }
     if(exchangeTokenId) {
       tokenPrice = await getTokenPrice(exchangeTokenId)
@@ -125,7 +125,7 @@ export const getShadowInfo = async (
         if(exchangeTokenId) {
           price = await getTokenPrice(exchangeTokenId)
         } else if(rewardSymbol.toLowerCase() === 'xshadow') {
-          price = (await getTokenPrice('shadow-2')) / 2
+          price = (await getTokenPrice('shadow-2'))
         }
 
         if(price > 0) {

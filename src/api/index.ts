@@ -2,6 +2,7 @@ import axios from "axios";
 import {getBurnsQuery, getGaugeRewardClaimsQuery, getMintsQuery, getPositionsQuery, getSwapsQuery} from "./query";
 import {ClBurn, ClMint, ClPosition, ClSwap, GaugeRewardClaim} from "../types";
 import {appConfig} from "../config";
+require('dotenv').config()
 
 const client = axios.create({
   baseURL: appConfig.shadowSubgraphUrl
@@ -83,4 +84,42 @@ export const getGaugeRewardClaims = async (params: GetEventsParams) => {
     query: getGaugeRewardClaimsQuery(params)
   })
   return data.data.gaugeRewardClaims
+}
+
+const swapXSubgraphClient = axios.create({
+  baseURL: 'https://thegraph.com/explorer/api/playground/QmfVBqpr3GV1QdG4hyv5PDi7cSknpTZEZKCWrmVjFbXebg',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.SUBGRAPH_API_KEY}`
+  }
+})
+
+export const getSwapXVaultDeposits = async (
+  userAddress: string,
+  vaultAddress: string
+) => {
+  const { data } = await swapXSubgraphClient.post<{
+    data: {
+      vaultDeposits: Array<{id: string;createdAtTimestamp: string;}>
+    }
+  }>('/', {
+    query: `
+      {
+        vaultDeposits(
+          first: 100,
+          where:{
+            vault: "${vaultAddress}",
+            sender: "${userAddress}"
+          },
+          orderBy: createdAtTimestamp
+          orderDirection: asc
+        ){
+          id
+          createdAtTimestamp
+        }
+      }
+    `
+  })
+
+  return data.data.vaultDeposits
 }

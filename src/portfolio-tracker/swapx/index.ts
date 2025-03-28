@@ -4,6 +4,7 @@ import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
 import {calculateAPR, calculateDaysDifference, portfolioItemFactory, roundToSignificantDigits} from "../helpers";
 import {PortfolioItem} from "../types";
 import moment from "moment/moment";
+import {getSwapXVaultDeposits} from "../../api";
 const PoolsList = require('./poolsList.json');
 const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
 const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
@@ -58,8 +59,14 @@ export const getSwapXInfo = async (
         const token1Decimals = Number(token1.decimals)
 
         // Get deposit amounts
-        const launchTimestamp = Date.now()
+        let launchTimestamp = 0
         const ICHIVaultAddress = await gaugeContract.TOKEN();
+        const vaultDeposits = await getSwapXVaultDeposits(userAddress, ICHIVaultAddress)
+
+        if(vaultDeposits.length > 0){
+          launchTimestamp = Number(vaultDeposits[0].createdAtTimestamp) * 1000
+        }
+
         const ICHIVaultContract = new ethers.Contract(ICHIVaultAddress, ICHIVaultABI, provider);
         const gaugeTotalSupply = await gaugeContract.totalSupply() as bigint
         const ichiTotalSupply = await ICHIVaultContract.totalSupply() as bigint
@@ -123,7 +130,7 @@ export const getSwapXInfo = async (
             rewardAmount1: '',
             rewardValue0: roundToSignificantDigits(rewardValue0.toString()),
             rewardValue1: '',
-            rewardValue: roundToSignificantDigits(rewardAmount0.toString()),
+            rewardValue: roundToSignificantDigits(rewardValue0.toString()),
             totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
             totalBlocks: (currentBlockNumber - Number(0)).toString(),
             link: `https://vfat.io/token?chainId=146&tokenAddress=${poolAddress}`

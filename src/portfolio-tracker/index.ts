@@ -20,9 +20,9 @@ const main = async () => {
 
     // let tokensInfo = await getTokensInfo(userAddress)
     // tokensInfo = await setUSDValues(tokensInfo)
-    // const shadowInfo = await getShadowInfo(userAddress)
+    const shadowInfo = await getShadowInfo(userAddress)
     const swapXInfo = await getSwapXInfo(userAddress)
-    const items = [...swapXInfo]
+    const items = [...swapXInfo, ...shadowInfo]
 
     const tsv = arrayToTSV(items)
     console.log(tsv)

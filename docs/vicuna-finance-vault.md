@@ -1,15 +1,20 @@
-1) Deposit 10 USDC into a Vicuna Finance USDC vault
+Starting conditions: 
+20 USDC.e (0x29219dd400f2bf60e5a23d13be72b486d4038894) on balance
+0 USDT (0x6047828dc181963ba44974801ff68e538da5eaf9) on balance
 
-<img width="558" alt="Screenshot 2025-03-29 at 7 48 39 PM" src="https://github.com/user-attachments/assets/bd7287aa-9c34-4f65-97b9-424c688eddc4" />
+1) Deposit 20 USDC into a Vicuna Finance USDC vault
 
-2) With an 80% LTV, borrow 8 USDT
+<img width="568" alt="Screenshot 2025-03-29 at 8 19 09 PM" src="https://github.com/user-attachments/assets/7e52da6e-9f6c-464c-ba6e-cc0b10709d65" />
 
-<img width="544" alt="Screenshot 2025-03-29 at 7 50 20 PM" src="https://github.com/user-attachments/assets/c24ed923-fe8b-4595-85b0-8da49a8b6386" />
 
-I'm paying 3% annual interest on the 8 USDT (that’s 0.24 USDT per year)
+2) With an 80% LTV, borrow 16 USDT
+
+<img width="586" alt="Screenshot 2025-03-29 at 8 20 17 PM" src="https://github.com/user-attachments/assets/3d72f0fd-0102-41cc-b4dc-d5a777d88c13" />
+
+I'm paying 3% annual interest on the 16 USDT
 
 3) Sell USDT for USDC.e (https://swap.defillama.com/?chain=sonic&from=0x0000000000000000000000000000000000000000&tab=swap&to=)
 
-8 USDT swapped to USDC.e
+16 USDT swapped to 16 USDC.e
 
-https://sonicscan.org//tx/0x46c56de8d039380c2888c37725ad2ce758a7e520f1507a3b201e716ce56d18fb
+https://sonicscan.org//tx/0xee9c7930e4de8797b8f7dc658f239fc50793f176493b22f7a40f4e5396be65bd

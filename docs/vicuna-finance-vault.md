@@ -1,7 +1,19 @@
-Initial conditions:
+#### Strategy
 
-- 20 USDC.e (0x29219dd400f2bf60e5a23d13be72b486d4038894) on balance
-- 0 USDT (0x6047828dc181963ba44974801ff68e538da5eaf9) on balance
+```
+https://vicunafinance.com/markets
+1. Select a market with a high lending rate and then borrow against it with a positive borrow rate. 
+2. In our case, the collateral asset is USDC.e with 13% lending rate .
+3. Borrow USDT for 3% against it at maximum LTV (80%)
+4. Sell USDT for USDC.e (https://swap.defillama.com/?chain=sonic&from=0x0000000000000000000000000000000000000000&tab=swap&to=)  and repeat step 1-3 for 5 times
+```
+
+#### Initial balance
+
+- 20 USDC.e (0x29219dd400f2bf60e5a23d13be72b486d4038894)
+- 0 USDT (0x6047828dc181963ba44974801ff68e538da5eaf9)
+
+
 
 #### Loop 1
 

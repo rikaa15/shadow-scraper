@@ -109,6 +109,6 @@ ROI: 7.9801 ÷ 20 = 39.90% annually
 
 <img width="1458" alt="Screenshot 2025-03-30 at 2 40 10 PM" src="https://github.com/user-attachments/assets/19f40dd8-67b2-402e-b3e8-11e425c4b6ff" />
 
-USDT supply APR dropped from 13% to 1.3%, USDT borrow APR dropped from -3% to -49% which made this strategy unprofitable
+USDC supply APR dropped from 13% to 1.3%, USDT borrow APR dropped from -3% to -49% which made this strategy unprofitable
 
 

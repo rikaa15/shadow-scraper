@@ -105,6 +105,10 @@ Net Profit: 9.5953 - 1.6152 = 7.9801 USD/year
 ROI: 7.9801 ÷ 20 = 39.90% annually
 
 
+#### March 30 Update
 
+<img width="1458" alt="Screenshot 2025-03-30 at 2 40 10 PM" src="https://github.com/user-attachments/assets/19f40dd8-67b2-402e-b3e8-11e425c4b6ff" />
+
+USDT supply APR dropped from 13% to 1.3%, USDT borrow APR dropped from -3% to -49% which made this strategy unprofitable
 
 

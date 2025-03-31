@@ -2,13 +2,20 @@
 
 https://uniswapv3book.com/milestone_1/calculating-liquidity.html
 
-#### Example of calculation token1 amount based of token0 amount and ticks range
+### Example of calculation token1 amount based of token0 amount and ticks range
 
+#### Initial conditions
+```
 Pa = 1.0005 (lower tick)
+
 P = 1.001 (current tick)
+
 Pb = 1.003 (upper tick)
+
 x = 10 (token0 amount)
+
 Goal: calculate y (token1 amount)
+```
 
 <img width="1853" alt="Screenshot 2025-03-31 at 2 10 22 PM" src="https://github.com/user-attachments/assets/81b8f718-a4de-4bdb-a3f8-cb1e7b0fb3a5" />
 

@@ -8,7 +8,7 @@ https://uniswapv3book.com/milestone_1/calculating-liquidity.html
 ```
 Pa = 1.0005 (lower tick)
 
-P = 1.001 (current tick)
+Pc = 1.001 (current tick)
 
 Pb = 1.003 (upper tick)
 

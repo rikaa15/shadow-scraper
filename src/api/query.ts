@@ -251,13 +251,13 @@ export const getPositionsQuery = (params: GetEventsParams) => {
         gauge { id }
         gaugeV2 { id }
         symbol
-        token0 { symbol decimals }
-        token1 { symbol decimals }
+        token0 { id symbol decimals }
+        token1 { id symbol decimals }
         feeGrowthGlobal0X128
         feeGrowthGlobal1X128
       }
-      token0 { symbol decimals }
-      token1 { symbol decimals }
+      token0 { id symbol decimals }
+      token1 { id symbol decimals }
       tickLower { tickIdx }
       tickUpper { tickIdx }
     }

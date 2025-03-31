@@ -1,5 +1,4 @@
 export interface PortfolioItem {
-  asset: string
   address: string
   depositTime: string
   depositAsset0: string
@@ -20,7 +19,8 @@ export interface PortfolioItem {
   totalBlocks: string
   apr: string
   type: string
-  link: string
+  vfat: string
+  depositLink: string
 }
 
 export const PortfolioItemsOrder: Array<keyof PortfolioItem> = [

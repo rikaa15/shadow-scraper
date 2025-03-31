@@ -109,10 +109,9 @@ export const getSwapXInfo = async (
 
         if(depositValue0 + depositValue1 > 0) {
           const currentBlockNumber = await provider.getBlockNumber()
-          const portfolioItem = {
+          const portfolioItem: PortfolioItem = {
             ...portfolioItemFactory(),
-            type: `Liquidity`,
-            asset: poolSymbol,
+            type: `Swap pool`,
             address: poolAddress,
             depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
             depositAsset0: token0.symbol,
@@ -133,7 +132,8 @@ export const getSwapXInfo = async (
             rewardValue: roundToSignificantDigits(rewardValue0.toString()),
             totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
             totalBlocks: (currentBlockNumber - Number(0)).toString(),
-            link: `https://vfat.io/token?chainId=146&tokenAddress=${poolAddress}`
+            vfat: `https://vfat.io/token?chainId=146&tokenAddress=${token0.id}`,
+            depositLink: `https://swapx.fi/earn?search=${poolSymbol}`
           }
 
           apr = calculateAPR(

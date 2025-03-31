@@ -2,9 +2,7 @@ import clipboardy from 'clipboardy';
 import {getSwapXInfo} from "./swapx";
 import {arrayToTSV} from "../utils";
 import {getShadowInfo} from "./shadow";
-// import {getTokensInfo} from "./tokens";
 import fs from "fs";
-import { setUSDValues } from './helpers'
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 

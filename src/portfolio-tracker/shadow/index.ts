@@ -40,7 +40,7 @@ const getClaimedRewardBySymbol = async (
     const exchangeTokenId = CoinGeckoTokenIdsMap[rewardToken.symbol.toLowerCase()]
     let tokenPrice = 0
     if(rewardToken.symbol.toLowerCase() === 'xshadow') {
-      tokenPrice = (await getTokenPrice('shadow-2'))
+      tokenPrice = (await getTokenPrice('shadow-2')) / 2
     }
     if(exchangeTokenId) {
       tokenPrice = await getTokenPrice(exchangeTokenId)
@@ -125,7 +125,7 @@ export const getShadowInfo = async (
         if(exchangeTokenId) {
           price = await getTokenPrice(exchangeTokenId)
         } else if(rewardSymbol.toLowerCase() === 'xshadow') {
-          price = (await getTokenPrice('shadow-2'))
+          price = (await getTokenPrice('shadow-2')) / 2
         }
 
         if(price > 0) {
@@ -145,10 +145,10 @@ export const getShadowInfo = async (
 
     if(totalDepositedValue > 0) {
       const currentBlockNumber = await provider.getBlockNumber()
-      const portfolioItem = {
+      const portfolioItem: PortfolioItem = {
         ...portfolioItemFactory(),
-        type: `Liquidity`,
-        asset: pool.symbol,
+        type: `Swap pool`,
+        // asset: pool.symbol,
         address: pool.id,
         depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
         depositAsset0: position.pool.token0.symbol,
@@ -171,7 +171,8 @@ export const getShadowInfo = async (
         ),
         totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
-        link: `https://vfat.io/token?chainId=146&tokenAddress=${pool.id}`
+        vfat: `https://vfat.io/token?chainId=146&tokenAddress=${pool.token0.id}`,
+        depositLink: `https://www.shadow.so/liquidity/${pool.id}`
       }
 
       apr = calculateAPR(
@@ -179,7 +180,7 @@ export const getShadowInfo = async (
         Number(portfolioItem.rewardValue),
         Number(portfolioItem.totalDays)
       )
-      portfolioItem.apr = roundToSignificantDigits(apr.toString(), 4)
+      portfolioItem.apr = roundToSignificantDigits(apr.toString())
       portfolioItems.push(portfolioItem)
     }
   }

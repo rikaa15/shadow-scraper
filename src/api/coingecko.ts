@@ -14,15 +14,15 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
 
 // For test purposes
 export const CoinGeckoRates: Record<string, number> = {
-  'swapx-2': 0.2948,
-  'shadow-2': 93.33,
-  'shadow-liquid-staking-token': 63.50,
-  'wrapped-sonic': 0.6159,
+  'swapx-2': 0.2519,
+  'shadow-2': 55.49,
+  'shadow-liquid-staking-token': 39.37,
+  'wrapped-sonic': 0.4755,
   'sonic-bridged-usdc-e-sonic': 1,
   'rings-scusd': 1,
   'tether': 1,
   'frax-usd': 1,
-  'weth': 1888.22
+  'weth': 1802.30
 }
 
 interface CoinGeckoPriceResponse {

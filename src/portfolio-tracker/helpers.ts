@@ -65,7 +65,6 @@ export const calculateAPR = (
 
 export const portfolioItemFactory = (): PortfolioItem => {
   return {
-    asset: '',
     address: '',
     depositTime: '',
     depositAsset0: '',
@@ -86,7 +85,8 @@ export const portfolioItemFactory = (): PortfolioItem => {
     totalBlocks: '',
     apr: '',
     type: '',
-    link: '',
+    vfat: '',
+    depositLink: ''
   }
 }
 

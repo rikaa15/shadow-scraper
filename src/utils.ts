@@ -44,7 +44,7 @@ export const camelToUnderscore = (str: string) => {
     // Handle acronyms (uppercase followed by uppercase then lowercase)
     .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
     // Add underscore before number following letter
-    .replace(/([a-zA-Z])(\d)/g, '$1_$2')
+    // .replace(/([a-zA-Z])(\d)/g, '$1_$2')
     // Add underscore before letter following number
     .replace(/(\d)([a-zA-Z])/g, '$1_$2')
     // Convert all to lowercase

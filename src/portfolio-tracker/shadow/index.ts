@@ -148,7 +148,7 @@ export const getShadowInfo = async (
       const portfolioItem: PortfolioItem = {
         ...portfolioItemFactory(),
         type: `Swap pool`,
-        // asset: pool.symbol,
+        name: 'shadow',
         address: pool.id,
         depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
         depositAsset0: position.pool.token0.symbol,

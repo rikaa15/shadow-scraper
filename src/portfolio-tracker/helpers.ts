@@ -65,6 +65,7 @@ export const calculateAPR = (
 
 export const portfolioItemFactory = (): PortfolioItem => {
   return {
+    name: '',
     address: '',
     depositTime: '',
     depositAsset0: '',

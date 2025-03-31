@@ -111,6 +111,7 @@ export const getSwapXInfo = async (
           const currentBlockNumber = await provider.getBlockNumber()
           const portfolioItem: PortfolioItem = {
             ...portfolioItemFactory(),
+            name: 'swapx',
             type: `Swap pool`,
             address: poolAddress,
             depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),

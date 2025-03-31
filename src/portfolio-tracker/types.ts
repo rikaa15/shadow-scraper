@@ -1,4 +1,5 @@
 export interface PortfolioItem {
+  name: string
   address: string
   depositTime: string
   depositAsset0: string

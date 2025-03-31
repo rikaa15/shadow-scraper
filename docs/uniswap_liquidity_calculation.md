@@ -19,9 +19,12 @@ Goal: calculate y (token1 amount)
 
 <img width="1853" alt="Screenshot 2025-03-31 at 2 10 22 PM" src="https://github.com/user-attachments/assets/81b8f718-a4de-4bdb-a3f8-cb1e7b0fb3a5" />
 
-Formaulas for the active liquidity range [Pa - Pb]:
+Formulas for the active liquidity range [Pa, Pb]:
+
+```
 L = x * S(Pb) * S(Pc) / (S(Pb) - S(Pc))
 L = y / (S(Pc) - S(Pa))
+```
 
 <img width="1235" alt="Screenshot 2025-03-31 at 3 05 49 PM" src="https://github.com/user-attachments/assets/2781b077-7394-4460-b852-07703236c1fe" />
 
@@ -31,6 +34,7 @@ Let's use S() instead of sqrt() for short
 
 #### 1) Compute Liquidity using x (token0)
 
+```
 S(Pc) = S(1.001) ≈ 1.000499875
 S(Pa) = S(1.0005) ≈ 1.0002499375
 S(Pb) = S(1.003) ≈ 1.001498127
@@ -38,6 +42,7 @@ S(Pb) = S(1.003) ≈ 1.001498127
 L = x * S(Pb) * S(Pc) / (S(Pb) - S(Pc))
 
 L = 10 * (1.001498127 * 1.000499875) / (1.001498127 - 1.000499875) = 10 * (1.001997749 / 0.000998252) = 10037.52
+```
 
 #### 2) Solve for y (token1) using computed liquidity (L)
 

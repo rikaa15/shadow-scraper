@@ -5,6 +5,7 @@ import {calculateAPR, calculateDaysDifference, portfolioItemFactory, roundToSign
 import {PortfolioItem} from "../types";
 import moment from "moment/moment";
 import {getSwapXVaultDeposits} from "../../api";
+import {getBlockAtTimestamp} from "../../api/llama";
 const PoolsList = require('./poolsList.json');
 const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
 const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
@@ -60,11 +61,18 @@ export const getSwapXInfo = async (
 
         // Get deposit amounts
         let launchTimestamp = 0
+        let launchBlockNumber = 0
         const ICHIVaultAddress = await gaugeContract.TOKEN();
         const vaultDeposits = await getSwapXVaultDeposits(userAddress, ICHIVaultAddress)
 
         if(vaultDeposits.length > 0){
-          launchTimestamp = Number(vaultDeposits[0].createdAtTimestamp) * 1000
+          const timestamp = Number(vaultDeposits[0].createdAtTimestamp)
+          launchTimestamp = timestamp * 1000
+          try {
+            launchBlockNumber = await getBlockAtTimestamp(timestamp)
+          } catch (e) {
+            console.error('SwapX: failed to get block number at timestamp', timestamp, e)
+          }
         }
 
         const ICHIVaultContract = new ethers.Contract(ICHIVaultAddress, ICHIVaultABI, provider);
@@ -132,7 +140,7 @@ export const getSwapXInfo = async (
             rewardValue1: '',
             rewardValue: roundToSignificantDigits(rewardValue0.toString()),
             totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
-            totalBlocks: (currentBlockNumber - Number(0)).toString(),
+            totalBlocks: (currentBlockNumber - launchBlockNumber).toString(),
             vfat: `https://vfat.io/token?chainId=146&tokenAddress=${token0.id}`,
             depositLink: `https://swapx.fi/earn?search=${poolSymbol}`
           }

@@ -22,6 +22,8 @@ Goal: calculate y (token1 amount)
 Formulas for the active liquidity range:
 <img width="1235" alt="Screenshot 2025-03-31 at 3 05 49 PM" src="https://github.com/user-attachments/assets/2781b077-7394-4460-b852-07703236c1fe" />
 
+Let's use S() instead of sqrt() for short
+
 ```
 L = x * S(Pb) * S(Pc) / (S(Pb) - S(Pc))
 L = y / (S(Pc) - S(Pa))
@@ -29,8 +31,6 @@ L = y / (S(Pc) - S(Pa))
 
 
 L should be equal in both expressions, so we can find y (token1 amount)
-
-Let's use S() instead of sqrt() for short
 
 #### 1) Compute Liquidity using x (token0)
 

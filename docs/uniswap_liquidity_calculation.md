@@ -65,4 +65,4 @@ y = 10037.52 * 0.0002499375 = 2.508752655 ≈ 2.5
 
 #### Result
 
-Esimated token1 amount = 2.5 which matched with dashboard estimation
+Esimated token1 amount = 2.5 matched with dashboard value

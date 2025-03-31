@@ -1,33 +1,42 @@
-Starting conditions: 
-20 USDC.e (0x29219dd400f2bf60e5a23d13be72b486d4038894) on balance
-0 USDT (0x6047828dc181963ba44974801ff68e538da5eaf9) on balance
+#### Strategy
+
+```
+https://vicunafinance.com/markets
+1. Select a market with a high lending rate and then borrow against it with a positive borrow rate. 
+2. In our case, the collateral asset is USDC.e with 13% lending rate .
+3. Borrow USDT for 3% against it at maximum LTV (80%)
+4. Sell USDT for USDC.e (https://swap.defillama.com/?chain=sonic&from=0x0000000000000000000000000000000000000000&tab=swap&to=)  and repeat step 1-3 for 5 times
+```
+
+#### Initial balance
+
+- 20 USDC.e (0x29219dd400f2bf60e5a23d13be72b486d4038894)
+- 0 USDT (0x6047828dc181963ba44974801ff68e538da5eaf9)
+
+
 
 #### Loop 1
 
-1) Deposit 20 USDC into a Vicuna Finance USDC vault
+Step 1: Deposit 20 USDC into a Vicuna Finance USDC vault
 
 <img width="568" alt="Screenshot 2025-03-29 at 8 19 09 PM" src="https://github.com/user-attachments/assets/7e52da6e-9f6c-464c-ba6e-cc0b10709d65" />
 
 
-2) With an 80% LTV, borrow 16 USDT
+Step 2: With an 80% LTV, borrow 16 USDT
 
 <img width="586" alt="Screenshot 2025-03-29 at 8 20 17 PM" src="https://github.com/user-attachments/assets/3d72f0fd-0102-41cc-b4dc-d5a777d88c13" />
 
 I'm paying 3% annual interest on the 16 USDT
 
-3) Sell USDT for USDC.e (https://swap.defillama.com/?chain=sonic&from=0x0000000000000000000000000000000000000000&tab=swap&to=)
+Step 3: Sell USDT for USDC.e (https://swap.defillama.com/?chain=sonic&from=0x0000000000000000000000000000000000000000&tab=swap&to=)
 
 16 USDT swapped to 16 USDC.e
 
 https://sonicscan.org//tx/0xee9c7930e4de8797b8f7dc658f239fc50793f176493b22f7a40f4e5396be65bd
 
-Total collateral: 36 + 12.8 = 48.8 USDC.e
+#### Loop 2: repeating the same steps from Loop 1
 
-Total debt: 16 + 12.8 = 28.8 USDT
-
-#### Loop 2
-
-New Collateral: 16 USDC.e
+New Collateral: 16 USDC.e (from swapping USDT to USDC on previous step)
 
 Borrow: 80% of 16 = 12.8 USDT
 
@@ -96,6 +105,10 @@ Net Profit: 9.5953 - 1.6152 = 7.9801 USD/year
 ROI: 7.9801 ÷ 20 = 39.90% annually
 
 
+#### March 30 Update
 
+<img width="1458" alt="Screenshot 2025-03-30 at 2 40 10 PM" src="https://github.com/user-attachments/assets/19f40dd8-67b2-402e-b3e8-11e425c4b6ff" />
+
+USDC supply APR dropped from 13% to 1.3%, USDT borrow APR dropped from -3% to -49% which made this strategy unprofitable
 
 

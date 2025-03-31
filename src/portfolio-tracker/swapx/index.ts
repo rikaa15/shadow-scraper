@@ -150,7 +150,7 @@ export const getSwapXInfo = async (
             Number(portfolioItem.rewardValue),
             Number(portfolioItem.totalDays)
           )
-          portfolioItem.apr = roundToSignificantDigits(apr.toString(), 4)
+          portfolioItem.apr = roundToSignificantDigits(apr.toString())
           return portfolioItem
         }
         return null

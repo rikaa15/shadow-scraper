@@ -26,10 +26,7 @@ const main = async () => {
     const txsInfo = await getWalletTransactionsInfo(userAddress)
     const txsTsv = arrayToTSV(txsInfo)
 
-    const tsv = `
-      ${exchangesTsv}\n
-      ${txsTsv}
-    `
+    const tsv = exchangesTsv + '\n\n' + txsTsv
 
     console.log(tsv)
 

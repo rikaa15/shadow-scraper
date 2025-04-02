@@ -1,7 +1,7 @@
 import {getTransactions} from "../../api/sonicscan";
 import {ethers} from "ethers";
 import {WalletHistoryItem} from "../types";
-import moment from "moment/moment";
+import moment from "moment-timezone";
 import {getTokenPrice} from "../../api/coingecko";
 import {includesSubstrings, roundToSignificantDigits} from "../helpers";
 
@@ -56,7 +56,9 @@ export const getWalletTransactionsInfo = async (walletAddress: string) => {
     const totalUsdValue = String(Number(totalSonicValue) * currentSonicPrice)
 
     walletHistoryItems.push({
-      time: moment(Number(timeStamp) * 1000).format('YY/MM/DD HH:MM:SS'),
+      time: moment(Number(timeStamp) * 1000)
+        .tz('America/Los_Angeles')
+        .format('YY/MM/DD HH:MM:SS'),
       type: functionNameShort,
       amount: amount,
       value: roundToSignificantDigits(ethers.formatEther(value)),

@@ -17,7 +17,7 @@ export const getWalletTransactionsInfo = async (walletAddress: string) => {
     const { blockNumber, timeStamp, functionName, value, input } = tx
 
     const [ functionNameShort ] = functionName.split('(')
-    let amount = ''
+    let amount = '0'
 
     if(functionName
       && functionNameShort
@@ -46,10 +46,6 @@ export const getWalletTransactionsInfo = async (walletAddress: string) => {
           } else {
             amount = decodedAmount.toString()
           }
-
-          // if(amount) {
-          //   amount = String(Number(amount) / Math.pow(10, 18))
-          // }
         }
       } catch (e) {}
     }

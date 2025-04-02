@@ -22,7 +22,7 @@ export const getWalletTransactionsInfo = async (walletAddress: string) => {
     if(functionName
       && functionNameShort
       && !functionName.includes('tuple')
-      && includesSubstrings(functionNameShort.toLowerCase(), ['mint', 'swap', 'deposit', 'liquidity'])
+      && includesSubstrings(functionNameShort.toLowerCase(), ['mint', 'swap', 'deposit', 'liquidity', 'transfer', 'supply'])
     ) {
       try {
         const contractInterface = new ethers.Interface([
@@ -31,7 +31,9 @@ export const getWalletTransactionsInfo = async (walletAddress: string) => {
         const decoded = contractInterface.decodeFunctionData(functionName, input);
 
         let decodedAmount = ''
-        if(functionNameShort === 'deposit') { // [ 10000000n ]
+        if(functionNameShort === 'mint') {
+          console.log('decoded', decoded)
+        } else if(functionNameShort === 'deposit') { // [ 10000000n ]
           decodedAmount = decoded[0].toString()
         } else if(functionNameShort === 'depositAssets') {
           decodedAmount = String(decoded[2])

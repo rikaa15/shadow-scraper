@@ -141,7 +141,6 @@ export const getSwapXInfo = async (
             rewardValue: roundToSignificantDigits(rewardValue0.toString()),
             totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
             totalBlocks: (currentBlockNumber - launchBlockNumber).toString(),
-            vfat: `https://vfat.io/token?chainId=146&tokenAddress=${token0.id}`,
             depositLink: `https://swapx.fi/earn?search=${poolSymbol}`
           }
 

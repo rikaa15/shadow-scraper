@@ -86,7 +86,6 @@ export const portfolioItemFactory = (): PortfolioItem => {
     totalBlocks: '',
     apr: '',
     type: '',
-    vfat: '',
     depositLink: ''
   }
 }

@@ -20,7 +20,6 @@ export interface PortfolioItem {
   totalBlocks: string
   apr: string
   type: string
-  vfat: string
   depositLink: string
 }
 
@@ -38,4 +37,13 @@ export interface PositionReward {
   asset: string
   amount: string
   value: string
+}
+
+export interface WalletHistoryItem {
+  time: string
+  type: string
+  amount: string
+  value: string
+  totalSonicValue: string
+  totalUsdValue: string
 }

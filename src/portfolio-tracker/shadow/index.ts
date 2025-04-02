@@ -171,7 +171,6 @@ export const getShadowInfo = async (
         ),
         totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
-        vfat: `https://vfat.io/token?chainId=146&tokenAddress=${pool.token0.id}`,
         depositLink: `https://www.shadow.so/liquidity/${pool.id}`
       }
 

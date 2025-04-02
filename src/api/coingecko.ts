@@ -17,7 +17,8 @@ export const CoinGeckoRates: Record<string, number> = {
   'swapx-2': 0.2519,
   'shadow-2': 55.49,
   'shadow-liquid-staking-token': 39.37,
-  'wrapped-sonic': 0.4755,
+  'wrapped-sonic': 0.4933,
+  'sonic': 0.4933,
   'sonic-bridged-usdc-e-sonic': 1,
   'rings-scusd': 1,
   'tether': 1,
@@ -42,15 +43,18 @@ export const getTokenPrices = async (tokens: string[])=> {
 }
 
 export const getTokenPrice = async (
-  tokenId: string
+  tokenId: string,
+  fromCache = true
 )=> {
-  if (tokenPriceCache[tokenId]) {
-    return tokenPriceCache[tokenId]
+  if(fromCache) {
+    if (tokenPriceCache[tokenId]) {
+      return tokenPriceCache[tokenId]
+    }
+    if(CoinGeckoRates[tokenId]) {
+      return CoinGeckoRates[tokenId]
+    }
   }
-  if(CoinGeckoRates[tokenId]) {
-    return CoinGeckoRates[tokenId]
-  }
-  console.log('!!!Get token price', tokenId)
+  console.log('Coingecko API: Get token price', tokenId)
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`
   const {data} = await axios.get<CoinGeckoPriceResponse>(url)
   const value = data[tokenId]['usd']

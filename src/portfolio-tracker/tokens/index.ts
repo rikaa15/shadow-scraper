@@ -1,7 +1,7 @@
-import {PortfolioItem} from "../index";
 import {ethers} from "ethers";
 import Decimal from "decimal.js";
 import {portfolioItemFactory} from "../helpers";
+import {PortfolioItem} from "../types";
 const ERC20ABI = require('../../abi/ERC20.json');
 
 const tokenAddresses = [
@@ -42,7 +42,6 @@ export const getTokensInfo = async (
               .div(Math.pow(10, decimals))
               .toDecimalPlaces(6)
               .toString(),
-            link: `https://vfat.io/token?chainId=146&tokenAddress=${tokenAddress}`
           }
         } else {
           return null

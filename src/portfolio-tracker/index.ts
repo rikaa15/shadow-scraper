@@ -27,8 +27,7 @@ const main = async () => {
     const txsTsv = arrayToTSV(txsInfo)
 
     const tsv = `
-      ${exchangesTsv}
-      \n
+      ${exchangesTsv}\n
       ${txsTsv}
     `
 

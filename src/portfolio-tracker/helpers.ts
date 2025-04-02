@@ -161,3 +161,10 @@ export const calculateDaysDifference = (
   const daysDiff = msDiff / (1000 * 60 * 60 * 24);
   return roundToSignificantDigits(daysDiff.toString(), significantDigits);
 }
+
+
+export const includesSubstrings = (
+  str: string, substrings: string[]
+) => {
+  return substrings.some(substring => str.toLowerCase().includes(substring.toLowerCase()));
+}

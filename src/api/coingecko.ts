@@ -12,7 +12,7 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'weth': 'weth'
 }
 
-// For test purposes
+// hardcode values for test purposes
 export const CoinGeckoRates: Record<string, number> = {
   'swapx-2': 0.2519,
   'shadow-2': 55.49,
@@ -23,7 +23,8 @@ export const CoinGeckoRates: Record<string, number> = {
   'rings-scusd': 1,
   'tether': 1,
   'frax-usd': 1,
-  'weth': 1802.30
+  'weth': 1802.30,
+  'pendle': 2.88,
 }
 
 interface CoinGeckoPriceResponse {

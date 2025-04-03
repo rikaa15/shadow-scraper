@@ -4,6 +4,7 @@ import {arrayToTSV} from "../utils";
 import {getShadowInfo} from "./shadow";
 import fs from "fs";
 import {getWalletTransactionsInfo} from "./transactions-history";
+import {getMagpieInfo} from "./magpie";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -21,7 +22,12 @@ const main = async () => {
     // tokensInfo = await setUSDValues(tokensInfo)
     const shadowInfo = await getShadowInfo(userAddress)
     const swapXInfo = await getSwapXInfo(userAddress)
-    const exchangesTsv = arrayToTSV([...shadowInfo, ...swapXInfo])
+    const magpieInfo = await getMagpieInfo(userAddress)
+    const exchangesTsv = arrayToTSV([
+      ...shadowInfo,
+      ...swapXInfo,
+      ...magpieInfo
+    ])
 
     const txsInfo = await getWalletTransactionsInfo(userAddress)
     const txsTsv = arrayToTSV(txsInfo)

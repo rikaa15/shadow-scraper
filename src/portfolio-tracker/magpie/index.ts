@@ -6,6 +6,11 @@ import {calculateAPR, calculateDaysDifference, portfolioItemFactory, roundToSign
 import moment from "moment/moment";
 import {getTransactions} from "../../api/sonicscan";
 const MasterPenpieABI = require('../../abi/MasterPenpie.json');
+// const mPendleSVBaseRewarderABI = require('../../abi/mPendleSVBaseRewarder.json');
+// Rewarder ABI: https://arbiscan.io/address/0xD51FDCcBEB6f69df92A0f0ee0141349E332FE670#code
+
+// const vlPenpieBaseRewarderABI = require('../../abi/vlPenpieBaseRewarder.json');
+// ABI: https://arbiscan.io/address/0x2854f036587c3f7F90d372f71fcD4B32616aD691#code
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const masterPenpieProxyAddress = '0x664cc2BcAe1E057EB1Ec379598c5B743Ad9Db6e7'
@@ -19,6 +24,7 @@ export const getMagpieInfo = async (
   walletAddress: string
 ) => {
   const penpie = new ethers.Contract(masterPenpieProxyAddress, MasterPenpieABI, provider);
+  // const penpieRewarder2 = new ethers.Contract('0x1Bfaf418C13e36958b0b6736B27C3E8bC1F9bB91', mPendleSVBaseRewarderABI, provider);
   // const userInfo = await penpie.userInfo(stakingToken, walletAddress)
   // const tokenToPoolInfo = await penpie.tokenToPoolInfo(stakingToken)
   const stakingInfo = await penpie.stakingInfo(pendleMarket, walletAddress)

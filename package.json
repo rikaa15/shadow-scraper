@@ -12,7 +12,8 @@
     "vfat": "nodemon src/vfat/index.ts",
     "portfolio": "ts-node src/portfolio-tracker/index.ts",
     "shadow_trade_export": "nodemon src/shadow_trades/export_trades.ts",
-    "shadow_trade_stats": "nodemon src/shadow_trades/stats.ts"
+    "shadow_trade_stats": "nodemon src/shadow_trades/stats.ts",
+    "spike_guard": "ts-node src/spike-guard/index.ts"
   },
   "keywords": [],
   "author": "",

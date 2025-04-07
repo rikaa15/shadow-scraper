@@ -5,12 +5,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: SiloFinance
+    name: Silo
     network: sonic
     source:
-      address: "0xcfbebcf6bc36f631cbb1011633ffc014db3db22d"
+      address: "0xe6605932e4a686534D19005BB9dB0FBA1F101272"
       abi: Silo
-      startBlock: 4978435
+      startBlock: 14850125
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9

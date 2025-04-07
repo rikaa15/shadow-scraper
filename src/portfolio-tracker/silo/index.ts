@@ -4,12 +4,13 @@ import {calculateAPR, calculateDaysDifference, portfolioItemFactory, roundToSign
 import moment from "moment/moment";
 import {getTransactions} from "../../api/sonicscan";
 import Decimal from "decimal.js";
+import {getSiloDeposits} from "../../api/silo-subgraph";
 const SiloABI = require('../../abi/Silo.json');
 const BoringVaultABI = require('../../abi/BoringVault.json');
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const SiloAddress = '0xe6605932e4a686534D19005BB9dB0FBA1F101272'
-// const SiloRouterAddress = '0x22AacdEc57b13911dE9f188CF69633cC537BdB76'
+const SiloRouterAddress = '0x22AacdEc57b13911dE9f188CF69633cC537BdB76'
 
 export const getSiloInfo = async (
   walletAddress: string
@@ -36,9 +37,17 @@ export const getSiloInfo = async (
   //   .map(tx => tx.hash)
   // console.log('executeTxs', executeTxs)
 
+  const deposits = await getSiloDeposits(walletAddress)
+  const firstDeposit = deposits[deposits.length - 1]
+  let totalDepositAmount = deposits.reduce((acc, item) => {
+    return acc + Number(item.assets) / Math.pow(10, decimals)
+  }, 0)
+  const depositAmount0 = String(totalDepositAmount)
+
   if(assetsAmount > 0n) {
-    const depositTimestamp = 1743401014 * 1000
-    const depositAmount0 = '5'
+    const depositTimestamp = firstDeposit
+      ? Number(firstDeposit.blockTimestamp) * 1000
+      : 0
     const depositValue0 = depositAmount0
     const rewardAmount0 = new Decimal(assetsAmount.toString()).div(10 ** decimals)
       .sub(new Decimal(depositAmount0))
@@ -46,7 +55,7 @@ export const getSiloInfo = async (
     const rewardValue0 = rewardAmount0
 
     const currentBlockNumber = await provider.getBlockNumber()
-    const depositBlockNumber = '17308224'
+    const depositBlockNumber = firstDeposit ? firstDeposit.blockNumber : '0'
 
     const portfolioItem: PortfolioItem = {
       ...portfolioItemFactory(),

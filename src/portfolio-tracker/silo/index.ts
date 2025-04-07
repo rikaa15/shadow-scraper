@@ -87,7 +87,6 @@ export const getSiloInfo = async (
       Number(portfolioItem.rewardValue),
       Number(portfolioItem.totalDays)
     )
-    console.log('apr', apr)
     portfolioItem.apr = roundToSignificantDigits(apr.toString())
 
     portfolioItems.push(portfolioItem)

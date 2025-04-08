@@ -21,14 +21,14 @@ const main = async () => {
 
     // let tokensInfo = await getTokensInfo(userAddress)
     // tokensInfo = await setUSDValues(tokensInfo)
-    // const shadowInfo = await getShadowInfo(userAddress)
-    // const swapXInfo = await getSwapXInfo(userAddress)
-    // const magpieInfo = await getMagpieInfo(userAddress)
+    const shadowInfo = await getShadowInfo(userAddress)
+    const swapXInfo = await getSwapXInfo(userAddress)
+    const magpieInfo = await getMagpieInfo(userAddress)
     const siloInfo = await getSiloInfo(userAddress)
     const exchangesTsv = arrayToTSV([
-      // ...shadowInfo,
-      // ...swapXInfo,
-      // ...magpieInfo,
+      ...shadowInfo,
+      ...swapXInfo,
+      ...magpieInfo,
       ...siloInfo
     ])
 

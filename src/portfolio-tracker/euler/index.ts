@@ -46,7 +46,7 @@ export const getEulerInfo = async (
     const portfolioItem: PortfolioItem = {
       ...portfolioItemFactory(),
       type: 'Swap pool',
-      name: 'silo',
+      name: 'euler',
       address: vaultAddress,
       depositTime: moment(depositTimestamp).format('YY/MM/DD HH:MM:SS'),
       depositAsset0: depositAsset0,

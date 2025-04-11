@@ -15,6 +15,7 @@ export const getEulerPortfolioHistory = async (
   walletAddress: string
 ) => {
   const assetAddress = await vault.asset() as string
+  const vaultName = await vault.name() as string
   const assetContract = new ethers.Contract(assetAddress, FiatTokenV2_ABI, provider);
   // const rewardAsset0 = await assetContract.symbol() as string
   // const depositAsset0 = rewardAsset0
@@ -34,6 +35,7 @@ export const getEulerPortfolioHistory = async (
 
   const daysCount = 7
 
+  console.log(`Euler vault=${vaultName}, wallet=${walletAddress}`)
   for(let i = 0; i < daysCount; i++) {
     const blockDate = moment().subtract(i + 1, "days").endOf('day')
     const blockTimestamp = blockDate.unix()
@@ -64,7 +66,7 @@ export const getEulerPortfolioHistory = async (
       const rewardValue = rewardAmount // USDC.e
       const totalDays = calculateDaysDifference(
         new Date(depositTimestamp),
-        new Date(),
+        new Date(blockTimestamp * 1000),
         4
       )
 

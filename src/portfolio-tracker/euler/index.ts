@@ -76,6 +76,10 @@ export const getEulerInfo = async (
       Number(portfolioItem.rewardValue),
       Number(portfolioItem.totalDays)
     )
+    console.log('portfolioItem.depositValue', portfolioItem.depositValue)
+    console.log('portfolioItem.rewardValue', portfolioItem.rewardValue)
+    console.log('portfolioItem.totalDays', portfolioItem.totalDays)
+    console.log('apr', apr)
     portfolioItem.apr = roundToSignificantDigits(apr.toString())
 
     portfolioItems.push(portfolioItem)

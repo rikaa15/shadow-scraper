@@ -10,11 +10,11 @@
     "jsonl": "nodemon src/jsonl/index.ts",
     "beefy": "nodemon src/beefy/index.ts",
     "vfat": "nodemon src/vfat/index.ts",
-    "portfolio": "ts-node src/portfolio-tracker/index.ts",
-    "history": "ts-node src/portfolio-tracker/history.ts",
     "shadow_trade_export": "nodemon src/shadow_trades/export_trades.ts",
     "shadow_trade_stats": "nodemon src/shadow_trades/stats.ts",
-    "spike_guard": "ts-node src/spike-guard/index.ts"
+    "portfolio": "ts-node src/portfolio-tracker/index.ts",
+    "history": "ts-node src/portfolio-tracker/history.ts",
+    "spectra": "ts-node src/portfolio-tracker/spectra-yt/index.ts"
   },
   "keywords": [],
   "author": "",

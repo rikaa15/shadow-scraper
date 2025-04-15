@@ -23,7 +23,6 @@ export const getEulerInfo = async (
   const assetsAmount = await vault.convertToAssets(sharesBalance, {
     blockTag: 19386245
   }) as bigint
-  console.log('assetsAmount', assetsAmount)
 
   const deposits = await getEulerDeposits(walletAddress)
   const firstDeposit = deposits[deposits.length - 1]

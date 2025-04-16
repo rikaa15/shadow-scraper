@@ -9,6 +9,7 @@ import {
   roundToSignificantDigits
 } from "../helpers";
 import { getClosestBlockByTimestamp } from "../../api/rpc";
+import { getSpectraData } from "../../api/spectra";
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
@@ -46,7 +47,7 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
   }
 
   if (!depositTimestamp || !startBlock) {
-    console.warn("⚠️ Could not find deposit time on-chain for this wallet.");
+    console.warn("Could not find deposit time on-chain for this wallet.");
     return portfolioItems;
   }
 
@@ -67,7 +68,50 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
   const rewardValue0 = currentValue.minus(depositValue0).toString();
 
   const totalDays = calculateDaysDifference(new Date(depositTimestamp), new Date(), 4);
-  const apr = calculateAPR(Number(depositValue0), Number(rewardValue0), Number(totalDays));
+  const lpAPR = calculateAPR(Number(depositValue0), Number(rewardValue0), Number(totalDays));
+
+  const spectraData = await getSpectraData(walletAddress);
+  const poolData = spectraData.find(p =>
+    p.pools.some(p => p.address.toLowerCase() === SpectraPoolAddress.toLowerCase())
+  );
+
+  const firstPool = poolData?.pools?.[0];
+
+  let ptAPR = new Decimal(0);
+  let ptRewardUSD = new Decimal(0);
+
+  if (firstPool && poolData?.maturity) {
+    const now = Math.floor(Date.now() / 1000);
+    const secondsToMaturity = poolData.maturity - now;
+    const daysToMaturity = secondsToMaturity / 86400;
+
+    const ptPrice = new Decimal(firstPool.ptPrice.usd);
+    const ptAmount = new Decimal(firstPool.ptAmount).div(1e6);
+    const totalLP = new Decimal(firstPool.lpt.supply).div(10 ** firstPool.lpt.decimals);
+    const totalPoolUSD = new Decimal(firstPool.liquidity.usd);
+    const userShare = lpBalance.div(totalLP);
+    const userPTAmount = userShare.mul(ptAmount);
+    const ptMarketPrice = new Decimal(firstPool.ptPrice.usd);
+    const valueSupplied = userPTAmount.mul(ptMarketPrice);
+    const estimatedEntryPrice = valueSupplied.div(userPTAmount);
+
+    // console.log({
+    //   ptAmount: ptAmount.toString(),
+    //   userPTAmount: userPTAmount.toString(),
+    //   valueSupplied: valueSupplied.toString(),
+    //   estimatedEntryPrice: estimatedEntryPrice.toString(),
+    //   ptRewardUSD: userPTAmount.mul(new Decimal(1).minus(estimatedEntryPrice)).toString()
+    // });
+
+    ptRewardUSD = userPTAmount.mul(new Decimal(1).minus(estimatedEntryPrice));
+
+    if (estimatedEntryPrice.gt(0) && daysToMaturity > 0) {
+      ptAPR = new Decimal(1).div(estimatedEntryPrice).minus(1).div(daysToMaturity).times(365);
+    }
+  }
+
+  const totalRewardValue = new Decimal(rewardValue0).plus(ptRewardUSD);
+  const totalApr = new Decimal(lpAPR).plus(ptAPR);
 
   const portfolioItem: PortfolioItem = {
     ...portfolioItemFactory(),
@@ -83,18 +127,18 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     depositValue1: '',
     depositValue: roundToSignificantDigits(depositValue0),
     rewardAsset0: 'USDC.e',
-    rewardAsset1: '',
-    rewardAmount0: roundToSignificantDigits(currentValue.minus(depositValue0).toString()),
+    rewardAsset1: 'PT-sw-wstkscUSD',
+    rewardAmount0: '',
     rewardAmount1: '',
     rewardValue0: roundToSignificantDigits(rewardValue0),
-    rewardValue1: '',
-    rewardValue: roundToSignificantDigits(rewardValue0),
+    rewardValue1: roundToSignificantDigits(ptRewardUSD.toString()),
+    rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
     totalDays,
     totalBlocks: currentBlock?.number ? (currentBlock.number - startBlock).toString() : "0",
     depositLink: `https://sonicscan.org/address/${SpectraPoolAddress}`
   };
 
-  portfolioItem.apr = roundToSignificantDigits(apr.toString());
+  portfolioItem.apr = roundToSignificantDigits(totalApr.toString());
   portfolioItems.push(portfolioItem);
 
   return portfolioItems;

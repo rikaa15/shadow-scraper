@@ -40,10 +40,11 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     });
 
     if (balance > 0n) {
-      depositTimestamp = block.timestamp * 1000;
-      startBlock = block.blockNumber;
-      break;
-    }
+        depositTimestamp = block.timestamp * 1000;
+        startBlock = block.blockNumber;
+      } else {
+        break;
+      }
   }
 
   if (!depositTimestamp || !startBlock) {
@@ -85,28 +86,20 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     const secondsToMaturity = poolData.maturity - now;
     const daysToMaturity = secondsToMaturity / 86400;
 
-    const ptPrice = new Decimal(firstPool.ptPrice.usd);
     const ptAmount = new Decimal(firstPool.ptAmount).div(1e6);
     const totalLP = new Decimal(firstPool.lpt.supply).div(10 ** firstPool.lpt.decimals);
-    const totalPoolUSD = new Decimal(firstPool.liquidity.usd);
     const userShare = lpBalance.div(totalLP);
     const userPTAmount = userShare.mul(ptAmount);
-    const ptMarketPrice = new Decimal(firstPool.ptPrice.usd);
-    const valueSupplied = userPTAmount.mul(ptMarketPrice);
-    const estimatedEntryPrice = valueSupplied.div(userPTAmount);
 
-    // console.log({
-    //   ptAmount: ptAmount.toString(),
-    //   userPTAmount: userPTAmount.toString(),
-    //   valueSupplied: valueSupplied.toString(),
-    //   estimatedEntryPrice: estimatedEntryPrice.toString(),
-    //   ptRewardUSD: userPTAmount.mul(new Decimal(1).minus(estimatedEntryPrice)).toString()
-    // });
+    const poolUSD = new Decimal(firstPool.liquidity.usd);
+    const ptValueAtDeposit = userPTAmount.mul(poolUSD.div(ptAmount));
+    const estimatedEntryPrice = ptValueAtDeposit.div(userPTAmount);
 
-    ptRewardUSD = userPTAmount.mul(new Decimal(1).minus(estimatedEntryPrice));
+    const maturityValue = new Decimal(poolData.maturityValue.usd);
+    ptRewardUSD = userPTAmount.mul(maturityValue.minus(estimatedEntryPrice));
 
     if (estimatedEntryPrice.gt(0) && daysToMaturity > 0) {
-      ptAPR = new Decimal(1).div(estimatedEntryPrice).minus(1).div(daysToMaturity).times(365);
+      ptAPR = maturityValue.minus(estimatedEntryPrice).div(estimatedEntryPrice).div(daysToMaturity).times(365);
     }
   }
 
@@ -135,7 +128,7 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
     totalDays,
     totalBlocks: currentBlock?.number ? (currentBlock.number - startBlock).toString() : "0",
-    depositLink: `https://sonicscan.org/address/${SpectraPoolAddress}`
+    depositLink: `https://app.spectra.finance/pools/sonic:${SpectraPoolAddress}`
   };
 
   portfolioItem.apr = roundToSignificantDigits(totalApr.toString());

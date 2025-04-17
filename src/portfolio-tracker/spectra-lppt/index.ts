@@ -10,6 +10,8 @@ import {
 } from "../helpers";
 import { getClosestBlockByTimestamp } from "../../api/rpc";
 import { getSpectraData } from "../../api/spectra";
+import fs from "fs";
+import { arrayToTSV } from "../../utils";
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
@@ -80,28 +82,20 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
 
   let ptAPR = new Decimal(0);
   let ptRewardUSD = new Decimal(0);
+  let rewardAmount1 = new Decimal(0);
+
 
   if (firstPool && poolData?.maturity) {
-    const now = Math.floor(Date.now() / 1000);
-    const secondsToMaturity = poolData.maturity - now;
-    const daysToMaturity = secondsToMaturity / 86400;
-
-    const ptAmount = new Decimal(firstPool.ptAmount).div(1e6);
-    const totalLP = new Decimal(firstPool.lpt.supply).div(10 ** firstPool.lpt.decimals);
-    const userShare = lpBalance.div(totalLP);
-    const userPTAmount = userShare.mul(ptAmount);
-
-    const poolUSD = new Decimal(firstPool.liquidity.usd);
-    const ptValueAtDeposit = userPTAmount.mul(poolUSD.div(ptAmount));
-    const estimatedEntryPrice = ptValueAtDeposit.div(userPTAmount);
-
-    const maturityValue = new Decimal(poolData.maturityValue.usd);
-    ptRewardUSD = userPTAmount.mul(maturityValue.minus(estimatedEntryPrice));
-
-    if (estimatedEntryPrice.gt(0) && daysToMaturity > 0) {
-      ptAPR = maturityValue.minus(estimatedEntryPrice).div(estimatedEntryPrice).div(daysToMaturity).times(365);
+    const ptPriceNow = new Decimal(firstPool.ptPrice.usd);
+    const ptPriceAtMaturity = new Decimal(poolData.maturityValue.usd);
+  
+    if (ptPriceNow.gt(0)) {
+      ptAPR = ptPriceAtMaturity.div(ptPriceNow).minus(1);
+      ptRewardUSD = new Decimal(firstPool.ptAmount).div(1e6).times(ptPriceAtMaturity.minus(ptPriceNow));
+      rewardAmount1 = new Decimal(firstPool.ptAmount).div(1e6);
     }
   }
+  
 
   const totalRewardValue = new Decimal(rewardValue0).plus(ptRewardUSD);
   const totalApr = new Decimal(lpAPR).plus(ptAPR);
@@ -121,8 +115,8 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     depositValue: roundToSignificantDigits(depositValue0),
     rewardAsset0: 'USDC.e',
     rewardAsset1: 'PT-sw-wstkscUSD',
-    rewardAmount0: '',
-    rewardAmount1: '',
+    rewardAmount0: roundToSignificantDigits(rewardValue0),
+    rewardAmount1: roundToSignificantDigits(rewardAmount1.toString()),
     rewardValue0: roundToSignificantDigits(rewardValue0),
     rewardValue1: roundToSignificantDigits(ptRewardUSD.toString()),
     rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
@@ -133,6 +127,9 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
 
   portfolioItem.apr = roundToSignificantDigits(totalApr.toString());
   portfolioItems.push(portfolioItem);
+  const tsv = arrayToTSV(portfolioItems);
+  const filename = `export/portfolio_${walletAddress}_${Math.round(Date.now() / 1000)}.tsv`;
+  fs.writeFileSync(filename, tsv, 'utf8');
 
   return portfolioItems;
 };

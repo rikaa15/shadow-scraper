@@ -3,7 +3,7 @@ import { getAddress } from "ethers";
 
 (async () => {
   try {
-    const wallet = getAddress("0x57De5488856e68710093996e6dE57d83a5A539C3");
+    const wallet = getAddress("0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A");
     const result = await getSpectraInfo(wallet);
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {

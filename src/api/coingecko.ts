@@ -14,11 +14,11 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
 
 // hardcode values for test purposes
 export const CoinGeckoRates: Record<string, number> = {
-  'swapx-2': 0.2519,
-  'shadow-2': 55.49,
-  'shadow-liquid-staking-token': 39.37,
-  'wrapped-sonic': 0.4933,
-  'sonic': 0.4933,
+  'swapx-2': 0.1665,
+  'shadow-2': 40.90,
+  'shadow-liquid-staking-token': 29.60,
+  'wrapped-sonic': 0.4805,
+  'sonic': 0.4805,
   'sonic-bridged-usdc-e-sonic': 1,
   'rings-scusd': 1,
   'tether': 1,

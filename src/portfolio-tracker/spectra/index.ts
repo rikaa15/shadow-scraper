@@ -97,6 +97,7 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
 
     if (ptPriceNow.gt(0)) {
       ptAPR = ptPriceAtMaturity.div(ptPriceNow).minus(1).mul(100);
+      console.log('ptAPR', ptAPR)
       ptRewardUSD = new Decimal(firstPool.ptAmount).div(1e6).times(ptPriceAtMaturity.minus(ptPriceNow));
       rewardAmount1 = new Decimal(firstPool.ptAmount).div(1e6);
     }

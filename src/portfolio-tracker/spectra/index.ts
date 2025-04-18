@@ -60,11 +60,10 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     return portfolioItems;
   }
 
-  const [lpBalanceRaw, vpStartRaw, vpNowRaw, ytClaimableYield, currentBlock] = await Promise.all([
+  const [lpBalanceRaw, vpStartRaw, vpNowRaw, currentBlock] = await Promise.all([
     lpToken.balanceOf(walletAddress),
     pool.get_virtual_price({ blockTag: startBlock }),
     pool.get_virtual_price(),
-    pt.getCurrentYieldOfUserInIBT(walletAddress),
     provider.getBlock("latest")
   ]);
 
@@ -103,25 +102,26 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     }
   }
 
-  if(ytClaimableYield > 0n) {
-    let balance = '0'
-    let ytDecimals = 6
-    const data = await getSpectraData(walletAddress)
-    if(data.length > 0) {
-      const [spectraInfo] = data
-      ytDecimals = spectraInfo.yt.decimals
-      balance = new Decimal(spectraInfo.yt.balance)
-        .div(10 ** ytDecimals)
-        .toString()
-    }
-    if(Number(balance) > 0) {
-      const reward = new Decimal(ytClaimableYield.toString())
-        .div(10 ** ytDecimals)
-        .toString()
-      const apr = calculateAPR(Number(balance), Number(reward), Number(totalDays));
-      ytAPR = new Decimal(apr)
-    }
-  }
+  // const ytClaimableYield = await pt.getCurrentYieldOfUserInIBT(walletAddress)
+  // if(ytClaimableYield > 0n) {
+  //   let balance = '0'
+  //   let ytDecimals = 6
+  //   const data = await getSpectraData(walletAddress)
+  //   if(data.length > 0) {
+  //     const [spectraInfo] = data
+  //     ytDecimals = spectraInfo.yt.decimals
+  //     balance = new Decimal(spectraInfo.yt.balance)
+  //       .div(10 ** ytDecimals)
+  //       .toString()
+  //   }
+  //   if(Number(balance) > 0) {
+  //     const reward = new Decimal(ytClaimableYield.toString())
+  //       .div(10 ** ytDecimals)
+  //       .toString()
+  //     const apr = calculateAPR(Number(balance), Number(reward), Number(totalDays));
+  //     ytAPR = new Decimal(apr)
+  //   }
+  // }
 
 
   const totalRewardValue = new Decimal(rewardValue0).plus(ptRewardUSD);

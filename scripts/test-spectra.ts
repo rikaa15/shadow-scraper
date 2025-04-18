@@ -1,4 +1,4 @@
-import { getSpectraInfo } from "../src/portfolio-tracker/spectra-lppt";
+import { getSpectraInfo } from "../src/portfolio-tracker/spectra";
 import { getAddress } from "ethers";
 
 (async () => {

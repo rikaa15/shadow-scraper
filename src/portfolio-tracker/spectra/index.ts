@@ -17,15 +17,21 @@ const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 const SpectraPoolAddress = "0x167b0951c5d3fb8ff5ab675401e369dd65817801";
 const SpectraLPTokenAddress = "0x7006bfca68c46a3bf98b41d0bd5665846a99440d";
+const SpectraPTAddress = "0x7002383d2305B8f3b2b7786F50C13D132A22076d";
+const SpectraYTAddress = '0x96E15759F99502692F7b39c3A80FE44C5da7DC8d'
 
-const SpectraPoolABI = require("../../abi/SpectraLP.json");
+const SpectraPoolABI = require("./SpectraLP.json");
 const SpectraLPTokenABI = require("../../abi/ERC20.json");
+const PrincipalTokenABI = require('./SpectraPT.json');
+const YieldTokenABI = require('./SpectraYT.json');
 
 export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioItem[]> => {
   const portfolioItems: PortfolioItem[] = [];
 
   const lpToken = new ethers.Contract(SpectraLPTokenAddress, SpectraLPTokenABI, provider);
   const pool = new ethers.Contract(SpectraPoolAddress, SpectraPoolABI, provider);
+  const pt = new ethers.Contract(SpectraPTAddress, PrincipalTokenABI, provider);
+  const yt = new ethers.Contract(SpectraYTAddress, YieldTokenABI, provider);
 
   const maxDaysBack = 90;
   let depositTimestamp: number | null = null;
@@ -54,10 +60,11 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     return portfolioItems;
   }
 
-  const [lpBalanceRaw, vpStartRaw, vpNowRaw, currentBlock] = await Promise.all([
+  const [lpBalanceRaw, vpStartRaw, vpNowRaw, ytClaimableYield, currentBlock] = await Promise.all([
     lpToken.balanceOf(walletAddress),
     pool.get_virtual_price({ blockTag: startBlock }),
     pool.get_virtual_price(),
+    pt.getCurrentYieldOfUserInIBT(walletAddress),
     provider.getBlock("latest")
   ]);
 
@@ -83,7 +90,7 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
   let ptAPR = new Decimal(0);
   let ptRewardUSD = new Decimal(0);
   let rewardAmount1 = new Decimal(0);
-
+  let ytAPR = new Decimal(0);
 
   if (firstPool && poolData?.maturity) {
     const ptPriceNow = new Decimal(firstPool.ptPrice.usd);
@@ -96,9 +103,29 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
     }
   }
 
+  if(ytClaimableYield > 0n) {
+    let balance = '0'
+    let ytDecimals = 6
+    const data = await getSpectraData(walletAddress)
+    if(data.length > 0) {
+      const [spectraInfo] = data
+      ytDecimals = spectraInfo.yt.decimals
+      balance = new Decimal(spectraInfo.yt.balance)
+        .div(10 ** ytDecimals)
+        .toString()
+    }
+    if(Number(balance) > 0) {
+      const reward = new Decimal(ytClaimableYield.toString())
+        .div(10 ** ytDecimals)
+        .toString()
+      const apr = calculateAPR(Number(balance), Number(reward), Number(totalDays));
+      ytAPR = new Decimal(apr)
+    }
+  }
+
 
   const totalRewardValue = new Decimal(rewardValue0).plus(ptRewardUSD);
-  const totalApr = new Decimal(lpAPR).plus(ptAPR);
+  const totalApr = new Decimal(lpAPR).plus(ptAPR).plus(ytAPR);
 
   const portfolioItem: PortfolioItem = {
     ...portfolioItemFactory(),

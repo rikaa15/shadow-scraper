@@ -1,0 +1,2 @@
+name	address	deposit_time	deposit_asset0	deposit_asset1	deposit_amount0	deposit_amount1	deposit_value0	deposit_value1	deposit_value	reward_asset0	reward_asset1	reward_amount0	reward_amount1	reward_value0	reward_value1	reward_value	total_days	total_blocks	apr	type	deposit_link
+spectra	0x167b0951c5d3fb8ff5ab675401e369dd65817801	25/04/14 23:59:59	USDC.e		7.73713		7.79225		7.79225	USDC.e	PT-sw-wstkscUSD	0.000178788	426073	0.000178788	9068.54	9068.54	2.465	441197	0.361747	Swap pool	https://app.spectra.finance/pools/sonic:0x167b0951c5d3fb8ff5ab675401e369dd65817801

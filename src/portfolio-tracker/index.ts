@@ -7,6 +7,7 @@ import {getWalletTransactionsInfo} from "./transactions-history";
 import {getMagpieInfo} from "./magpie";
 import {getSiloInfo} from "./silo";
 import {getEulerInfo} from "./euler";
+import {getSpectraInfo} from "./spectra";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -23,17 +24,29 @@ const main = async () => {
     // let tokensInfo = await getTokensInfo(userAddress)
     // tokensInfo = await setUSDValues(tokensInfo)
 
-    const shadowInfo = await getShadowInfo(userAddress)
-    const swapXInfo = await getSwapXInfo(userAddress)
-    const magpieInfo = await getMagpieInfo(userAddress)
-    const siloInfo = await getSiloInfo(userAddress)
-    const eulerInfo = await getEulerInfo(userAddress)
+    const [
+      shadowInfo,
+      swapXInfo,
+      magpieInfo,
+      siloInfo,
+      eulerInfo,
+      spectraInfo
+    ] = await Promise.all([
+      getShadowInfo(userAddress),
+      getSwapXInfo(userAddress),
+      getMagpieInfo(userAddress),
+      getSiloInfo(userAddress),
+      getEulerInfo(userAddress),
+      getSpectraInfo(userAddress)
+    ])
+
     const exchangesTsv = arrayToTSV([
       ...shadowInfo,
       ...swapXInfo,
       ...magpieInfo,
       ...siloInfo,
-      ...eulerInfo
+      ...eulerInfo,
+      ...spectraInfo
     ])
 
     const txsTsv = ''

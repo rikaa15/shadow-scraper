@@ -158,6 +158,7 @@ export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioIt
   const tsv = arrayToTSV(portfolioItems);
   const filename = `export/portfolio_${walletAddress}_${Math.round(Date.now() / 1000)}.tsv`;
   fs.writeFileSync(filename, tsv, 'utf8');
+  console.log('Spectra portfolio exported to ', filename)
 
   return portfolioItems;
 };

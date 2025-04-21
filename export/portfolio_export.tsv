@@ -3,8 +3,9 @@ shadow	0x9053fe060f412ad5677f934f89e07524343ee8e7	25/03/17 19:03:00	USDC.e	USDT	
 swapx	0x640429b0633851f487639bcdd8ed523ddf1bbff8	25/03/17 19:03:00	USDC.e	scUSD	5.63552	4.35850	5.63552	4.35850	9.99403	SWPx		0.253906		0.0422754		0.0422754	34.71	7070077	4.45000	Swap pool	https://swapx.fi/earn?search=USDC.e/scUSD
 magpie pendle	0x3f5ea53d1160177445b1898afbb16da111182418	25/03/17 21:03:00	aUSDC LP		0.00000000000489710		10.0135		10.0135	PENDLE		0.00914670		0.0263425		0.0263425	34.61	7048411	2.77000	Swap pool	https://www.pendle.magpiexyz.io/stake/0x3f5ea53d1160177445b1898afbb16da111182418
 spectra	0x167b0951c5d3fb8ff5ab675401e369dd65817801	25/03/17 23:59:59	USDC.e		5.22854		5.26240		5.26240	USDC.e	PT-sw-wstkscUSD	0.00353686	424084	0.00353686	8363.36	8363.37	34.53	7033601	2.72198	Swap pool	https://app.spectra.finance/pools/sonic:0x167b0951c5d3fb8ff5ab675401e369dd65817801
-
+																					
 silo	0xe6605932e4a686534D19005BB9dB0FBA1F101272	25/03/31 20:03:00	scUSD		5.00007		5.00007		5.00007	scUSD		0.0118660		0.0118660		0.0118660	20.71	4062834	4.18000	Swap pool	https://v2.silo.finance/markets/sonic/ptausdc14aug-scusd-46?action=deposit
 euler	0x196F3C7443E940911EE2Bb88e019Fd71400349D9	25/04/08 10:04:00	USDC.e		12.0000		12.0000		12.0000	USDC.e	wS	0.0136040	0.201709	0.0136040	0.0980988	0.111703	13.12	2463740	5.04500	Swap pool	https://app.euler.finance/vault/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic
 aave	0x578Ee1ca3a8E1b54554Da1Bf7C583506C4CD11c6	25/03/21 12:24:11	USDC.e		1		1		1	aSonUSDC		0.00012800		0.00012800		0.00012800	25.302	1093041	0.18470	Lending	https://app.aave.com/reserve-overview/?underlyingAsset=0x29219dd400f2bf60e5a23d13be72b486d4038894&marketName=proto_sonic_v3
-pendle	0x6e4e95fab7db1f0524b4b0a05f0b9c96380b7dfa		wstkscUSD		4.36354					wstkscUSD									8.65	Fixed Yield	https://app.pendle.finance/trade/markets/0x6e4e95fab7db1f0524b4b0a05f0b9c96380b7dfa/swap?view=pt&chain=sonic&py=output
+pendle	0x6e4e95fab7db1f0524b4b0a05f0b9c96380b7dfa		wstkscUSD		1					wstkscUSD									7.05600	Fixed Yield	https://app.pendle.finance/trade/markets/0x6e4e95fab7db1f0524b4b0a05f0b9c96380b7dfa/swap?view=pt&chain=sonic&py=output
+pendle	0x3f5ea53d1160177445b1898afbb16da111182418		aUSDC		1					aUSDC									7.553	Fixed Yield	https://app.pendle.finance/trade/markets/0x3f5ea53d1160177445b1898afbb16da111182418/swap?view=pt&chain=sonic

@@ -2,7 +2,7 @@ import axios from "axios";
 import {getBurnsQuery, getGaugeRewardClaimsQuery, getMintsQuery, getPositionsQuery, getSwapsQuery} from "./query";
 import {ClBurn, ClMint, ClPosition, ClSwap, GaugeRewardClaim} from "../types";
 import {appConfig} from "../config";
-require('dotenv').config()
+import 'dotenv/config'
 
 const client = axios.create({
   baseURL: appConfig.shadowSubgraphUrl

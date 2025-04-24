@@ -1,5 +1,5 @@
 import axios from 'axios';
-require('dotenv').config()
+import 'dotenv/config'
 
 const SonicApiKey = process.env.SONICSCAN_API_KEY || ''
 

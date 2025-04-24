@@ -2,7 +2,7 @@ import {ethers} from "ethers";
 import Decimal from "decimal.js";
 import {portfolioItemFactory} from "../helpers";
 import {PortfolioItem} from "../types";
-const ERC20ABI = require('../../abi/ERC20.json');
+import ERC20ABI from '../../abi/ERC20.json'
 
 const tokenAddresses = [
   '0x29219dd400f2bf60e5a23d13be72b486d4038894', // USDC

@@ -20,10 +20,10 @@ const SpectraLPTokenAddress = "0x7006bfca68c46a3bf98b41d0bd5665846a99440d";
 const SpectraPTAddress = "0x7002383d2305B8f3b2b7786F50C13D132A22076d";
 const SpectraYTAddress = '0x96E15759F99502692F7b39c3A80FE44C5da7DC8d'
 
-const SpectraPoolABI = require("./SpectraLP.json");
-const SpectraLPTokenABI = require("../../abi/ERC20.json");
-const PrincipalTokenABI = require('./SpectraPT.json');
-const YieldTokenABI = require('./SpectraYT.json');
+import SpectraPoolABI from "./SpectraLP.json"
+import SpectraLPTokenABI from "../../abi/ERC20.json"
+import PrincipalTokenABI from './SpectraPT.json'
+import YieldTokenABI from './SpectraYT.json'
 
 export const getSpectraInfo = async (walletAddress: string): Promise<PortfolioItem[]> => {
   const portfolioItems: PortfolioItem[] = [];

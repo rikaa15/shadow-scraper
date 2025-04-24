@@ -8,8 +8,8 @@ import {
   roundToSignificantDigits
 } from "../helpers";
 import {CoinGeckoTokenIdsMap, getTokenPrice} from "../../api/coingecko";
-const GaugeV3ABI = require('../../abi/GaugeV3.json');
-const ERC20ABI = require('../../abi/ERC20.json');
+import GaugeV3ABI from '../../abi/GaugeV3.json';
+import ERC20ABI from '../../abi/ERC20.json';
 import moment from 'moment'
 import {ClPosition, GaugeRewardClaim} from "../../types";
 import {PortfolioItem, PositionReward} from "../types";

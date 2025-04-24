@@ -5,11 +5,9 @@ import {PortfolioItem} from "../types";
 import {calculateAPR, calculateDaysDifference, portfolioItemFactory, roundToSignificantDigits} from "../helpers";
 import moment from "moment/moment";
 import {getTransactions} from "../../api/sonicscan";
-const MasterPenpieABI = require('../../abi/MasterPenpie.json');
-// const mPendleSVBaseRewarderABI = require('../../abi/mPendleSVBaseRewarder.json');
+import MasterPenpieABI from '../../abi/MasterPenpie.json'
 // Rewarder ABI: https://arbiscan.io/address/0xD51FDCcBEB6f69df92A0f0ee0141349E332FE670#code
 
-// const vlPenpieBaseRewarderABI = require('../../abi/vlPenpieBaseRewarder.json');
 // ABI: https://arbiscan.io/address/0x2854f036587c3f7F90d372f71fcD4B32616aD691#code
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");

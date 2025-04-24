@@ -6,10 +6,10 @@ import {PortfolioItem} from "../types";
 import moment from "moment/moment";
 import {getSwapXVaultDeposits} from "../../api";
 import {getBlockAtTimestamp} from "../../api/llama";
-const PoolsList = require('./poolsList.json');
-const SwapXPoolABI = require('../../abi/SwapxGaugeV2CL.json');
-const SwapXRewardsTokenABI = require('../../abi/SwapXRewardsToken.json');
-const ICHIVaultABI = require('../../abi/ICHIVault.json');
+import PoolsList from './poolsList.json'
+import SwapXPoolABI from '../../abi/SwapxGaugeV2CL.json'
+import SwapXRewardsTokenABI from '../../abi/SwapXRewardsToken.json'
+import ICHIVaultABI from '../../abi/ICHIVault.json'
 
 // https://sonicscan.org/address/0xdce26623440b34a93e748e131577049a8d84dded#readContract
 // query: "query ConcPools...
@@ -40,7 +40,7 @@ export const getSwapXInfo = async (
     .flat()
     .filter((item: any) => item.addresss !== '');
 
-  let poolsWithRewards: PortfolioItem[] = await Promise.all(
+  let poolsWithRewards = await Promise.all(
     v3Pools.map(async (v3Pool: any) => {
       try {
         const { address: poolAddress, token0, token1 } = v3Pool
@@ -160,7 +160,7 @@ export const getSwapXInfo = async (
   )
 
   poolsWithRewards = poolsWithRewards
-    .filter((item) => Boolean(item)
+    .filter((item) => item && Boolean(item)
       && (Number(item.depositValue) > 0)
     )
 

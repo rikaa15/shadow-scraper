@@ -5,8 +5,8 @@ import moment from "moment/moment";
 import {getTransactions} from "../../api/sonicscan";
 import Decimal from "decimal.js";
 import {getSiloDeposits} from "../../api/silo-subgraph";
-const SiloABI = require('../../abi/Silo.json');
-const BoringVaultABI = require('../../abi/BoringVault.json');
+import SiloABI from '../../abi/Silo.json'
+import BoringVaultABI from '../../abi/BoringVault.json'
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const SiloAddress = '0xe6605932e4a686534D19005BB9dB0FBA1F101272'

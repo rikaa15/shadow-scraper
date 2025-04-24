@@ -4,8 +4,8 @@ import {getEulerDeposits} from "../../api/euler-subgraph";
 import {getClosestBlockByTimestamp} from "../../api/rpc";
 import {calculateAPR, calculateDaysDifference, roundToSignificantDigits} from "../helpers";
 import Decimal from "decimal.js";
-const EulerEVaultABI = require('../../abi/EulerEVault.json');
-const FiatTokenV2_ABI = require('../../abi/FiatTokenV2_2_Euler.json');
+import EulerEVaultABI from '../../abi/EulerEVault.json'
+import FiatTokenV2_ABI from '../../abi/FiatTokenV2_2_Euler.json'
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const vaultAddress = '0x196F3C7443E940911EE2Bb88e019Fd71400349D9'

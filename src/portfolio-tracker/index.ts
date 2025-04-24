@@ -8,6 +8,7 @@ import {getMagpieInfo} from "./magpie";
 import {getSiloInfo} from "./silo";
 import {getEulerInfo} from "./euler";
 import {getSpectraInfo} from "./spectra";
+import {PortfolioItem} from "./types";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -47,7 +48,7 @@ const main = async () => {
       ...siloInfo,
       ...eulerInfo,
       ...spectraInfo
-    ])
+    ] as PortfolioItem[])
 
     const txsTsv = ''
     // const txsInfo = await getWalletTransactionsInfo(userAddress)

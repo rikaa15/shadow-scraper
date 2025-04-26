@@ -1,14 +1,13 @@
 import moment from "moment";
 import {ethers} from "ethers";
-import {getEulerDeposits} from "../../api/euler-subgraph";
 import {getClosestBlockByTimestamp} from "../../api/rpc";
-import {calculateAPR, calculateDaysDifference, roundToSignificantDigits} from "../helpers";
+import {roundToSignificantDigits} from "../helpers";
 import Decimal from "decimal.js";
 import EulerEVaultABI from '../../abi/EulerEVault.json'
-import FiatTokenV2_ABI from '../../abi/FiatTokenV2_2_Euler.json'
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const vaultAddress = '0x196F3C7443E940911EE2Bb88e019Fd71400349D9'
+// const vaultAddress = '0x3D9e5462A940684073EED7e4a13d19AE0Dcd13bc'
 const vault = new ethers.Contract(vaultAddress, EulerEVaultABI, provider);
 
 const SecondsPerYear = 365.2425 * 86400
@@ -71,7 +70,7 @@ export const getEulerVaultHistory = async () => {
     }
 
     console.log(`[${
-      blockDate.format('YYYY-MM-DD HH:SS')
+      blockDate.format('YYYY-MM-DD HH:ss')
     }] APR=${
       roundToSignificantDigits(vaultApr.mul(100).toString(), 6)
     }`)

@@ -16,17 +16,13 @@ const NumberRay = 10 ** 27
 const CONFIG_SCALE = 10000
 
 export const getEulerVaultHistory = async () => {
-  const assetAddress = await vault.asset() as string
   const vaultName = await vault.name() as string
-  const assetContract = new ethers.Contract(assetAddress, FiatTokenV2_ABI, provider);
-  const assetSymbol = await assetContract.symbol() as string
-  // const depositAsset0 = rewardAsset0
-  const decimals = Number(await assetContract.decimals() as bigint)
 
   const daysCount = 30
-  const startTimestamp = new Date('Feb-03-2025 11:05:40 PM UTC').valueOf()
+  let minApr = new Decimal(1000)
+  let maxApr = new Decimal(0)
 
-  console.log(`Euler vault=${vaultName}`)
+  console.log(`Euler vault ${vaultName}`)
   for(let i = 0; i < daysCount; i++) {
     const blockDate = moment().subtract(i + 1, "days").endOf('day')
     const blockTimestamp = blockDate.unix()
@@ -67,10 +63,23 @@ export const getEulerVaultHistory = async () => {
 
     const vaultApr = effectiveAnnualizedRate.mul(utilizationRate)
 
+    if(vaultApr.lt(minApr)) {
+      minApr = vaultApr
+    }
+    if(vaultApr.gt(maxApr)) {
+      maxApr = vaultApr
+    }
+
     console.log(`[${
       blockDate.format('YYYY-MM-DD HH:SS')
     }] APR=${
       roundToSignificantDigits(vaultApr.mul(100).toString(), 6)
     }`)
   }
+
+  console.log(`Script completed, min apr=${
+    roundToSignificantDigits(minApr.mul(100).toString(), 6)
+  }, max apr = ${
+    roundToSignificantDigits(maxApr.mul(100).toString(), 6)
+  }`)
 }

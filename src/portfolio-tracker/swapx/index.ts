@@ -7,9 +7,9 @@ import moment from "moment/moment";
 import {getSwapXVaultDeposits} from "../../api";
 import {getBlockAtTimestamp} from "../../api/llama";
 import PoolsList from './poolsList.json'
-import SwapXPoolABI from '../../abi/SwapxGaugeV2CL.json'
-import SwapXRewardsTokenABI from '../../abi/SwapXRewardsToken.json'
-import ICHIVaultABI from '../../abi/ICHIVault.json'
+import SwapXPoolABI from './SwapxGaugeV2CL.json'
+import SwapXRewardsTokenABI from './SwapXRewardsToken.json'
+import ICHIVaultABI from './ICHIVault.json'
 
 // https://sonicscan.org/address/0xdce26623440b34a93e748e131577049a8d84dded#readContract
 // query: "query ConcPools...

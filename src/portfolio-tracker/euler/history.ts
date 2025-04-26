@@ -11,6 +11,10 @@ const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const vaultAddress = '0x196F3C7443E940911EE2Bb88e019Fd71400349D9'
 const vault = new ethers.Contract(vaultAddress, EulerEVaultABI, provider);
 
+const SecondsPerYear = 31556952
+const NumberRay = 10 ** 27
+const CONFIG_SCALE = 10000
+
 export const getEulerVaultHistory = async () => {
   const assetAddress = await vault.asset() as string
   const vaultName = await vault.name() as string
@@ -19,7 +23,7 @@ export const getEulerVaultHistory = async () => {
   // const depositAsset0 = rewardAsset0
   const decimals = Number(await assetContract.decimals() as bigint)
 
-  const daysCount = 7
+  const daysCount = 30
   const startTimestamp = new Date('Feb-03-2025 11:05:40 PM UTC').valueOf()
 
   console.log(`Euler vault=${vaultName}`)
@@ -39,73 +43,34 @@ export const getEulerVaultHistory = async () => {
     }
 
     const blockTag = block.blockNumber
-    const interestRate = await vault.interestRate({
-      blockTag
-    }) as bigint
 
-    if(interestRate > 0n) {
-      const SecondsPerYear = 31556952
-      const NumberRay = 10 ** 27
-      const interestRateStr = new Decimal(interestRate.toString())
-        .mul(SecondsPerYear)
-        .mul(100)
-        .div(NumberRay)
-        .toString()
-      console.log(blockDateStr, 'interestRate', interestRateStr)
-    }
+    const interestRate = await vault.interestRate({ blockTag }) as bigint
+    const interestFee = await vault.interestFee({ blockTag }) as bigint
+    const totalBorrows = await vault.totalBorrows({ blockTag }) as bigint
+    const totalAssets = await vault.totalAssets({ blockTag }) as bigint
 
-    // const totalAssets = await vault.totalAssets({
-    //   blockTag
-    // }) as bigint
-    //
-    // if(totalAssets > 0n) {
-    //   const shares = await vault.totalSupply({
-    //     blockTag
-    //   }) as bigint
-    //   const currentAssets = await vault.convertToAssets(shares, {
-    //     blockTag
-    //   }) as bigint
-    //   const accumulatedFeesAssets = totalAssets - currentAssets
-    //   console.log('totalAssets - currentAssets', totalAssets - currentAssets)
-    //
-    //   const totalDays = calculateDaysDifference(
-    //     new Date(startTimestamp),
-    //     new Date(blockTimestamp * 1000),
-    //     4
-    //   )
-    //
-    //   const assets = new Decimal(totalAssets.toString())
-    //     .div(10 ** decimals)
-    //     .toString()
-    //
-    //   const fees = new Decimal(accumulatedFeesAssets.toString())
-    //     .div(10 ** decimals)
-    //     .toString()
-    //
-    //   const apr = calculateAPR(
-    //     Number(roundToSignificantDigits(assets)),
-    //     Number(roundToSignificantDigits(fees)),
-    //     Number(roundToSignificantDigits(totalDays, 4))
-    //   )
-    //
-    //   console.log(`Date=${
-    //     blockDateStr
-    //   }, apr=${
-    //     apr
-    //   }%, assets=${
-    //     assets
-    //   }${assetSymbol}, fees=${
-    //     fees
-    //   }${assetSymbol}, block=${
-    //     block.blockNumber
-    //   }, total days=${totalDays}`)
-    // } else {
-    //   console.log(`No shares found at ${
-    //     blockDateStr
-    //   }, block=${
-    //     block.blockNumber
-    //   }, exit`)
-    //   break;
-    // }
+    const perSecondRate = new Decimal(interestRate.toString())
+      .div(NumberRay)
+
+    const annualizedRate = new Decimal(
+      (new Decimal(1).add(perSecondRate)).pow(SecondsPerYear)
+    ).sub(new Decimal(1))
+
+    const feePercentage = new Decimal(interestFee.toString())
+      .div(CONFIG_SCALE)
+
+    const effectiveAnnualizedRate = annualizedRate
+      .mul(new Decimal(1).sub(feePercentage))
+
+    const utilizationRate = new Decimal(totalBorrows.toString())
+      .div(new Decimal(totalAssets.toString()))
+
+    const vaultApr = effectiveAnnualizedRate.mul(utilizationRate)
+
+    console.log(`[${
+      blockDate.format('YYYY-MM-DD HH:SS')
+    }] APR=${
+      roundToSignificantDigits(vaultApr.mul(100).toString(), 6)
+    }`)
   }
 }

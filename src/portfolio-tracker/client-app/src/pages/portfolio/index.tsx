@@ -8,15 +8,17 @@ import {getSiloInfo} from "../../../../silo";
 import {getEulerInfo} from "../../../../euler";
 import {getSpectraInfo} from "../../../../spectra";
 import {PortfolioItem} from "../../../../types.ts";
+import {UserPositionsTable} from "./PositionsTable.tsx";
 
 export const PortfolioPage = () => {
   const [inProgress, setInProgress] = useState(false);
   const [status, setStatus] = useState<string>('');
   const [walletAddress, setWalletAddress] = useState('0x881E625E5C30973b47ceE3a0f3Ef456012F13f7D')
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
 
   const onGetRewardsClick = async () => {
     setInProgress(true)
-    const portfolioItems: PortfolioItem[] = []
+    const items: PortfolioItem[] = []
 
     const dataProviders = [
       getShadowInfo,
@@ -30,15 +32,16 @@ export const PortfolioPage = () => {
     for(let i = 0; i < dataProviders.length; i++) {
       const fetchData = dataProviders[i]
       try {
-        setStatus(`Fetching data ${i + 1}/${dataProviders.length}`)
-        const data = await fetchData(walletAddress)
-        portfolioItems.push(...data)
+        setStatus(`Fetching provider data (${i + 1}/${dataProviders.length})`)
+        const data = await fetchData(walletAddress) as PortfolioItem[]
+        items.push(...data)
       } catch (e) {
         console.error('Failed to fetch data', i, e)
       }
     }
 
     setInProgress(false)
+    setPortfolioItems(items)
   }
 
   return <Box pad={'32px'}>
@@ -66,6 +69,9 @@ export const PortfolioPage = () => {
       <Box margin={{ top: '32px' }}>
         <Text>{status}</Text>
       </Box>
+    </Box>
+    <Box>
+      <UserPositionsTable portfolioItems={portfolioItems} />
     </Box>
   </Box>
 }

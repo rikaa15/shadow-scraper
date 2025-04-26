@@ -11,7 +11,7 @@ const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 const vaultAddress = '0x196F3C7443E940911EE2Bb88e019Fd71400349D9'
 const vault = new ethers.Contract(vaultAddress, EulerEVaultABI, provider);
 
-const SecondsPerYear = 31556952
+const SecondsPerYear = 365.2425 * 86400
 const NumberRay = 10 ** 27
 const CONFIG_SCALE = 10000
 

@@ -6,6 +6,7 @@ import {
   calculateTokenAPR, 
   findPoolId, 
   getTokenInfo,
+  getUserDepositInfo,
 } from './equilibriaHelper';
 import { portfolioItemFactory, roundToSignificantDigits, calculateDaysDifference } from "../helpers";
 
@@ -13,7 +14,7 @@ import { portfolioItemFactory, roundToSignificantDigits, calculateDaysDifference
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 // Contract addresses
-const MARKET_LP = '0x6e4e95fab7db1f0524b4b0a05f0b9c96380b7dfa'; // PT-wstscUSD Market
+const MARKET_LP = '0x3F5EA53d1160177445B1898afbB16da111182418'; 
 
 const DEPOSIT_LINK = 'https://equilibria.fi/dashboard';
 
@@ -91,20 +92,16 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
       console.log(`${reward.symbol}: ${reward.amount.toString()} (${reward.token})`);
     });
 
-    // Get the current block for timestamp
-    const currentBlock = await provider.getBlock('latest');
-    const currentTimestamp = currentBlock ? currentBlock.timestamp * 1000 : Date.now();
-    
-    // Since we don't have actual deposit data, we'll use an estimate
-    // In a real scenario, you'd want to query deposit events
-    const depositTimestamp = currentTimestamp - (30 * 24 * 60 * 60 * 1000); // Assume deposit was 30 days ago
-    const depositAmount = ethers.formatUnits(userBalance, depositTokenInfo.decimals);
+    const walletDepositInfo = await getUserDepositInfo(userAddress, marketAddress)
+
+    const depositTimestamp = walletDepositInfo.depositTimestamp
+    const depositAmount = '10.00' // walletDepositInfo.totalDeposited 
     const depositDate = new Date(depositTimestamp);
     
     // Process rewards
     const mainReward = rewards[0]; // First reward token (usually PENDLE)
     let secondaryReward = rewards[1]; // Second reward token (if exists)
-    
+
     // Calculate APR for main reward
     const aprResult = await calculateTokenAPR(
       mainReward.token,
@@ -166,7 +163,7 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
           .toString()
       ),
       totalDays: calculateDaysDifference(new Date(depositTimestamp), new Date(), 4),
-      totalBlocks: '0', // We don't have this info readily available
+      totalBlocks: '0', // We don't have this info readily available || Math.floor(aprData.daysSinceDeposit * 24 * 60 * 30); // ~2 seconds per block
       apr: roundToSignificantDigits(totalApr.toString()),
       depositLink: DEPOSIT_LINK
     };

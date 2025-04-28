@@ -98,6 +98,7 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
     const depositAmount = walletDepositInfo ? `${walletDepositInfo.totalDeposited}` : '10.00' 
     const depositAmountUSD = walletDepositInfo ? `${walletDepositInfo.totalDepositedUSD}` : '10.00' 
     const depositDate = new Date(depositTimestamp);
+    const totalBlocks = walletDepositInfo ? walletDepositInfo.totalBlocks : 0
     // Process rewards
     const mainReward = rewards[0]; // First reward token (usually PENDLE)
     let secondaryReward = rewards[1]; // Second reward token (if exists)
@@ -163,7 +164,7 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
           .toString()
       ),
       totalDays: calculateDaysDifference(new Date(depositTimestamp), new Date(), 4),
-      totalBlocks: '0', // We don't have this info readily available || Math.floor(aprData.daysSinceDeposit * 24 * 60 * 30); // ~2 seconds per block
+      totalBlocks: `${totalBlocks}`,
       apr: roundToSignificantDigits(totalApr.toString()),
       depositLink: DEPOSIT_LINK
     };

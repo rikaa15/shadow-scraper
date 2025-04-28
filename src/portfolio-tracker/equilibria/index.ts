@@ -94,10 +94,10 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
 
     const walletDepositInfo = await getUserDepositInfo(userAddress, marketAddress)
 
-    const depositTimestamp = walletDepositInfo.depositTimestamp
-    const depositAmount = '10.00' // walletDepositInfo.totalDeposited 
+    const depositTimestamp = walletDepositInfo ? walletDepositInfo.depositTimestamp : new Date()
+    const depositAmount = walletDepositInfo ? `${walletDepositInfo.totalDeposited}` : '10.00' 
+    const depositAmountUSD = walletDepositInfo ? `${walletDepositInfo.totalDepositedUSD}` : '10.00' 
     const depositDate = new Date(depositTimestamp);
-    
     // Process rewards
     const mainReward = rewards[0]; // First reward token (usually PENDLE)
     let secondaryReward = rewards[1]; // Second reward token (if exists)
@@ -107,10 +107,9 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
       mainReward.token,
       mainReward.symbol,
       mainReward.amount,
-      parseFloat(depositAmount),
+      parseFloat(depositAmountUSD),
       depositDate
     );
-    
     // Calculate secondary APR if available
     let secondaryAprResult = {
       tokenPrice: 0,
@@ -119,6 +118,7 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
     };
     
     if (secondaryReward) {
+      
       secondaryAprResult = await calculateTokenAPR(
         secondaryReward.token,
         secondaryReward.symbol,
@@ -140,11 +140,11 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
       depositTime: moment(depositTimestamp).format('YY/MM/DD HH:MM:SS'),
       depositAsset0: depositTokenInfo.symbol,
       depositAsset1: '',
-      depositAmount0: roundToSignificantDigits(depositAmount),
+      depositAmount0: roundToSignificantDigits(depositAmountUSD, 3),
       depositAmount1: '',
-      depositValue0: roundToSignificantDigits(depositAmount),
+      depositValue0: roundToSignificantDigits(depositAmountUSD, 3),
       depositValue1: '',
-      depositValue: roundToSignificantDigits(depositAmount),
+      depositValue: roundToSignificantDigits(depositAmountUSD, 3),
       rewardAsset0: mainReward.symbol,
       rewardAsset1: secondaryReward ? secondaryReward.symbol : '',
       rewardAmount0: roundToSignificantDigits(mainReward.amount.toString()),

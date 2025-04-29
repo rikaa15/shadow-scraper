@@ -2,7 +2,7 @@
 
 This report estimates the 30-day realized past gains for DeFi pools on the Sonic network.
 
-Calculations are based on available APR data.
+Calculations are based on available APR data and market trends for each vault.
 
 An initial investment of $100,000 is assumed for each pool.
 

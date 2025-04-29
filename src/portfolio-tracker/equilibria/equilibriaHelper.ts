@@ -132,7 +132,6 @@ export async function calculateTokenAPR(
     // Calculate reward value in USD
     const rewardValueUSD = rewardAmount.mul(tokenPrice);
 
-    // Calculate APR: (reward value / deposit value) * 365 / days * 100
     const apr = calculateAPR(
       Number(depositUSD),
       Number(rewardValueUSD),

@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import erc20Abi from '../../abi/ERC20.json'
 import { getTokenPrice } from "../../api/coingecko";
 import moment from "moment";
+import { calculateAPR } from "../helpers";
 
 // Setup provider
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
@@ -132,7 +133,11 @@ export async function calculateTokenAPR(
     const rewardValueUSD = rewardAmount.mul(tokenPrice);
 
     // Calculate APR: (reward value / deposit value) * 365 / days * 100
-    const apr = rewardValueUSD.div(depositUSD).mul(365).div(daysSinceDeposit).mul(100);
+    const apr = calculateAPR(
+      Number(depositUSD),
+      Number(rewardValueUSD),
+      Number(daysSinceDeposit)
+    )
     console.log(rewardValueUSD, depositUSD, daysSinceDeposit)
     console.log(`APR Calculation for ${rewardSymbol}:`);
     console.log(`- Reward amount: ${rewardAmount} ${rewardSymbol}`);
@@ -140,11 +145,11 @@ export async function calculateTokenAPR(
     console.log(`- Reward value: $${rewardValueUSD}`);
     console.log(`- Deposit value: $${depositUSD}`);
     console.log(`- Days since deposit: ${daysSinceDeposit.toFixed(2)}`);
-    console.log(`- Calculated APR: ${apr.toNumber().toFixed(2)}%`);
+    console.log(`- Calculated APR: ${apr.toFixed(2)}%`);
 
     return {
       tokenPrice,
-      apr: apr.toNumber(),
+      apr: apr,
       daysSinceDeposit
     }
   } catch (error) {

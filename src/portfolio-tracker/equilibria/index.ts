@@ -95,8 +95,8 @@ export async function getEquilibriaInfo(userAddress: string, marketAddress: stri
     const walletDepositInfo = await getUserDepositInfo(userAddress, marketAddress)
 
     const depositTimestamp = walletDepositInfo ? walletDepositInfo.depositTimestamp : new Date()
-    const depositAmount = walletDepositInfo ? `${walletDepositInfo.totalDeposited}` : '10.00' 
-    const depositAmountUSD = walletDepositInfo ? `${walletDepositInfo.totalDepositedUSD}` : '10.00' 
+    const depositAmount = walletDepositInfo ? `${walletDepositInfo.totalDeposited}` : '0' 
+    const depositAmountUSD = walletDepositInfo ? `${walletDepositInfo.totalDepositedUSD}` : '0' 
     const depositDate = new Date(depositTimestamp);
     const totalBlocks = walletDepositInfo ? walletDepositInfo.totalBlocks : 0
     // Process rewards

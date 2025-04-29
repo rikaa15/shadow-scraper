@@ -20,5 +20,5 @@ An initial investment of $100,000 is assumed for each pool.
 | CL1-USDC.e/USDT ([link](https://vfat.io/farm?chainId=146&farmAddress=0xf3ac5aef4116abfd322fdc683420a4fc4b7f2d73&poolId=0))                                      | vfat               | 9.57%           | $786      | 9.57%       | $786.16        |
 
 Notes:
-- Aave: last supply usdc.e campaign round has ended and a new one has just started. Updated value for current APR will be available in 2 days.
+- Aave: last supply usdc.e campaign round has ended and a new one has just started. New rewards value and APR will be available in 2 days.
 - SwapX frxUSD/scUSD and vfat CL1-USDC.e/USDT past gains calculation based on my position's performance, as no position was previously opened. More accurate results will be available in 2-3 days.

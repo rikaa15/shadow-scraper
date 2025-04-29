@@ -244,7 +244,7 @@ export async function getUserDepositInfo(userAddress: string, marketAddress: str
         };
       }));
 
-      const firstDeposit = depositHistory[0] // was already sorted;
+      const firstDeposit = depositHistory[0] // is already sorted;
 
       const block = await provider.getBlock(firstDeposit.blockNumber);
       const depositTimestamp = block ? new Date(Number(block.timestamp) * 1000) : new Date();

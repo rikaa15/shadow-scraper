@@ -21,6 +21,7 @@
   "description": "",
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
+    "@types/node-fetch": "^2.6.12",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },

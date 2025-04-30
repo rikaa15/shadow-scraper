@@ -5,6 +5,7 @@ import { getAddress } from "ethers";
 import { getShadowInfo } from "../src/portfolio-tracker/shadow";
 import { getSiloInfo } from "../src/portfolio-tracker/silo";
 import { getSwapXInfo } from "../src/portfolio-tracker/swapx";
+import { getPendleInfo } from "../src/portfolio-tracker/pendle-lp";
 
 const functionMap: Record<string, (wallet: string) => Promise<any>> = {
   spectra: getSpectraInfo,
@@ -12,12 +13,13 @@ const functionMap: Record<string, (wallet: string) => Promise<any>> = {
   magpie: getMagpieInfo,
   shadow: getShadowInfo,
   silo: getSiloInfo,
-  swapx: getSwapXInfo
+  swapx: getSwapXInfo,
+  pendle: getPendleInfo
 };
 
 // Change here
 const selectedFunction = process.argv[2] || 'euler';
-const walletAddress = getAddress("0x881E625E5C30973b47ceE3a0f3Ef456012F13f7D");
+const walletAddress = getAddress("0x57De5488856e68710093996e6dE57d83a5A539C3");
 //
 
 (async () => {

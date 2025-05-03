@@ -1,4 +1,4 @@
-import {exportArrayToCSV} from "../utils";
+import {exportArrayToCSV} from "../../utils";
 
 const { data: { clmHarvestEvents } } = require('./harvests.json')
 import Decimal from 'decimal.js'

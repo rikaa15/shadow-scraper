@@ -14,8 +14,6 @@ export const getEulerCollateralHistory = async () => {
 
   const daysCount = 30
 
-  const ltvList = await vault.LTVList() as string[]
-
   console.log(`Euler vault ${vaultName}`)
   for(let i = 0; i < daysCount; i++) {
     const blockDate = moment().subtract(i, "days").endOf('day')
@@ -31,27 +29,32 @@ export const getEulerCollateralHistory = async () => {
     }
 
     const blockTag = block.blockNumber
+    const totalBorrows = await vault.totalBorrows({ blockTag }) as bigint
+    const totalAssets = await vault.totalAssets({ blockTag }) as bigint
 
-    for(const ltvAddress of ltvList) {
-      const ltvVault = new ethers.Contract(ltvAddress, EulerEVaultABI, provider);
-      const [
-        borrowLTV,
-        liquidationLTV,
-        initialLiquidationLTV,
-        targetTimestamp,
-        rampDuration
-      ] = await vault.LTVFull(ltvAddress, { blockTag }) as [bigint, bigint, bigint, bigint, bigint]
-      const ltvSymbol = await ltvVault.symbol()
-      console.log(`[${
-        blockDate.format('YYYY MMM DD')
-      }] vault=${ltvSymbol}, LTV=${
-        new Decimal(borrowLTV.toString()).div(100)
-          .toSD(4).toString()
-      }%, LLTV=${
-        new Decimal(liquidationLTV.toString()).div(100)
-          .toSD(4).toString()
-      }%`)
-    }
+    const utilization = new Decimal(totalBorrows.toString())
+      .div(new Decimal(totalAssets.toString()))
+      .mul(100)
+
+    console.log(`[${
+      blockDate.format('YYYY MMM DD')
+    }] total borrows=${
+      new Decimal(totalBorrows.toString())
+        .div(10 ** 6)
+        .div(10 ** 6)
+        .toSD(4)
+        .toString()
+    }M, total supply=${
+      new Decimal(totalAssets.toString())
+        .div(10 ** 6)
+        .div(10 ** 6)
+        .toSD(4)
+        .toString()
+    }M, utilization=${
+      utilization
+        .toSD(4)
+        .toString()
+    }%`)
   }
 
   console.log(`Script completed`)

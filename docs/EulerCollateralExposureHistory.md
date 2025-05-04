@@ -42,7 +42,6 @@ Collateral exposure history
 [2025 Apr 30] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 30] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 30] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 30] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 29] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 29] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 29] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -50,7 +49,6 @@ Collateral exposure history
 [2025 Apr 29] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 29] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 29] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 29] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 28] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 28] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 28] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -58,7 +56,6 @@ Collateral exposure history
 [2025 Apr 28] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 28] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 28] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 28] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 27] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 27] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 27] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -66,7 +63,6 @@ Collateral exposure history
 [2025 Apr 27] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 27] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 27] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 27] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 26] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 26] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 26] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -74,7 +70,6 @@ Collateral exposure history
 [2025 Apr 26] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 26] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 26] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 26] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 25] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 25] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 25] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -82,7 +77,6 @@ Collateral exposure history
 [2025 Apr 25] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 25] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 25] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 25] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 24] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 24] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 24] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -90,7 +84,6 @@ Collateral exposure history
 [2025 Apr 24] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 24] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 24] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 24] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 23] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 23] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 23] vault=escUSD-2, LTV=0%, LLTV=93.5%
@@ -98,7 +91,6 @@ Collateral exposure history
 [2025 Apr 23] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 23] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 23] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 23] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 22] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 22] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 22] vault=escUSD-2, LTV=0%, LLTV=0%
@@ -106,7 +98,6 @@ Collateral exposure history
 [2025 Apr 22] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 22] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 22] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 22] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 21] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 21] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 21] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -114,7 +105,6 @@ Collateral exposure history
 [2025 Apr 21] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 21] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 21] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 21] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 20] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 20] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 20] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -122,7 +112,6 @@ Collateral exposure history
 [2025 Apr 20] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 20] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 20] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 20] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 19] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 19] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 19] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -130,7 +119,6 @@ Collateral exposure history
 [2025 Apr 19] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 19] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 19] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 19] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 18] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 18] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 18] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -138,7 +126,6 @@ Collateral exposure history
 [2025 Apr 18] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 18] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 18] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 18] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 17] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 17] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 17] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -146,7 +133,6 @@ Collateral exposure history
 [2025 Apr 17] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 17] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 17] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 17] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 16] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 16] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 16] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -154,7 +140,6 @@ Collateral exposure history
 [2025 Apr 16] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 16] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 16] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 16] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 15] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 15] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 15] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -162,7 +147,6 @@ Collateral exposure history
 [2025 Apr 15] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 15] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 15] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 15] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 14] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 14] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 14] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -170,7 +154,6 @@ Collateral exposure history
 [2025 Apr 14] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 14] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 14] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 14] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 13] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 13] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 13] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -178,7 +161,6 @@ Collateral exposure history
 [2025 Apr 13] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 13] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 13] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 13] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 12] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 12] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 12] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -186,7 +168,6 @@ Collateral exposure history
 [2025 Apr 12] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 12] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 12] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 12] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 11] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 11] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 11] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -194,7 +175,6 @@ Collateral exposure history
 [2025 Apr 11] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 11] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 11] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 11] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 10] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 10] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 10] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -202,7 +182,6 @@ Collateral exposure history
 [2025 Apr 10] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 10] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 10] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 10] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 09] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 09] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 09] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -210,7 +189,6 @@ Collateral exposure history
 [2025 Apr 09] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 09] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 09] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 09] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 08] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 08] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 08] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -218,7 +196,6 @@ Collateral exposure history
 [2025 Apr 08] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 08] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 08] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 08] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 07] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 07] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 07] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -226,7 +203,6 @@ Collateral exposure history
 [2025 Apr 07] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 07] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 07] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 07] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 06] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 06] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 06] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -234,7 +210,6 @@ Collateral exposure history
 [2025 Apr 06] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 06] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 06] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 06] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
 [2025 Apr 05] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 Apr 05] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 Apr 05] vault=escUSD-2, LTV=90.5%, LLTV=91.5%
@@ -242,5 +217,5 @@ Collateral exposure history
 [2025 Apr 05] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 Apr 05] vault=ewS-2, LTV=77%, LLTV=78%
 [2025 Apr 05] vault=ePT-wstkscUSD-29MAY2025-1, LTV=90.5%, LLTV=91.5%
-[2025 Apr 05] vault=ePT-aSonUSDC-14AUG2025-1, LTV=0%, LLTV=0%
+
 ```

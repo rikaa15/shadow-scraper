@@ -14,8 +14,6 @@ export const getEulerCollateralHistory = async () => {
 
   const daysCount = 30
 
-  const ltvList = await vault.LTVList() as string[]
-
   console.log(`Euler vault ${vaultName}`)
   for(let i = 0; i < daysCount; i++) {
     const blockDate = moment().subtract(i, "days").endOf('day')
@@ -31,7 +29,7 @@ export const getEulerCollateralHistory = async () => {
     }
 
     const blockTag = block.blockNumber
-
+    const ltvList = await vault.LTVList({ blockTag }) as string[]
     for(const ltvAddress of ltvList) {
       const ltvVault = new ethers.Contract(ltvAddress, EulerEVaultABI, provider);
       const [

@@ -1,6 +1,6 @@
 ```shell
 Euler MEV Capital Sonic Cluster USDC.e
-
+[2025 May 04] total borrows=7.419M, total supply=14.07M, utilization=52.73%
 [2025 May 03] total borrows=7.313M, total supply=15.36M, utilization=47.62%
 [2025 May 02] total borrows=7.421M, total supply=15.35M, utilization=48.34%
 [2025 May 01] total borrows=7.458M, total supply=15.33M, utilization=48.64%

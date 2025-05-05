@@ -3,6 +3,11 @@ Euler MEV Capital Sonic Cluster USDC.e
 Collateral exposure history
 
 ```shell
+[2025 May 05] vault=eWETH-1, LTV=77%, LLTV=78%
+[2025 May 05] vault=escETH-2, LTV=77%, LLTV=78%
+[2025 May 05] vault=escUSD-2, LTV=0%, LLTV=91.5%
+[2025 May 05] vault=ewstkscETH-1, LTV=77%, LLTV=78%
+[2025 May 05] vault=ewstkscUSD-1, LTV=90.5%, LLTV=91.5%
 [2025 May 04] vault=eWETH-1, LTV=77%, LLTV=78%
 [2025 May 04] vault=escETH-2, LTV=77%, LLTV=78%
 [2025 May 04] vault=escUSD-2, LTV=0%, LLTV=91.5%

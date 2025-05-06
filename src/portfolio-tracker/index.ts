@@ -8,6 +8,7 @@ import {getMagpieInfo} from "./magpie";
 import {getSiloInfo} from "./silo";
 import {getEulerInfo} from "./euler";
 import {getSpectraInfo} from "./spectra";
+import {getBeefyInfo} from './beefy';
 import {PortfolioItem} from "./types";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
@@ -31,14 +32,16 @@ const main = async () => {
       magpieInfo,
       siloInfo,
       eulerInfo,
-      spectraInfo
+      spectraInfo,
+      beefyInfo
     ] = await Promise.all([
       getShadowInfo(userAddress),
       getSwapXInfo(userAddress),
       getMagpieInfo(userAddress),
       getSiloInfo(userAddress),
       getEulerInfo(userAddress),
-      getSpectraInfo(userAddress)
+      getSpectraInfo(userAddress),
+      getBeefyInfo(userAddress)
     ])
 
     const exchangesTsv = arrayToTSV([
@@ -47,7 +50,8 @@ const main = async () => {
       ...magpieInfo,
       ...siloInfo,
       ...eulerInfo,
-      ...spectraInfo
+      ...spectraInfo,
+      ...beefyInfo
     ] as PortfolioItem[])
 
     const txsTsv = ''

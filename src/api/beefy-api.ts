@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { ethers } from "ethers";
 
 const beefyClient = axios.create({
   baseURL: 'https://api.beefy.finance'
@@ -43,45 +44,6 @@ export interface BeefyVault {
   pricePerFullShare: string;
 }
 
-// Cache configuration
-const CACHE_PREFIX = 'beefy_vault_';
-const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes in milliseconds
-
-/**
- * Saves a vault to localStorage with expiry time
- */
-const saveVaultToCache = (vaultAddress: string, vault: BeefyVault | null) => {
-  try {
-    const cacheKey = `${CACHE_PREFIX}${vaultAddress.toLowerCase()}`;
-    const cacheData = {
-      timestamp: Date.now(),
-      vault: vault
-    };
-    localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-  } catch (error) {
-    console.warn('Failed to save vault to cache:', error);
-  }
-};
-
-/**
- * Retrieves a vault from cache if valid
- */
-const getVaultFromCache = (vaultAddress: string): BeefyVault | null => {
-  try {
-    const cacheKey = `${CACHE_PREFIX}${vaultAddress.toLowerCase()}`;
-    const cachedData = localStorage.getItem(cacheKey);
-    if (!cachedData) return null;
-    
-    const parsedData = JSON.parse(cachedData);
-    const isExpired = Date.now() - parsedData.timestamp > CACHE_EXPIRY;
-    
-    return isExpired ? null : parsedData.vault;
-  } catch (error) {
-    console.warn('Failed to retrieve vault from cache:', error);
-    return null;
-  }
-};
-
 /**
  * Fetches all vaults from Beefy
  * @returns Promise with array of all Beefy vaults (including EOL vaults)
@@ -104,18 +66,9 @@ export const getAllBeefyVaults = async (): Promise<BeefyVault[]> => {
  */
 export const getBeefyVaultByAddress = async (
   vaultAddress: string, 
-  forceRefresh = false
 ): Promise<BeefyVault | null> => {
   // Normalize the address
   const normalizedAddress = vaultAddress.toLowerCase();
-  
-  // Try to get from cache first (unless force refresh is requested)
-  if (!forceRefresh) {
-    const cachedVault = getVaultFromCache(normalizedAddress);
-    if (cachedVault !== null) {
-      return cachedVault; // This returns null if vault wasn't found earlier
-    }
-  }
   
   try {
     // Fetch fresh data if cache is invalid or force refresh requested
@@ -125,7 +78,7 @@ export const getBeefyVaultByAddress = async (
     );
     
     // Update cache (even store null results to avoid redundant searches)
-    saveVaultToCache(normalizedAddress, vault || null);
+   // saveVaultToCache(normalizedAddress, vault || null);
     
     return vault || null;
   } catch (error) {
@@ -215,7 +168,6 @@ export const getPpfsPrice = async (
     // }
     const fromDate: string = getFromDate(depositTransactionDate)
     const toDate: string = getToDate(depositTransactionDate)
-    
     // Format the dates properly for the API
     const fromDateParam = encodeURIComponent(fromDate);
     const toDateParam = encodeURIComponent(toDate);
@@ -223,15 +175,13 @@ export const getPpfsPrice = async (
     const productId = `beefy:${productType}:${chain}:${address.toLowerCase()}`
     // Build the URL with proper parameters
     const url = `/api/v1/price/raw?product_key=${encodeURIComponent(productId)}&price_type=${priceType}&from_date_utc=${fromDateParam}&to_date_utc=${toDateParam}`;
-    
-    console.log(`Requesting: ${url}`);
-    
+        
     const response = await beefeDatabarnClient.get(url);
-
     // The API returns an array of arrays with timestamp and value
+    const fco = response.data[0][1]
     if (Array.isArray(response.data) && response.data.length > 0) {
       // Transform the data into a more usable format
-      const depositPpfs = response.data.find((price: any) => price[1] === depositBlockNumber)
+      const depositPpfs = response.data.find((price: any) => Number(price[1]) === Number(depositBlockNumber))
       if (depositPpfs) {
         return {
           timestamp: depositPpfs[0],
@@ -264,14 +214,26 @@ export const getPpfsPrice = async (
 };
 
 
-/**
- * Clears the cache for a specific vault
- */
-export const clearVaultCache = (vaultAddress: string): void => {
+export const getBeefyVaultUSDValue = async (vaultAddress: string, underlyingAmount: bigint) => {
   try {
-    const cacheKey = `${CACHE_PREFIX}${vaultAddress.toLowerCase()}`;
-    localStorage.removeItem(cacheKey);
+    // Get vault information from Beefy API
+    const vaultInfo = await getBeefyVaultByAddress(vaultAddress);
+    if (vaultInfo) {
+      // Get the current LP/token price
+      const pricesResponse = await fetch('https://api.beefy.finance/lps');
+      const prices = await pricesResponse.json();
+
+      // Try to find the price using the oracleId from vault info
+      const lpPrice = prices[vaultInfo.oracleId];
+      
+      return parseFloat(ethers.formatUnits(underlyingAmount, vaultInfo.tokenDecimals)) * lpPrice;
+
+    }
+    // If no price found, return 0
+    console.warn(`No price found for vault ${vaultAddress}`);
+    return 0;
   } catch (error) {
-    console.warn('Failed to clear vault cache:', error);
+    console.error('Error getting USD value:', error);
+    return 0;
   }
 };

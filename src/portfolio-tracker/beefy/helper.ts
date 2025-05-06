@@ -1,3 +1,10 @@
+import { ethers } from "ethers";
+import BeefyVaultABI from '../../abi/BeefyVaultV7.json'
+import ERC20_ABI from '../../abi/ERC20.json'
+import { getBeefyVaultByAddress } from "../../api/beefy-api";
+
+const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
+
 export const calculateBeefyAPY = (
   currentPPFS: bigint,
   depositPPFS: bigint,

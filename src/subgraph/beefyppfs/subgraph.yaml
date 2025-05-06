@@ -1,0 +1,50 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: BeefyVaultV7Factory
+    network: sonic
+    source:
+      address: "0x8e0B63846ebEFf857EE35eF3BD3A2df9EF7D6456"
+      abi: BeefyVaultV7Factory
+      startBlock: 490985
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ProxyCreated
+        - Vault
+      abis:
+        - name: BeefyVaultV7Factory
+          file: ./abis/BeefyVaultV7Factory.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+      eventHandlers:
+        - event: ProxyCreated(address)
+          handler: handleProxyCreated
+      file: ./src/beefy-vault-v-7-factory.ts
+
+templates:
+  - kind: ethereum/contract
+    name: BeefyVault
+    network: sonic
+    source:
+      abi: BeefyVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - User
+        - UserVaultBalance
+        - Transaction
+      abis:
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/beefy-vault.ts

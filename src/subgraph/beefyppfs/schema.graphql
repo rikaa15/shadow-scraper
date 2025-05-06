@@ -1,0 +1,50 @@
+type ProxyCreated @entity(immutable: true) {
+  id: Bytes!
+  proxy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  vault: Vault # Link to the vault entity
+}
+
+type Vault @entity {
+  id: Bytes!
+  address: Bytes!
+  name: String
+  symbol: String
+  decimals: Int
+  totalSupply: BigInt!
+  pricePerFullShare: BigInt!
+  balance: BigInt!
+  strategy: Bytes
+  createdAt: ProxyCreated!
+  transactions: [Transaction!]! @derivedFrom(field: "vault")
+  userBalances: [UserVaultBalance!]! @derivedFrom(field: "vault")
+}
+
+type User @entity {
+  id: Bytes!
+  address: Bytes!
+  transactions: [Transaction!]! @derivedFrom(field: "user")
+  vaultBalances: [UserVaultBalance!]! @derivedFrom(field: "user")
+}
+
+type UserVaultBalance @entity {
+  id: Bytes!
+  user: User!
+  vault: Vault!
+  balance: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
+
+type Transaction @entity {
+  id: Bytes!
+  hash: Bytes!
+  user: User!
+  vault: Vault!
+  type: String! # deposit, withdraw, transfer
+  amount: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}

@@ -4,7 +4,7 @@ import {getPortfolioMetrics} from "../src/portfolio-tracker/metrics";
 
 (async () => {
   try {
-    const data = await getPortfolioMetrics("0x70709614BF9aD5bBAb18E2244046d48f234a1583")
+    const data = await getPortfolioMetrics("0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A")
     console.log(JSON.stringify(data, null, 2));
   } catch (error) {
     console.error("Error:", error);

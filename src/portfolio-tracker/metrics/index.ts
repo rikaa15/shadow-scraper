@@ -1,12 +1,4 @@
-import {getShadowInfo} from "../shadow";
-import {getSwapXInfo} from "../swapx";
-import {getMagpieInfo} from "../magpie";
-import {getSiloInfo} from "../silo";
-import {getEulerInfo} from "../euler";
-import {getSpectraInfo} from "../spectra";
-import {getBeefyInfo} from "../beefy";
-import {PortfolioItem} from "../types";
-import Decimal from "decimal.js";
+import {getPendlePositions} from "../../api/pendle";
 
 const calculateCAGR = (
   start: number,
@@ -19,39 +11,24 @@ const calculateCAGR = (
 export const getPortfolioMetrics = async (
   walletAddress: string
 ) => {
-  const startValue = 10000
-  const currentValue = 15000
+  let pendleLPValue = 0
+  let pendlePTValue = 0
 
-  const portfolioItems = await Promise.all([
-    getShadowInfo(walletAddress),
-    getSwapXInfo(walletAddress),
-    getMagpieInfo(walletAddress),
-    getSiloInfo(walletAddress),
-    getEulerInfo(walletAddress),
-    getBeefyInfo(walletAddress)
-  ])
+  const pendlePositions = await getPendlePositions(walletAddress)
+  const sonicPositions = pendlePositions.find(item => item.chainId === 146)
+  if(sonicPositions) {
+    const openPositions = sonicPositions.openPositions
 
-  const items = portfolioItems
-    .flat()
-    .filter(item => Boolean(item)) as PortfolioItem[]
+    pendleLPValue = openPositions.reduce((acc, cur) => acc + cur.lp.valuation, 0)
+    pendlePTValue = openPositions.reduce((acc, cur) => acc + cur.pt.valuation, 0)
+  }
 
-  const depositValueUSD = items.reduce((acc, item) => {
-    const depositValue = new Decimal(item.depositValue)
-    return acc.add(depositValue)
-  }, new Decimal(0))
+  const totalValueUSD = pendleLPValue + pendlePTValue
 
-  const currentValueUSD = items.reduce((acc, item) => {
-    const depositValue = new Decimal(item.depositValue)
-    const rewardValue = new Decimal(item.rewardValue)
-    const currentValue = depositValue.add(rewardValue)
-    return acc.add(currentValue)
-  }, new Decimal(0))
-
-  console.log('depositValueUSD', depositValueUSD.toString())
-  console.log('currentValueUSD', currentValueUSD.toString())
-
-  const cagr = calculateCAGR(startValue, currentValue, 5)
+  // const cagr = calculateCAGR(startValue, currentValue, 5)
   return {
-    cagr
+    totalValueUSD,
+    pendlePTValue,
+    pendleLPValue
   }
 }

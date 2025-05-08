@@ -9,7 +9,8 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'shadow': 'shadow-2',
   'x33': 'shadow-liquid-staking-token',
   'frxusd': 'frax-usd',
-  'weth': 'weth'
+  'weth': 'weth',
+  'pendle': 'pendle',
 }
 
 // hardcode values for test purposes
@@ -24,7 +25,7 @@ export const CoinGeckoRates: Record<string, number> = {
   'tether': 1,
   'frax-usd': 1,
   'weth': 1802.30,
-  'pendle': 2.88,
+  'pendle': 3.43,
 }
 
 interface CoinGeckoPriceResponse {

@@ -29,7 +29,7 @@ export const getPortfolioMetrics = async (
   }, 0)
 
   const eulerMEVUSDCe = await getEulerInfo(walletAddress, '0x196F3C7443E940911EE2Bb88e019Fd71400349D9')
-  const eulerMEVUSDCeValue = beefyItems.reduce((acc, item) => {
+  const eulerMEVUSDCeValue = eulerMEVUSDCe.reduce((acc, item) => {
     return acc + Number(item.depositValue) + Number(item.rewardValue)
   }, 0)
 
@@ -61,6 +61,8 @@ export const getPortfolioMetrics = async (
   const totalValueUSD = items.reduce((acc, item) => {
     return acc + item.value
   }, 0)
+
+  console.log('totalValueUSD', totalValueUSD)
 
   return {
     totalValueUSD,

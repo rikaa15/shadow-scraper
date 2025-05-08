@@ -46,6 +46,9 @@ export const getBeefyInfo = async (walletAddress: string, vaultAddress = VAULT_A
   const currentPPFS = await vault.getPricePerFullShare() as bigint;
   const transactions = await getBeefyDeposits(walletAddress, vaultAddress)
   const firstDeposit = transactions[transactions.length - 1];
+  if(!firstDeposit) {
+    return []
+  }
   const firstDepositTimestamp = new Date(parseInt(firstDeposit.timestamp) * 1000).toISOString();
 
   const depositPpfsPrice = await getPpfsPrice(vaultAddress, firstDepositTimestamp, firstDeposit.blockNumber)

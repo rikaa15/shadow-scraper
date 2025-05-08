@@ -10,6 +10,8 @@ import {getEulerInfo} from "./euler";
 import {getSpectraInfo} from "./spectra";
 import {getBeefyInfo} from './beefy';
 import {PortfolioItem} from "./types";
+import {getEquilibriaInfo} from "./equilibria";
+import moment from "moment/moment";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -17,7 +19,7 @@ const main = async () => {
   try {
     const userAddress = process.env.npm_config_useraddress || ''
     const copyToClipboard = Boolean(process.env.npm_config_copy) || false
-    const exportToTsv = Boolean(process.env.npm_config_export) || false
+    const exportToTsv = Boolean(process.env.npm_config_export) || true
     if(!userAddress) {
       console.log(`No userAddress set. Usage example: npm run portfolio --userAddress=0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A.`)
       process.exit(1)
@@ -33,7 +35,8 @@ const main = async () => {
       siloInfo,
       eulerInfo,
       spectraInfo,
-      beefyInfo
+      beefyInfo,
+      eqInfo
     ] = await Promise.all([
       getShadowInfo(userAddress),
       getSwapXInfo(userAddress),
@@ -41,7 +44,8 @@ const main = async () => {
       getSiloInfo(userAddress),
       getEulerInfo(userAddress),
       getSpectraInfo(userAddress),
-      getBeefyInfo(userAddress)
+      getBeefyInfo(userAddress),
+      getEquilibriaInfo(userAddress)
     ])
 
     const exchangesTsv = arrayToTSV([
@@ -51,14 +55,15 @@ const main = async () => {
       ...siloInfo,
       ...eulerInfo,
       ...spectraInfo,
-      ...beefyInfo
+      ...beefyInfo,
+      ...eqInfo
     ] as PortfolioItem[])
 
     const txsTsv = ''
     // const txsInfo = await getWalletTransactionsInfo(userAddress)
     // const txsTsv = arrayToTSV(txsInfo)
 
-    const tsv = exchangesTsv + '\n\n' + txsTsv
+    const tsv = exchangesTsv
 
     console.log(tsv)
 
@@ -66,7 +71,8 @@ const main = async () => {
       clipboardy.writeSync(tsv);
     }
     if(exportToTsv) {
-      const filename = `export/portfolio_${userAddress}_${Math.round(Date.now() / 1000)}.tsv`
+      const currentDate = moment().format('YYYY-MM-DD HH:mm')
+      const filename = `export/${currentDate}-portfolio-${userAddress}.tsv`
       fs.writeFileSync(filename, tsv, 'utf8');
       console.log(`${filename} created successfully`)
     }

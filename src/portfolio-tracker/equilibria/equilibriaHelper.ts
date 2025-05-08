@@ -248,7 +248,7 @@ export async function getUserDepositInfo(userAddress: string, marketAddress: str
 
       const block = await provider.getBlock(firstDeposit.blockNumber);
       const depositTimestamp = block ? new Date(Number(block.timestamp) * 1000) : new Date();
-      
+
       const currentBlockNumber = await provider.getBlockNumber();
       const depositBlockNumber = firstDeposit ? Number(firstDeposit.blockNumber) : 0;
       const totalBlocks = currentBlockNumber - depositBlockNumber;

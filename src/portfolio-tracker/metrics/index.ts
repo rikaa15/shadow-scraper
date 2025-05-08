@@ -1,6 +1,7 @@
 import {getPendlePositions} from "../../api/pendle";
 import {getBeefyInfo} from "../beefy";
 import {getEulerInfo} from "../euler";
+import {getMagpieInfo} from "../magpie";
 
 const calculateCAGR = (
   start: number,
@@ -32,6 +33,9 @@ export const getPortfolioMetrics = async (
   const eulerMEVUSDCeValue = eulerMEVUSDCe.reduce((acc, item) => {
     return acc + Number(item.depositValue) + Number(item.rewardValue)
   }, 0)
+
+  const magpie = await getMagpieInfo(walletAddress)
+  console.log('magpie', magpie)
 
   const items = [
     {

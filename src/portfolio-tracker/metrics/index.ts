@@ -1,5 +1,6 @@
 import {getPendlePositions} from "../../api/pendle";
 import {getBeefyInfo} from "../beefy";
+import {getEulerInfo} from "../euler";
 
 const calculateCAGR = (
   start: number,
@@ -27,12 +28,42 @@ export const getPortfolioMetrics = async (
     return acc + Number(item.depositValue) + Number(item.rewardValue)
   }, 0)
 
-  const totalValueUSD = pendleLPValue + pendlePTValue + beefyValue
+  const eulerMEVUSDCe = await getEulerInfo(walletAddress, '0x196F3C7443E940911EE2Bb88e019Fd71400349D9')
+  const eulerMEVUSDCeValue = beefyItems.reduce((acc, item) => {
+    return acc + Number(item.depositValue) + Number(item.rewardValue)
+  }, 0)
+
+  const items = [
+    {
+      platform: 'Pendle',
+      name: 'USDC (Silo-20)',
+      value: pendlePTValue
+    },
+    {
+      platform: 'Pendle',
+      name: 'LP aUSDC',
+      value: pendleLPValue
+    },
+    {
+      platform: 'Beefy',
+      name: 'frxUSD-scUSD',
+      value: beefyValue,
+      link: 'https://app.beefy.com/vault/swapx-ichi-frxusd-scusd'
+    },
+    {
+      platform: 'Euler',
+      name: 'MEV USDC.e',
+      value: eulerMEVUSDCeValue,
+      link: 'https://app.euler.finance/vault/0x196F3C7443E940911EE2Bb88e019Fd71400349D9?network=sonic'
+    }
+  ]
+
+  const totalValueUSD = items.reduce((acc, item) => {
+    return acc + item.value
+  }, 0)
 
   return {
     totalValueUSD,
-    pendlePTValue,
-    pendleLPValue,
-    beefyValue
+    items
   }
 }

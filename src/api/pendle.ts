@@ -1,16 +1,26 @@
 import Decimal from "decimal.js";
 import fetch from "node-fetch";
 
-export const fetchPendleMarketData = async (marketAddress: string) => {
-  const url = `https://api-v2.pendle.finance/core/v2/146/markets/${marketAddress}/data`;
-  const res = await fetch(url);
+export const fetchPendleMarketData = async (
+  marketAddress: string,
+  timestampISO?: string
+) => {
+  const url = new URL(`https://api-v2.pendle.finance/core/v2/146/markets/${marketAddress}/data`);
+  if (timestampISO) url.searchParams.append("timestamp", timestampISO);
+
+  const res = await fetch(url.toString());
   if (!res.ok) throw new Error("Failed to fetch market data from Pendle API");
+
   const data = await res.json();
   return {
     tradingVolumeUSD: new Decimal(data.tradingVolume.usd),
     liquidityUSD: new Decimal(data.liquidity.usd),
+    ptDiscount: data.ptDiscount,
+    timestamp: data.timestamp,
+    raw: data
   };
 };
+
 
 export const fetchPendleUserLPValuation = async (marketAddress: string, walletAddress: string) => {
   const url = `https://api-v2.pendle.finance/core/v1/dashboard/positions/database/${walletAddress}?filterUsd=0.1`;

@@ -1,24 +1,19 @@
 import { ethers } from "ethers";
 import fetch from "node-fetch";
+import moment from "moment";
+import Decimal from "decimal.js";
+
+import { PortfolioItem } from "../types";
+import { portfolioItemFactory, roundToSignificantDigits } from "../helpers";
+import { fetchPendleMarketData } from "../../api/pendle";
 import PendleMarketABI from "../../abi/PendleMarketV3.json";
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
-const chainId = 146;
-const wallet = "0x57De5488856e68710093996e6dE57d83a5A539C3";
 const marketAddress = "0x3F5EA53d1160177445B1898afbB16da111182418";
 const ptAddress = "0x930441Aa7Ab17654dF5663781CA0C02CC17e6643";
 
-async function getPendleMarketData(chainId: number, market: string, timestamp?: string) {
-  const url = new URL(`https://api-v2.pendle.finance/core/v2/${chainId}/markets/${market}/data`);
-  if (timestamp) url.searchParams.append("timestamp", timestamp);
-
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`Pendle API error: ${res.status}`);
-  return await res.json();
-}
-
-async function getPTAPY() {
+export const getPendlePTInfo = async (wallet: string): Promise<PortfolioItem[]> => {
   const iface = new ethers.Interface(PendleMarketABI);
 
   const logs = await provider.getLogs({
@@ -49,17 +44,17 @@ async function getPTAPY() {
   }
 
   if (!matchedLog || netPt === undefined || netSy === undefined) {
-    throw new Error("No matching Mint log found");
+    return [];
   }
 
   const block = await provider.getBlock(matchedLog.blockNumber);
-  if (!block) throw new Error("Block not found");
+  if (!block) return [];
 
   const ptContract = new ethers.Contract(ptAddress, ["function expiry() view returns (uint256)"], provider);
   const ptExpiry = Number(await ptContract.expiry());
 
   const mintDateISO = new Date(block.timestamp * 1000).toISOString();
-  const marketData = await getPendleMarketData(chainId, marketAddress, mintDateISO);
+  const marketData = await fetchPendleMarketData(marketAddress, mintDateISO);
 
   const ptDiscount = marketData.ptDiscount;
   const snapshotTimestamp = Math.floor(new Date(marketData.timestamp).getTime() / 1000);
@@ -69,14 +64,33 @@ async function getPTAPY() {
   const rawApy = Math.pow(1 + ptDiscount, 1 / T) - 1;
   const effectiveApy = rawApy * ptShare;
 
-  console.log("APY Breakdown");
-  console.log(`PT Share: ${(ptShare * 100).toFixed(2)}%`);
-  console.log(`Raw PT APY (from discount): ${(rawApy * 100).toFixed(2)}%`);
-  console.log(`Effective Fixed APY: ${(effectiveApy * 100).toFixed(2)}%`);
-  console.log(`PT Discount (at mint): ${ptDiscount}`);
-  console.log(`PT Expiry: ${new Date(ptExpiry * 1000).toLocaleString()}`);
-  console.log(`Snapshot Timestamp (API): ${new Date(snapshotTimestamp * 1000).toLocaleString()}`);
-  console.log(`Mint Timestamp: ${new Date(block.timestamp * 1000).toLocaleString()}`);
-}
+  const depositValue = new Decimal((Number(netPt + netSy) / 1e6).toFixed(6));
 
-getPTAPY();
+  return [
+    {
+      ...portfolioItemFactory(),
+      name: "pendle-pt",
+      address: marketAddress,
+      depositTime: moment.unix(block.timestamp).format("YY/MM/DD HH:mm:ss"),
+      depositAsset0: "PT",
+      depositAsset1: "",
+      depositAmount0: "",
+      depositAmount1: "",
+      depositValue0: roundToSignificantDigits(depositValue.toString()),
+      depositValue1: "",
+      depositValue: roundToSignificantDigits(depositValue.toString()),
+      rewardAsset0: "",
+      rewardAsset1: "",
+      rewardAmount0: "",
+      rewardAmount1: "",
+      rewardValue0: "",
+      rewardValue1: "",
+      rewardValue: "",
+      totalDays: "",
+      totalBlocks: "",
+      apr: roundToSignificantDigits((effectiveApy * 100).toString()),
+      type: "fixed",
+      depositLink: `https://app.pendle.finance/trade/pools/${marketAddress}`
+    }
+  ];
+};

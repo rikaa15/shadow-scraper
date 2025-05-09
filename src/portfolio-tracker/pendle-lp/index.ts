@@ -104,7 +104,7 @@ const getFirstActiveDepositTimestamp = async (
   return null;
 };
 
-export const getPendleInfo = async (walletAddress: string): Promise<PortfolioItem[]> => {
+export const getPendleLPInfo = async (walletAddress: string): Promise<PortfolioItem[]> => {
   console.log(`\nWallet: ${walletAddress}`);
 
   const [marketData, userValuation] = await Promise.all([

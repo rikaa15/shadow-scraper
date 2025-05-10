@@ -27,7 +27,7 @@ export const getBeefyInfo = async (walletAddress: string, vaultAddress = VAULT_A
 
   // Format wallet address
   const formattedWalletAddress = ethers.getAddress(walletAddress);
-  
+
   // Create contract instances
   const vault = new ethers.Contract(vaultAddress, BeefyVaultABI, provider);
   const assetAddress = await vault.want();
@@ -35,19 +35,22 @@ export const getBeefyInfo = async (walletAddress: string, vaultAddress = VAULT_A
   const vaultInfo = await getBeefyVaultByAddress(vaultAddress)
 
   const assetContract = new ethers.Contract(assetAddress, ERC20_ABI, provider);
-  
+
   // Get token details
   const assetSymbol = await assetContract.symbol();
-      
+
   // Get user's mooToken balance (shares)
   const sharesBalance = await vault.balanceOf(formattedWalletAddress);
-  
-  
+
+
   const currentPPFS = await vault.getPricePerFullShare() as bigint;
   const transactions = await getBeefyDeposits(walletAddress, vaultAddress)
   const firstDeposit = transactions[transactions.length - 1];
+  if(!firstDeposit) {
+    return []
+  }
   const firstDepositTimestamp = new Date(parseInt(firstDeposit.timestamp) * 1000).toISOString();
-  
+
   const depositPpfsPrice = await getPpfsPrice(vaultAddress, firstDepositTimestamp, firstDeposit.blockNumber)
   const depositPPFS = depositPpfsPrice ? BigInt(Math.floor(+depositPpfsPrice.ppfsPrice * 1e18)) : 0n
   const currentUnderlyingTokens = (sharesBalance * currentPPFS) / (10n ** 18n);
@@ -60,11 +63,11 @@ export const getBeefyInfo = async (walletAddress: string, vaultAddress = VAULT_A
   const daysElapsed = (currentDate.getTime() - depositDate.getTime()) / (1000 * 60 * 60 * 24);
   const apr = calculateAPR(depositedTotal, totalRewards, daysElapsed);
   const apy = calculateBeefyAPY(currentUnderlyingTokens, initialUnderlyingTokens, firstDepositTimestamp)
-  
+
   // get the deposit and gain value in USD
   const initialDepositUSD = await getBeefyVaultUSDValue(VAULT_ADDRESS, initialUnderlyingTokens)
   const gainsInUSD =  await getBeefyVaultUSDValue(VAULT_ADDRESS, gains)
-  
+
   const currentBlockNumber = await provider.getBlockNumber();
   const totalBlocks = currentBlockNumber - +firstDeposit.blockNumber;
   const portfolioItem: PortfolioItem = {
@@ -73,7 +76,7 @@ export const getBeefyInfo = async (walletAddress: string, vaultAddress = VAULT_A
     name: 'beefy',
     address: vaultAddress,
     depositTime: moment(firstDepositTimestamp).format('YY/MM/DD HH:MM:SS'),
-    depositAsset0: assetSymbol, 
+    depositAsset0: assetSymbol,
     depositAsset1: '',  // Empty for single-asset vaults
     depositAmount0: roundToSignificantDigits(`${initialDepositUSD}`, 3),
     depositAmount1: '',
@@ -88,19 +91,19 @@ export const getBeefyInfo = async (walletAddress: string, vaultAddress = VAULT_A
     rewardValue1: '',
     rewardValue: roundToSignificantDigits(`${gainsInUSD}`, 4),
     totalDays: roundToSignificantDigits(`${daysElapsed}`, 4),
-    totalBlocks: `${totalBlocks}`, 
+    totalBlocks: `${totalBlocks}`,
     apr: roundToSignificantDigits(apr.toString(), 4),
     depositLink: VAULT_LINK
   };
 
-  console.log(`\nVault: ${vaultInfo?.name}`)
-  console.log(`User ${walletAddress}`)
-  console.log('Deposit Time:', moment(firstDepositTimestamp).format('YY/MM/DD HH:MM:SS'))
-  console.log('Deposit amount:', roundToSignificantDigits(`${initialDepositUSD}`, 3))
-  console.log('Total Days:', roundToSignificantDigits(`${daysElapsed}`, 4))
-  console.log('Earings:', roundToSignificantDigits(`${gainsInUSD}`, 4))
-  console.log(`APY: ${apy}%`)
-  console.log(`APR: ${apr}%\n`)
+  // console.log(`\nVault: ${vaultInfo?.name}`)
+  // console.log(`User ${walletAddress}`)
+  // console.log('Deposit Time:', moment(firstDepositTimestamp).format('YY/MM/DD HH:MM:SS'))
+  // console.log('Deposit amount:', roundToSignificantDigits(`${initialDepositUSD}`, 3))
+  // console.log('Total Days:', roundToSignificantDigits(`${daysElapsed}`, 4))
+  // console.log('Earings:', roundToSignificantDigits(`${gainsInUSD}`, 4))
+  // console.log(`APY: ${apy}%`)
+  // console.log(`APR: ${apr}%\n`)
 
   portfolioItems.push(portfolioItem);
   return portfolioItems;

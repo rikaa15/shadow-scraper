@@ -23,7 +23,7 @@ import {
   Transfer as TransferEvent,
   VaultStatus as VaultStatusEvent,
   Withdraw as WithdrawEvent
-} from "../generated/EVault/EVault"
+} from "../generated/templates/EVault/EVault"
 import {
   Approval,
   BalanceForwarderStatus,
@@ -48,8 +48,23 @@ import {
   Repay,
   Transfer,
   VaultStatus,
-  Withdraw
+  Withdraw,
+  EulerVault
 } from "../generated/schema"
+import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
+
+// Helper function to load or create EulerVault entity
+function loadOrCreateEulerVault(address: Address): EulerVault {
+  let vault = EulerVault.load(address)
+  if (vault == null) {
+    vault = new EulerVault(address)
+    vault.blockNumber = BigInt.fromI32(0)
+    vault.blockTimestamp = BigInt.fromI32(0)
+    vault.transactionHash = Bytes.fromHexString("0x") as Bytes
+    vault.save()
+  }
+  return vault
+}
 
 export function handleApproval(event: ApprovalEvent): void {
   let entity = new Approval(
@@ -88,6 +103,7 @@ export function handleBorrow(event: BorrowEvent): void {
   )
   entity.account = event.params.account
   entity.assets = event.params.assets
+  entity.vault = event.address
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -135,6 +151,7 @@ export function handleDeposit(event: DepositEvent): void {
   entity.owner = event.params.owner
   entity.assets = event.params.assets
   entity.shares = event.params.shares
+  entity.vault = event.address  // Add the vault address
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -150,6 +167,65 @@ export function handleEVaultCreated(event: EVaultCreatedEvent): void {
   entity.creator = event.params.creator
   entity.asset = event.params.asset
   entity.dToken = event.params.dToken
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+  
+  // Update vault information
+  let vault = loadOrCreateEulerVault(event.address)
+  vault.creator = event.params.creator
+  vault.asset = event.params.asset
+  vault.dToken = event.params.dToken
+  vault.blockNumber = event.block.number
+  vault.blockTimestamp = event.block.timestamp
+  vault.transactionHash = event.transaction.hash
+  vault.save()
+}
+
+export function handleRepay(event: RepayEvent): void {
+  let entity = new Repay(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.account = event.params.account
+  entity.assets = event.params.assets
+  entity.vault = event.address  // Add the vault address
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleTransfer(event: TransferEvent): void {
+  let entity = new Transfer(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.from = event.params.from
+  entity.to = event.params.to
+  entity.value = event.params.value
+  entity.vault = event.address  // Add the vault address
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleWithdraw(event: WithdrawEvent): void {
+  let entity = new Withdraw(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.sender = event.params.sender
+  entity.receiver = event.params.receiver
+  entity.owner = event.params.owner
+  entity.assets = event.params.assets
+  entity.shares = event.params.shares
+  entity.vault = event.address  // Add the vault address
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -349,35 +425,6 @@ export function handlePullDebt(event: PullDebtEvent): void {
   entity.save()
 }
 
-export function handleRepay(event: RepayEvent): void {
-  let entity = new Repay(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.account = event.params.account
-  entity.assets = event.params.assets
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleTransfer(event: TransferEvent): void {
-  let entity = new Transfer(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.from = event.params.from
-  entity.to = event.params.to
-  entity.value = event.params.value
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
 export function handleVaultStatus(event: VaultStatusEvent): void {
   let entity = new VaultStatus(
     event.transaction.hash.concatI32(event.logIndex.toI32())
@@ -397,19 +444,4 @@ export function handleVaultStatus(event: VaultStatusEvent): void {
   entity.save()
 }
 
-export function handleWithdraw(event: WithdrawEvent): void {
-  let entity = new Withdraw(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.sender = event.params.sender
-  entity.receiver = event.params.receiver
-  entity.owner = event.params.owner
-  entity.assets = event.params.assets
-  entity.shares = event.params.shares
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}

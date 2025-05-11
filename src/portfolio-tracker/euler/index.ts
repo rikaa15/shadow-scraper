@@ -17,22 +17,22 @@ const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 const vaultArray = [
   {
-    name: "euler-mev",
+    name: "MEV USDC.e",
     address: "0x196F3C7443E940911EE2Bb88e019Fd71400349D9",
   },
   {
-    name: "euler-re7",
+    name: "Re7 USDC.e",
     address: "0x3D9e5462A940684073EED7e4a13d19AE0Dcd13bc",
   },
 ];
 
 export const getEulerInfo = async (walletAddress: string) => {
   const portfolioItems: PortfolioItem[] = [];
-  
+
   const currentBlockNumber = await provider.getBlockNumber();
-  
+
   const merklRewards = await getEulerMerklRewards(walletAddress);
-  
+
   const vaultPromises = vaultArray.map(async (vault) => {
     const vaultContract = new ethers.Contract(vault.address, EulerEVaultABI, provider);
 
@@ -43,31 +43,31 @@ export const getEulerInfo = async (walletAddress: string) => {
       if (deposits.length === 0) {
         return null; // No deposits for this vault
       }
-      
+
       // Create batch requests for asset info
       const [assetAddress, sharesBalance] = await Promise.all([
         vaultContract.asset(),
         vaultContract.balanceOf(walletAddress)
       ]);
-      
+
       // Skip if user has no shares
       if (sharesBalance === 0n) {
         return null;
       }
-      
+
       const assetContract = new ethers.Contract(
         assetAddress,
         FiatTokenV2_ABI,
         provider
       );
-      
+
       // Fetch asset information in parallel
       const [rewardAsset0, decimals, assetsAmount] = await Promise.all([
         assetContract.symbol(),
         assetContract.decimals(),
         vaultContract.convertToAssets(sharesBalance)
       ]);
-      
+
       const depositAsset0 = rewardAsset0;
       const decimalsNum = Number(decimals);
 
@@ -92,7 +92,7 @@ export const getEulerInfo = async (walletAddress: string) => {
         let rewardAsset1 = "wS";  // Default to wS
         let rewardAmount1 = "0";
         let rewardValue1 = "0";
-        
+
         if (merklRewards.length > 0) {
           const [baseReward] = merklRewards;
           const rewardDecimals = baseReward.reward.decimals;
@@ -170,9 +170,9 @@ export const getEulerInfo = async (walletAddress: string) => {
       return null;
     }
   });
-  
+
   const results = await Promise.all(vaultPromises);
-  
+
   results.forEach(item => {
     if (item) portfolioItems.push(item);
   });

@@ -7,7 +7,7 @@ import {getEulerInfo} from "../src/portfolio-tracker/euler";
 (async () => {
   try {
     const wallet = getAddress("0x62e9625bdff857fe8892fceb07ee9685812a850e")
-    const result = await getEulerInfo(wallet, '0x3D9e5462A940684073EED7e4a13d19AE0Dcd13bc');
+    const result = await getEulerInfo(wallet);
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error("Error running getBeefyInfo:", error);

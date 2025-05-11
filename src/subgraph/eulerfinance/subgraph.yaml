@@ -5,12 +5,33 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
+    name: EVaultFactory
+    network: sonic
+    source:
+      address: "0xF075cC8660B51D0b8a4474e3f47eDAC5fA034cFB"
+      abi: EVaultFactory
+      startBlock: 5324454
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - ProxyCreated
+      abis:
+        - name: EVaultFactory
+          file: ./abis/EVaultFactory.json
+        - name: EVault
+          file: ./abis/EVault.json
+      eventHandlers:
+        - event: ProxyCreated(indexed address,bool,address,bytes)
+          handler: handleProxyCreated
+      file: ./src/e-vault-factory.ts
+templates:
+  - kind: ethereum
     name: EVault
     network: sonic
     source:
-      address: "0x196F3C7443E940911EE2Bb88e019Fd71400349D9"
       abi: EVault
-      startBlock: 6463739
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9

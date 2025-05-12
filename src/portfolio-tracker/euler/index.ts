@@ -9,7 +9,7 @@ import {
   roundToSignificantDigits,
 } from "../helpers";
 import moment from "moment";
-import { getMerklRewards } from "../../api/euler-api";
+// import { getMerklRewards } from "../../api/euler-api";
 import EulerEVaultABI from "../../abi/EulerEVault.json";
 import FiatTokenV2_ABI from "../../abi/FiatTokenV2_2_Euler.json";
 
@@ -31,7 +31,7 @@ export const getEulerInfo = async (walletAddress: string) => {
 
   const currentBlockNumber = await provider.getBlockNumber();
 
-  const merklRewards = await getMerklRewards(walletAddress);
+  // const merklRewards = await getMerklRewards(walletAddress);
 
   const vaultPromises = vaultArray.map(async (vault) => {
     const vaultContract = new ethers.Contract(vault.address, EulerEVaultABI, provider);

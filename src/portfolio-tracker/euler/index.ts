@@ -93,15 +93,15 @@ export const getEulerInfo = async (walletAddress: string) => {
         let rewardAmount1 = "0";
         let rewardValue1 = "0";
 
-        if (merklRewards.length > 0) {
-          const [baseReward] = merklRewards;
-          const rewardDecimals = baseReward.reward.decimals;
-          rewardAsset1 = baseReward.reward.symbol;
-          rewardAmount1 = new Decimal(baseReward.accumulated)
-            .div(10 ** rewardDecimals)
-            .toString();
-          rewardValue1 = String(Number(rewardAmount1) * baseReward.tokenPrice);
-        }
+        // if (merklRewards.length > 0) {
+        //   const [baseReward] = merklRewards;
+        //   const rewardDecimals = baseReward.reward.decimals;
+        //   rewardAsset1 = baseReward.reward.symbol;
+        //   rewardAmount1 = new Decimal(baseReward.accumulated)
+        //     .div(10 ** rewardDecimals)
+        //     .toString();
+        //   rewardValue1 = String(Number(rewardAmount1) * baseReward.tokenPrice);
+        // }
 
         const depositBlockNumber = firstDeposit
           ? firstDeposit.blockNumber

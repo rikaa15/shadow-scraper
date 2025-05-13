@@ -19,7 +19,8 @@ const main = async () => {
   try {
     const userAddress = process.env.npm_config_useraddress || ''
     const copyToClipboard = Boolean(process.env.npm_config_copy) || false
-    const exportToTsv = Boolean(process.env.npm_config_export) || true
+    const exportToTsv = Boolean(process.env.npm_config_export) || false
+    const includeTransactions = Boolean(process.env.npm_config_txs) || false
     if(!userAddress) {
       console.log(`No userAddress set. Usage example: npm run portfolio --userAddress=0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A.`)
       process.exit(1)
@@ -28,6 +29,13 @@ const main = async () => {
     // let tokensInfo = await getTokensInfo(userAddress)
     // tokensInfo = await setUSDValues(tokensInfo)
 
+    let txsTsv = ''
+    if(includeTransactions) {
+      const txsInfo = await getWalletTransactionsInfo(userAddress)
+      txsTsv = arrayToTSV(txsInfo) + '\n\n'
+    }
+
+
     const [
       shadowInfo,
       swapXInfo,
@@ -35,7 +43,7 @@ const main = async () => {
       siloInfo,
       eulerInfo,
       spectraInfo,
-      beefyInfo,
+      // beefyInfo,
       eqInfo
     ] = await Promise.all([
       getShadowInfo(userAddress),
@@ -44,7 +52,7 @@ const main = async () => {
       getSiloInfo(userAddress),
       getEulerInfo(userAddress),
       getSpectraInfo(userAddress),
-      getBeefyInfo(userAddress),
+      // getBeefyInfo(userAddress),
       getEquilibriaInfo(userAddress)
     ])
 
@@ -55,15 +63,11 @@ const main = async () => {
       ...siloInfo,
       ...eulerInfo,
       ...spectraInfo,
-      ...beefyInfo,
+      // ...beefyInfo,
       ...eqInfo
     ] as PortfolioItem[])
 
-    const txsTsv = ''
-    // const txsInfo = await getWalletTransactionsInfo(userAddress)
-    // const txsTsv = arrayToTSV(txsInfo)
-
-    const tsv = exchangesTsv
+    const tsv = txsTsv + exchangesTsv
 
     console.log(tsv)
 

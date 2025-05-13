@@ -24,17 +24,17 @@ export const getBeefyDeposits = async (
 ) => {
   // Convert addresses to lowercase for proper comparison
   const formattedUserAddress = userAddress.toLowerCase();
-  
+
   // Build query conditions
   let whereCondition = `user_: {address: "${formattedUserAddress}"}`;
-  
+
   if (vaultAddress) {
     whereCondition += `, vault_: {address: "${vaultAddress.toLowerCase()}"}`;
   }
-  
+
   // Add type condition to get only deposits (mint transactions)
   whereCondition += `, type: "mint"`;
-  
+
   const { data } = await client.post<{
     data: {
       transactions: BeefyTransaction[]

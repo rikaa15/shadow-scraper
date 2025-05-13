@@ -5,8 +5,6 @@ import { getAddress } from "ethers";
 import { getShadowInfo } from "../src/portfolio-tracker/shadow";
 import { getSiloInfo } from "../src/portfolio-tracker/silo";
 import { getSwapXInfo } from "../src/portfolio-tracker/swapx";
-import { getPendleLPInfo } from "../src/portfolio-tracker/pendle-lp";
-import { getPendlePTInfo } from "../src/portfolio-tracker/pendle-pt";
 import { getPendleInfo } from "../src/portfolio-tracker/pendle";
 
 const functionMap: Record<string, (wallet: string) => Promise<any>> = {
@@ -16,8 +14,6 @@ const functionMap: Record<string, (wallet: string) => Promise<any>> = {
   shadow: getShadowInfo,
   silo: getSiloInfo,
   swapx: getSwapXInfo,
-  pendlelp: getPendleLPInfo,
-  pendlept: getPendlePTInfo,
   pendle: getPendleInfo,
 };
 

@@ -11,55 +11,77 @@ import pendleMarketABI from "../../abi/PendleMarketV3.json";
 import pendleRouterABI from "../../abi/PendleRouterV4.json";
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
-const marketAddress = "0x3f5ea53d1160177445b1898afbb16da111182418";
-const ptAddress = "0x930441Aa7Ab17654dF5663781CA0C02CC17e6643";
+const routerAddress = "0x888888888889758f76e7103c6cbf23abbf58f946";
 const rewardTokenAddress = "0xf1ef7d2d4c0c881cd634481e0586ed5d2871a74b";
 const rewardTokenSymbol = "pendle";
-const routerAddress = "0x888888888889758f76e7103c6cbf23abbf58f946";
+
+const markets = [
+  {
+    name: "aUSDC",
+    marketAddress: "0x3f5ea53d1160177445b1898afbb16da111182418",
+    ptAddress: "0x930441Aa7Ab17654dF5663781CA0C02CC17e6643"
+  },
+  {
+    name: "USDC (Silo-20)",
+    marketAddress: "0xacfad541698437f6ef0e728c56a50ce35c73cc3e",
+    ptAddress: "0x77d8f09053c28faf1e00df6511b23125d438616f"
+  }
+];
 
 export const getPendleInfo = async (wallet: string): Promise<PortfolioItem[]> => {
-  const [lp, pt] = await Promise.all([
-    getPendleLPInfo(wallet),
-    getPendlePTInfo(wallet)
-  ]);
-
-  const rewardValue1 = lp.depositValue
-    .mul(lp.feeAPR.div(100))
-    .plus(lp.depositValue.mul(pt.apr.div(100)));
-
-  const totalRewardValue = lp.rewardValue.plus(rewardValue1);
-  const apr = lp.apr.plus(pt.apr);
-
-  return [
-    {
-      ...portfolioItemFactory(),
-      name: "pendle",
-      address: marketAddress,
-      depositTime: lp.depositTime,
-      depositAsset0: "aUSDC LP",
-      depositAsset1: "",
-      depositAmount0: roundToSignificantDigits(lp.depositAmount.toString()),
-      depositAmount1: "",
-      depositValue0: roundToSignificantDigits(lp.depositValue.toString()),
-      depositValue1: "",
-      depositValue: roundToSignificantDigits(lp.depositValue.toString()),
-      rewardAsset0: "PENDLE",
-      rewardAsset1: "USD",
-      rewardAmount0: lp.rewardAmount.toFixed(6),
-      rewardAmount1: "",
-      rewardValue0: lp.rewardValue.toFixed(6),
-      rewardValue1: roundToSignificantDigits(rewardValue1.toString()),
-      rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
-      totalDays: lp.daysActive.toFixed(2),
-      totalBlocks: lp.totalBlocks.toString(),
-      apr: roundToSignificantDigits(apr.toString()),
-      type: "Swap pool",
-      depositLink: `https://app.pendle.finance/trade/pools/${marketAddress}`
+    const results: PortfolioItem[] = [];
+  
+    for (const { name, marketAddress, ptAddress } of markets) {
+      try {
+        const [lp, pt] = await Promise.all([
+          getPendleLPInfo(wallet, marketAddress),
+          getPendlePTInfo(wallet, marketAddress, ptAddress)
+        ]);
+  
+        const rewardValue1 = lp.depositValue
+          .mul(lp.feeAPR.div(100))
+          .plus(lp.depositValue.mul(pt.apr.div(100)));
+  
+        const totalRewardValue = lp.rewardValue.plus(rewardValue1);
+        const apr = lp.apr.plus(pt.apr);
+  
+        results.push({
+          ...portfolioItemFactory(),
+          name: `pendle (${name})`,
+          address: marketAddress,
+          depositTime: lp.depositTime,
+          depositAsset0: `${name} LP`,
+          depositAsset1: "",
+          depositAmount0: roundToSignificantDigits(lp.depositAmount.toString()),
+          depositAmount1: "",
+          depositValue0: roundToSignificantDigits(lp.depositValue.toString()),
+          depositValue1: "",
+          depositValue: roundToSignificantDigits(lp.depositValue.toString()),
+          rewardAsset0: "PENDLE",
+          rewardAsset1: "USD",
+          rewardAmount0: lp.rewardAmount.toFixed(6),
+          rewardAmount1: "",
+          rewardValue0: lp.rewardValue.toFixed(6),
+          rewardValue1: roundToSignificantDigits(rewardValue1.toString()),
+          rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
+          totalDays: lp.daysActive.toFixed(2),
+          totalBlocks: lp.totalBlocks.toString(),
+          apr: roundToSignificantDigits(apr.toString()),
+          type: "Swap pool",
+          depositLink: `https://app.pendle.finance/trade/pools/${marketAddress}`
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`Skipping market ${name} due to error: ${message}`);
+        continue;
+      }
     }
-  ];
-};
+  
+    return results;
+  };
+  
 
-async function getPendleLPInfo(wallet: string) {
+async function getPendleLPInfo(wallet: string, marketAddress: string) {
   const [marketData, userValuation] = await Promise.all([
     fetchPendleMarketData(marketAddress),
     fetchPendleUserLPValuation(marketAddress, wallet)
@@ -112,8 +134,7 @@ async function getPendleLPInfo(wallet: string) {
   };
 }
 
-async function getPendlePTInfo(wallet: string) {
-  const market = new ethers.Contract(marketAddress, pendleMarketABI, provider);
+async function getPendlePTInfo(wallet: string, marketAddress: string, ptAddress: string) {
   const marketData = await fetchPendleMarketData(marketAddress);
   const iface = new ethers.Interface(pendleMarketABI);
 

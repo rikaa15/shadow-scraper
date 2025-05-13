@@ -60,8 +60,8 @@ export const getPendlePTInfo = async (wallet: string): Promise<PortfolioItem[]> 
   const snapshotTimestamp = Math.floor(new Date(marketData.timestamp).getTime() / 1000);
 
   const ptShare = Number(netPt) / (Number(netPt + netSy));
-  const T = (ptExpiry - snapshotTimestamp) / (365 * 86400);
-  const rawApy = Math.pow(1 + ptDiscount, 1 / T) - 1;
+  const timeToMaturity = (ptExpiry - snapshotTimestamp) / (365 * 86400);
+  const rawApy = Math.pow(1 + ptDiscount, 1 / timeToMaturity) - 1;
   const effectiveApy = rawApy * ptShare;
 
   const depositValue = new Decimal((Number(netPt + netSy) / 1e6).toFixed(6));

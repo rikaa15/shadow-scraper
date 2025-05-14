@@ -2,15 +2,23 @@ import Decimal from "decimal.js";
 import { ethers } from "ethers";
 import erc20Abi from '../../abi/ERC20.json'
 import { getTokenPrice } from "../../api/coingecko";
-import moment from "moment";
 import { calculateAPR } from "../helpers";
 
-// Setup provider
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 // Cache for token and market information to reduce RPC calls
 const tokenCache = new Map<string, TokenInfo>();
 
+/* We use a conversion factor to calculate USD values from raw eqbPENDLE-LPT token amounts.
+ * This is necessary because Equilibria's deposit process involves multiple internal token transfers and conversions:
+ * 1. User deposits PENDLE-LPT to Equilibria
+ * 2. System mints a very small amount of eqbPENDLE-LPT as a receipt token
+ * 3. PENDLE tokens are transferred between various contracts with a portion going to reward pools
+ * 
+ * The actual USD value displayed in Equilibria's UI is derived from the PENDLE amount deposited into reward pools,
+ * while transaction logs only show the receipt token amount. The conversion factor bridges this gap, allowing us
+ * to calculate the correct USD value from on-chain data.
+ */
 const CONVERSION_FACTOR = 0.0000020482
 export interface TokenInfo {
   address: string;
@@ -187,14 +195,13 @@ export async function getUserDepositInfo(userAddress: string, marketAddress: str
 
     const depositEvents = await pendleBoosterContract.queryFilter(filter, 1, 'latest');
 
-    // moment(depositTimestamp).format('YY/MM/DD HH:MM:SS'),
+
     if (depositEvents.length > 0) {
       // Process and calculate deposits and withdrawals
       let totalDeposited = BigInt(0);
 
       // Process deposit history with related transfers
       const depositHistory = await Promise.all(depositEvents.map(async (event: any) => {
-        // const { amount } = event.args || {};
         const amount = event.args!.amount;
         totalDeposited += amount;
 

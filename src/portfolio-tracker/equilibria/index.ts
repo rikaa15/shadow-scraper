@@ -47,8 +47,6 @@ async function getUnclaimedRewards(
   // Get reward tokens
   const rewardTokens = await rewardPoolContract.getRewardTokens();
 
-  // console.log(`Found ${rewardTokens.length} reward tokens`);
-
   // Get earned amounts for each token
   const rewards = await Promise.all(
     rewardTokens.map(async (token: string) => {
@@ -72,6 +70,14 @@ async function getUnclaimedRewards(
   return rewards;
 }
 
+/**
+ * Get portfolio information for Equilibria positions.
+ * Equilibria uses a boosted rewards system similar to Curve/Convex. Users stake LP tokens in reward pools
+ * and earn both PENDLE incentives (distributed via vePENDLE voting) and underlying SY (Standardized Yield) rewards.
+ * Rewards are distributed over 7-day periods. When harvested, rewards are split with 77.5% going to LPs and 22.5%
+ * to protocol fees. Equilibria aggregates vePENDLE to boost rewards for all its users without requiring them to lock
+ * PENDLE individually.
+ */
 export async function getEquilibriaInfo(userAddress: string) {
   const portfolioItems: PortfolioItem[] = [];
   const marketPromises = marketArray.map(async (market) => {
@@ -95,7 +101,7 @@ export async function getEquilibriaInfo(userAddress: string) {
       // Get user's balance in the reward pool
       const userBalance = await rewardPoolContract.balanceOf(userAddress);
 
-      // If user has no balance, return empty array
+      // If user has no balance, return null
       if (userBalance === 0n) {
         return null;
       }
@@ -110,14 +116,17 @@ export async function getEquilibriaInfo(userAddress: string) {
       const depositTimestamp = walletDepositInfo
         ? walletDepositInfo.depositTimestamp
         : new Date();
-      const depositAmount = walletDepositInfo
-        ? `${walletDepositInfo.totalDeposited}`
+      
+      const depositTokenAmount = walletDepositInfo
+        ? String(walletDepositInfo.totalDeposited)
         : "0";
       const depositAmountUSD = walletDepositInfo
-        ? `${walletDepositInfo.totalDepositedUSD}`
+        ? String(walletDepositInfo.totalDepositedUSD)
         : "0";
+      
       const depositDate = new Date(depositTimestamp);
       const totalBlocks = walletDepositInfo ? walletDepositInfo.totalBlocks : 0;
+      
       // Process rewards
       const mainReward = rewards[0]; // First reward token (usually PENDLE)
       let secondaryReward = rewards[1]; // Second reward token (if exists)
@@ -130,6 +139,7 @@ export async function getEquilibriaInfo(userAddress: string) {
         parseFloat(depositAmountUSD),
         depositDate
       );
+      
       // Calculate secondary APR if available
       let secondaryAprResult = {
         tokenPrice: 0,
@@ -142,7 +152,7 @@ export async function getEquilibriaInfo(userAddress: string) {
           secondaryReward.token,
           secondaryReward.symbol,
           secondaryReward.amount,
-          parseFloat(depositAmount),
+          parseFloat(depositAmountUSD), // Use USD value for consistency
           depositDate
         );
       }
@@ -150,6 +160,13 @@ export async function getEquilibriaInfo(userAddress: string) {
       // Calculate total APR
       const totalApr =
         aprResult.apr + (secondaryAprResult ? secondaryAprResult.apr : 0);
+
+      // Calculate reward values
+      const mainRewardUsdValue = mainReward.amount.mul(aprResult.tokenPrice);
+      const secondaryRewardUsdValue = secondaryReward && secondaryAprResult 
+        ? secondaryReward.amount.mul(secondaryAprResult.tokenPrice)
+        : new Decimal(0);
+      const totalRewardValue = mainRewardUsdValue.add(secondaryRewardUsdValue);
 
       // Create portfolio item
       const portfolioItem: PortfolioItem = {
@@ -160,45 +177,29 @@ export async function getEquilibriaInfo(userAddress: string) {
         depositTime: moment(depositTimestamp).format("YY/MM/DD HH:MM:SS"),
         depositAsset0: depositTokenInfo.symbol,
         depositAsset1: "",
-        depositAmount0: roundToSignificantDigits(depositAmountUSD, 3),
+        depositAmount0: roundToSignificantDigits(depositTokenAmount),
         depositAmount1: "",
-        depositValue0: roundToSignificantDigits(depositAmountUSD, 3),
+        depositValue0: roundToSignificantDigits(depositAmountUSD, 2),
         depositValue1: "",
-        depositValue: roundToSignificantDigits(depositAmountUSD, 3),
+        depositValue: roundToSignificantDigits(depositAmountUSD, 2),
         rewardAsset0: mainReward.symbol,
         rewardAsset1: secondaryReward ? secondaryReward.symbol : "",
         rewardAmount0: roundToSignificantDigits(mainReward.amount.toString()),
         rewardAmount1: secondaryReward
           ? roundToSignificantDigits(secondaryReward.amount.toString())
           : "",
-        rewardValue0: roundToSignificantDigits(
-          mainReward.amount.mul(aprResult.tokenPrice).toString()
-        ),
-        rewardValue1:
-          secondaryReward && secondaryAprResult
-            ? roundToSignificantDigits(
-                secondaryReward.amount
-                  .mul(secondaryAprResult.tokenPrice)
-                  .toString()
-              )
-            : "",
-        rewardValue: roundToSignificantDigits(
-          mainReward.amount
-            .mul(aprResult.tokenPrice)
-            .add(
-              secondaryReward && secondaryAprResult
-                ? secondaryReward.amount.mul(secondaryAprResult.tokenPrice)
-                : 0
-            )
-            .toString()
-        ),
+        rewardValue0: roundToSignificantDigits(mainRewardUsdValue.toString()),
+        rewardValue1: secondaryReward
+          ? roundToSignificantDigits(secondaryRewardUsdValue.toString(), 2)
+          : "",
+        rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
         totalDays: calculateDaysDifference(
           new Date(depositTimestamp),
           new Date(),
           4
         ),
         totalBlocks: `${totalBlocks}`,
-        apr: roundToSignificantDigits(totalApr.toString()),
+        apr: roundToSignificantDigits(totalApr.toString(), 4),
         depositLink: DEPOSIT_LINK,
       };
 

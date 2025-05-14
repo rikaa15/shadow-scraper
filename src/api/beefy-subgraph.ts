@@ -24,27 +24,44 @@ export const getBeefyDeposits = async (
 ) => {
   // Convert addresses to lowercase for proper comparison
   const formattedUserAddress = userAddress.toLowerCase();
-
-  // Build query conditions
-  let whereCondition = `user_: {address: "${formattedUserAddress}"}`;
-
+  
+  // Build query conditions for both transaction types
+  let whereConditionMint = `user_: {address: "${formattedUserAddress}"}, type: "mint"`;
+  let whereConditionReceive = `user_: {address: "${formattedUserAddress}"}, type: "receive"`;
+  
   if (vaultAddress) {
-    whereCondition += `, vault_: {address: "${vaultAddress.toLowerCase()}"}`;
+    const vaultCondition = `vault_: {address: "${vaultAddress.toLowerCase()}"}`;
+    // ichi vaults
+    whereConditionMint += `, ${vaultCondition}`;
+    // shadow vaults
+    whereConditionReceive += `, ${vaultCondition}`;
   }
-
-  // Add type condition to get only deposits (mint transactions)
-  whereCondition += `, type: "mint"`;
 
   const { data } = await client.post<{
     data: {
-      transactions: BeefyTransaction[]
+      mintTransactions: BeefyTransaction[],
+      receiveTransactions: BeefyTransaction[]
     }
   }>('/', {
     query: `
       {
-        transactions(
-          first: 1000,
-          where: {${whereCondition}},
+        mintTransactions: transactions(
+          first: 500,
+          where: {${whereConditionMint}},
+          orderBy: blockNumber,
+          orderDirection: desc
+        ) {
+          id
+          hash
+          blockNumber
+          timestamp
+          type
+          amount
+        }
+        
+        receiveTransactions: transactions(
+          first: 500,
+          where: {${whereConditionReceive}},
           orderBy: blockNumber,
           orderDirection: desc
         ) {
@@ -57,7 +74,18 @@ export const getBeefyDeposits = async (
         }
       }
     `
-  })
+  });
 
-  return data.data.transactions
+  // Combine and return both types of transactions
+  if (!data?.data) {
+    console.error('No data returned from GraphQL query');
+    return [];
+  }
+  
+  const mintTxs = data.data.mintTransactions || [];
+  const receiveTxs = data.data.receiveTransactions || [];
+  
+  // Combine and sort by blockNumber descending
+  return [...mintTxs, ...receiveTxs].sort((a, b) => b.blockNumber - a.blockNumber);
 }
+

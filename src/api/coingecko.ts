@@ -9,12 +9,15 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'shadow': 'shadow-2',
   'x33': 'shadow-liquid-staking-token',
   'frxusd': 'frax-usd',
-  'weth': 'weth'
+  'weth': 'weth',
+  'pendle': 'pendle',
+  'wbtc': 'wrapped-bitcoin',
+  'scbtc': 'rings-scbtc'
 }
 
 // hardcode values for test purposes
 export const CoinGeckoRates: Record<string, number> = {
-  'swapx-2': 0.1473,
+  'swapx-2': 0.1329,
   'shadow-2': 56.58,
   'shadow-liquid-staking-token': 44.12,
   'wrapped-sonic': 0.5905,
@@ -25,6 +28,8 @@ export const CoinGeckoRates: Record<string, number> = {
   'frax-usd': 1,
   'weth': 2298.87,
   'pendle': 3.80,
+  'wrapped-bitcoin': 103637.04,
+  'rings-scbtc': 103637.04,
 }
 
 interface CoinGeckoPriceResponse {

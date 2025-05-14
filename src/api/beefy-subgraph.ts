@@ -34,8 +34,7 @@ export const getBeefyDeposits = async (
     whereConditionMint += `, ${vaultCondition}`;
     whereConditionReceive += `, ${vaultCondition}`;
   }
-  
-  // Use a union query to get both types of transactions
+
   const { data } = await client.post<{
     data: {
       mintTransactions: BeefyTransaction[],
@@ -87,3 +86,4 @@ export const getBeefyDeposits = async (
   // Combine and sort by blockNumber descending
   return [...mintTxs, ...receiveTxs].sort((a, b) => b.blockNumber - a.blockNumber);
 }
+

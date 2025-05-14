@@ -3,7 +3,7 @@ import { getSwapXInfo } from "../src/portfolio-tracker/swapx";
 
 (async () => {
   try {
-    const wallet = getAddress("0x70709614BF9aD5bBAb18E2244046d48f234a1583");
+    const wallet = getAddress("0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A");
     const result = await getSwapXInfo(wallet)
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {

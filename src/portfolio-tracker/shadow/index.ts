@@ -82,6 +82,8 @@ export const getShadowInfo = async (
 
   for (const position of positions) {
     const { id: positionId, pool } = position
+    console.log(`Found position: ${position.id} in ${position.pool.symbol} (${position.pool.id})`);
+
 
     const gaugeContract = new ethers.Contract(pool.gaugeV2.id, GaugeV3ABI, provider);
 
@@ -142,6 +144,17 @@ export const getShadowInfo = async (
     }
 
     const rewards = mergeRewards(claimedRewards, unclaimedRewards)
+    const usdcReward = rewards.find(r => r.asset.toLowerCase() === 'usdc.e');
+    const xshadowReward = rewards.find(r => r.asset.toLowerCase() === 'xshadow');
+    const shadowReward = rewards.find(r => r.asset.toLowerCase() === 'shadow');
+    const defaultRewards = [shadowReward, xshadowReward].filter(Boolean);
+
+    if (defaultRewards.length < 2) {
+      defaultRewards.push(...rewards.filter(r => !defaultRewards.includes(r)).slice(0, 2 - defaultRewards.length));
+    }
+    const rewardA = usdcReward && xshadowReward ? usdcReward : defaultRewards[0] || { asset: '', amount: '0', value: '0' };
+    const rewardB = usdcReward && xshadowReward ? xshadowReward : defaultRewards[1] || { asset: '', amount: '0', value: '0' };
+
 
     if(totalDepositedValue > 0) {
       const currentBlockNumber = await provider.getBlockNumber()
@@ -160,15 +173,15 @@ export const getShadowInfo = async (
         depositValue: roundToSignificantDigits(
           (deposit0Value + deposit1Value).toString()
         ),
-        rewardAsset0: rewards[0].asset || '',
-        rewardAsset1: rewards[1].asset || '',
-        rewardAmount0: roundToSignificantDigits(rewards[0].amount),
-        rewardAmount1: roundToSignificantDigits(rewards[1].amount),
-        rewardValue0: roundToSignificantDigits(rewards[0].value),
-        rewardValue1: roundToSignificantDigits(rewards[1].value),
+        rewardAsset0: rewardA.asset,
+        rewardAsset1: rewardB.asset,
+        rewardAmount0: roundToSignificantDigits(rewardA.amount),
+        rewardAmount1: roundToSignificantDigits(rewardB.amount),
+        rewardValue0: roundToSignificantDigits(rewardA.value),
+        rewardValue1: roundToSignificantDigits(rewardB.value),
         rewardValue: roundToSignificantDigits(
-          (Number(rewards[0].value) + Number(rewards[1].value)).toString()
-        ),
+          rewards.reduce((acc, r) => acc + Number(r.value), 0).toString()
+        ),        
         totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
         depositLink: `https://www.shadow.so/liquidity/${pool.id}`

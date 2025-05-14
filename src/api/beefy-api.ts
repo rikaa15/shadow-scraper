@@ -220,14 +220,13 @@ export const getBeefyVaultUSDValue = async (vaultAddress: string, underlyingAmou
     const vaultInfo = await getBeefyVaultByAddress(vaultAddress);
     if (vaultInfo) {
       // Get the current LP/token price
-      const pricesResponse = await fetch('https://api.beefy.finance/lps');
-      const prices = await pricesResponse.json();
+      const pricesResponse = await axios.get('https://api.beefy.finance/lps');
+      const prices = pricesResponse.data;
 
       // Try to find the price using the oracleId from vault info
       const lpPrice = prices[vaultInfo.oracleId];
       
       return parseFloat(ethers.formatUnits(underlyingAmount, vaultInfo.tokenDecimals)) * lpPrice;
-
     }
     // If no price found, return 0
     console.warn(`No price found for vault ${vaultAddress}`);

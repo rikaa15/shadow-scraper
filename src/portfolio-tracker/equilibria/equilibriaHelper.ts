@@ -137,14 +137,14 @@ export async function calculateTokenAPR(
       Number(rewardValueUSD),
       Number(daysSinceDeposit)
     )
-    console.log(rewardValueUSD, depositUSD, daysSinceDeposit)
-    console.log(`APR Calculation for ${rewardSymbol}:`);
-    console.log(`- Reward amount: ${rewardAmount} ${rewardSymbol}`);
-    console.log(`- Token price: $${tokenPrice}`);
-    console.log(`- Reward value: $${rewardValueUSD}`);
-    console.log(`- Deposit value: $${depositUSD}`);
-    console.log(`- Days since deposit: ${daysSinceDeposit.toFixed(2)}`);
-    console.log(`- Calculated APR: ${apr.toFixed(2)}%`);
+    // console.log(rewardValueUSD, depositUSD, daysSinceDeposit)
+    // console.log(`APR Calculation for ${rewardSymbol}:`);
+    // console.log(`- Reward amount: ${rewardAmount} ${rewardSymbol}`);
+    // console.log(`- Token price: $${tokenPrice}`);
+    // console.log(`- Reward value: $${rewardValueUSD}`);
+    // console.log(`- Deposit value: $${depositUSD}`);
+    // console.log(`- Days since deposit: ${daysSinceDeposit.toFixed(2)}`);
+    // console.log(`- Calculated APR: ${apr.toFixed(2)}%`);
 
     return {
       tokenPrice,
@@ -164,9 +164,9 @@ export async function getUserDepositInfo(userAddress: string, marketAddress: str
     userAddress = ethers.getAddress(userAddress);
     marketAddress = ethers.getAddress(marketAddress);
 
-    console.log(`Finding pool ID for Market: ${marketAddress}`);
+    // console.log(`Finding pool ID for Market: ${marketAddress}`);
     const { poolId, token, rewardPool } = await findPoolId(marketAddress);
-    console.log(`Found pool ID: ${poolId} with deposit token: ${token} and reward pool: ${rewardPool}`);
+    // console.log(`Found pool ID: ${poolId} with deposit token: ${token} and reward pool: ${rewardPool}`);
 
     // Get token info with error handling
     const tokenInfo = await getTokenInfo(token).catch(() => ({ symbol: 'UNKNOWN', decimals: 18 }));

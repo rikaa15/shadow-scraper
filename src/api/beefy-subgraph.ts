@@ -31,7 +31,9 @@ export const getBeefyDeposits = async (
   
   if (vaultAddress) {
     const vaultCondition = `vault_: {address: "${vaultAddress.toLowerCase()}"}`;
+    // ichi vaults
     whereConditionMint += `, ${vaultCondition}`;
+    // shadow vaults
     whereConditionReceive += `, ${vaultCondition}`;
   }
 

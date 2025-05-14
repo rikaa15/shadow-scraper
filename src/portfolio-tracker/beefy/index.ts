@@ -4,76 +4,90 @@ import ERC20_ABI from '../../abi/ERC20.json'
 import { calculateAPR, portfolioItemFactory, roundToSignificantDigits } from "../helpers";
 import moment from "moment";
 import { PortfolioItem } from "../types";
-import { getBeefyVaultByAddress, getBeefyVaultUSDValue, getPpfsPrice } from "../../api/beefy-api";
+import { getBeefyVaultUSDValue, getPpfsPrice } from "../../api/beefy-api";
 import { calculateBeefyAPY } from "./helper";
 import { getBeefyDeposits } from "../../api/beefy-subgraph";
-
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 const vaultArray = [
   {
-    name: 'beefy',
+    name: 'beefy-frxusd',
     address:'0x0f61600BAE509820207827b7e3d108ceeeB23C48',
     url: 'https://app.beefy.com/vault/swapx-ichi-frxusd-scusd',
     type: 'vault'
   },
+  {
+    name: 'beefy-wbtc',
+    address:'0x920D88cA46041eFdB317c1a4150e8f0515e88D9B',
+    url: 'https://app.beefy.com/vault/shadow-cow-sonic-wbtc-usdc.e-vault',
+    type: 'vault'
+  },
 ];
 
-/**
- * Get Beefy vault position information
- * @param walletAddress User's wallet address
- * @param vaultAddress Vault's address
- * @returns Array of portfolio items with position details
- */
 export const getBeefyInfo = async (walletAddress: string) => {
   const portfolioItems: PortfolioItem[] = [];
-
-  // Format wallet address
   const formattedWalletAddress = ethers.getAddress(walletAddress);
 
   const vaultPromises = vaultArray.map(async (vault) => { 
-
     // Create contract instances
     const vaultContract = new ethers.Contract(vault.address, BeefyVaultABI, provider);
     const assetAddress = await vaultContract.want();
-
     const assetContract = new ethers.Contract(assetAddress, ERC20_ABI, provider);
 
     // Get token details
     const assetSymbol = await assetContract.symbol();
+    const assetDecimals = await assetContract.decimals();
 
     // Get user's mooToken balance (shares)
     const sharesBalance = await vaultContract.balanceOf(formattedWalletAddress);
-
+    
+    // If user has no shares, return null
+    if (sharesBalance === 0n) {
+      return null;
+    }
 
     const currentPPFS = await vaultContract.getPricePerFullShare() as bigint;
-    const transactions = await getBeefyDeposits(walletAddress, vault.address)
+    const transactions = await getBeefyDeposits(walletAddress, vault.address);
+    
     const firstDeposit = transactions[transactions.length - 1];
     if(!firstDeposit) {
-      return null
+      return null;
     }
+    
     const firstDepositTimestamp = new Date(parseInt(firstDeposit.timestamp) * 1000).toISOString();
 
-    const depositPpfsPrice = await getPpfsPrice(vault.address, firstDepositTimestamp, firstDeposit.blockNumber)
-    const depositPPFS = depositPpfsPrice ? BigInt(Math.floor(+depositPpfsPrice.ppfsPrice * 1e18)) : 0n
+    // Get PPFS at time of deposit
+    const depositPpfsPrice = await getPpfsPrice(vault.address, firstDepositTimestamp, firstDeposit.blockNumber);
+    const depositPPFS = depositPpfsPrice ? BigInt(Math.floor(+depositPpfsPrice.ppfsPrice * 1e18)) : 0n;
+    
+    // Calculate token amounts (in the underlying LP token)
     const currentUnderlyingTokens = (sharesBalance * currentPPFS) / (10n ** 18n);
     const initialUnderlyingTokens = (sharesBalance * depositPPFS) / (10n ** 18n);
-    const gains = currentUnderlyingTokens - initialUnderlyingTokens;
-    const depositedTotal = Number(initialUnderlyingTokens);
-    const totalRewards = Number(gains);
+    const gainTokens = currentUnderlyingTokens - initialUnderlyingTokens;
+    
+    // Token amount with proper decimal formatting
+    const initialTokensFormatted = Number(initialUnderlyingTokens) / (10 ** Number(assetDecimals));
+    const gainTokensFormatted = Number(gainTokens) / (10 ** Number(assetDecimals));
+    
+    // Get USD values
+    const initialDepositUSD = await getBeefyVaultUSDValue(vault.address, initialUnderlyingTokens);
+    const currentValueUSD = await getBeefyVaultUSDValue(vault.address, currentUnderlyingTokens);
+    const gainUSD = currentValueUSD - initialDepositUSD; // Calculate gains directly from USD values
+    
+    // Calculate time metrics
     const depositDate = new Date(firstDepositTimestamp);
     const currentDate = new Date();
     const daysElapsed = (currentDate.getTime() - depositDate.getTime()) / (1000 * 60 * 60 * 24);
-    const apr = calculateAPR(depositedTotal, totalRewards, daysElapsed);
+    
+    // Calculate performance metrics
+    const apr = calculateAPR(initialDepositUSD, gainUSD, daysElapsed);
     const apy = calculateBeefyAPY(currentUnderlyingTokens, initialUnderlyingTokens, firstDepositTimestamp)
-
-    // get the deposit and gain value in USD
-    const initialDepositUSD = await getBeefyVaultUSDValue(vault.address, initialUnderlyingTokens)
-    const gainsInUSD =  await getBeefyVaultUSDValue(vault.address, gains)
+    console.log(`APY for ${vault.name} vault:`, apy)
 
     const currentBlockNumber = await provider.getBlockNumber();
     const totalBlocks = currentBlockNumber - +firstDeposit.blockNumber;
+    
     const portfolioItem: PortfolioItem = {
       ...portfolioItemFactory(),
       type: vault.type,
@@ -81,38 +95,27 @@ export const getBeefyInfo = async (walletAddress: string) => {
       address: vault.address,
       depositTime: moment(firstDepositTimestamp).format('YY/MM/DD HH:MM:SS'),
       depositAsset0: assetSymbol,
-      depositAsset1: '',  // Empty for single-asset vaults
-      depositAmount0: roundToSignificantDigits(`${initialDepositUSD}`, 3),
+      depositAsset1: '',
+      depositAmount0: roundToSignificantDigits(`${initialTokensFormatted}`, 6), // Token amount
       depositAmount1: '',
-      depositValue0: roundToSignificantDigits(`${initialDepositUSD}`, 3),
+      depositValue0: roundToSignificantDigits(`${initialDepositUSD}`, 2), // USD value
       depositValue1: '',
-      depositValue: roundToSignificantDigits(`${initialDepositUSD}`, 3),
-      rewardAsset0: assetSymbol,  // For Beefy, rewards are in the same asset
+      depositValue: roundToSignificantDigits(`${initialDepositUSD}`, 2),
+      rewardAsset0: assetSymbol,
       rewardAsset1: '',
-      rewardAmount0: roundToSignificantDigits(`${gainsInUSD}`, 4),
+      rewardAmount0: roundToSignificantDigits(`${gainTokensFormatted}`, 6), // Gain in tokens
       rewardAmount1: '',
-      rewardValue0: roundToSignificantDigits(`${gainsInUSD}`, 4),
+      rewardValue0: roundToSignificantDigits(`${gainUSD}`, 2), // Gain in USD
       rewardValue1: '',
-      rewardValue: roundToSignificantDigits(`${gainsInUSD}`, 4),
+      rewardValue: roundToSignificantDigits(`${gainUSD}`, 2),
       totalDays: roundToSignificantDigits(`${daysElapsed}`, 4),
       totalBlocks: `${totalBlocks}`,
       apr: roundToSignificantDigits(apr.toString(), 4),
       depositLink: vault.url
     };
 
-    return portfolioItem
-  })
-
-  
-
-  // console.log(`\nVault: ${vaultInfo?.name}`)
-  // console.log(`User ${walletAddress}`)
-  // console.log('Deposit Time:', moment(firstDepositTimestamp).format('YY/MM/DD HH:MM:SS'))
-  // console.log('Deposit amount:', roundToSignificantDigits(`${initialDepositUSD}`, 3))
-  // console.log('Total Days:', roundToSignificantDigits(`${daysElapsed}`, 4))
-  // console.log('Earings:', roundToSignificantDigits(`${gainsInUSD}`, 4))
-  // console.log(`APY: ${apy}%`)
-  // console.log(`APR: ${apr}%\n`)
+    return portfolioItem;
+  });
 
   const results = await Promise.all(vaultPromises);
 
@@ -121,5 +124,4 @@ export const getBeefyInfo = async (walletAddress: string) => {
   });
 
   return portfolioItems;
-
 };

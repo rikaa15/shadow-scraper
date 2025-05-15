@@ -71,7 +71,6 @@ async function getUnclaimedRewards(
 }
 
 /**
- * Get portfolio information for Equilibria positions.
  * Equilibria uses a boosted rewards system similar to Curve/Convex. Users stake LP tokens in reward pools
  * and earn both PENDLE incentives (distributed via vePENDLE voting) and underlying SY (Standardized Yield) rewards.
  * Rewards are distributed over 7-day periods. When harvested, rewards are split with 77.5% going to LPs and 22.5%

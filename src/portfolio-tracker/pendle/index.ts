@@ -1,10 +1,9 @@
 import { ethers } from "ethers";
-import fetch from "node-fetch";
 import moment from "moment";
 import Decimal from "decimal.js";
 
 import { PortfolioItem } from "../types";
-import { portfolioItemFactory, roundToSignificantDigits } from "../helpers";
+import { portfolioItemFactory, roundToSignificantDigits, calculateAPR, calculateDaysDifference } from "../helpers";
 import { getTokenPrice } from "../../api/coingecko";
 import { fetchPendleMarketData, fetchPendleUserLPValuation } from "../../api/pendle";
 import pendleMarketABI from "../../abi/PendleMarketV3.json";
@@ -49,22 +48,22 @@ export const getPendleInfo = async (wallet: string): Promise<PortfolioItem[]> =>
           ...portfolioItemFactory(),
           name: `pendle (${name})`,
           address: marketAddress,
-          depositTime: lp.depositTime,
-          depositAsset0: `${name} LP`,
+          depositTime: moment(lp.depositTime).format("YY/MM/DD HH:mm:ss"),
+          depositAsset0: `${name}`,
           depositAsset1: "",
-          depositAmount0: roundToSignificantDigits(lp.depositAmount.toString()),
+          depositAmount0: roundToSignificantDigits(lp.depositValue.toString()), // assume 'aUSDC' deposit amount from 'aUSDC LP' deposit amount to simplify calculation
           depositAmount1: "",
           depositValue0: roundToSignificantDigits(lp.depositValue.toString()),
           depositValue1: "",
           depositValue: roundToSignificantDigits(lp.depositValue.toString()),
           rewardAsset0: "PENDLE",
           rewardAsset1: "USD",
-          rewardAmount0: lp.rewardAmount.toFixed(6),
-          rewardAmount1: "",
-          rewardValue0: lp.rewardValue.toFixed(6),
+          rewardAmount0: roundToSignificantDigits(lp.rewardAmount.toString()),
+          rewardAmount1: roundToSignificantDigits(rewardValue1.toString()),
+          rewardValue0: roundToSignificantDigits(lp.rewardValue.toString()),
           rewardValue1: roundToSignificantDigits(rewardValue1.toString()),
           rewardValue: roundToSignificantDigits(totalRewardValue.toString()),
-          totalDays: lp.daysActive.toFixed(2),
+          totalDays: calculateDaysDifference(lp.depositTime, new Date(), 4),
           totalBlocks: lp.totalBlocks.toString(),
           apr: roundToSignificantDigits(apr.toString()),
           type: "Swap pool",
@@ -114,7 +113,7 @@ async function getPendleLPInfo(wallet: string, marketAddress: string) {
 
   const incentiveDays = lastBlock ? new Decimal(now - lastBlock.timestamp).div(86400) : new Decimal(1);
   const feeDays = firstBlock ? new Decimal(now - firstBlock.timestamp).div(86400) : new Decimal(1);
-  const depositTime = moment.unix(firstBlock?.timestamp || now).format("YY/MM/DD HH:mm:ss");
+  const depositTime = new Date((firstBlock?.timestamp || now) * 1000);
 
   const feeRate = decodeFeeRate(marketState.lnFeeRateRoot);
   const feeAPR = getFeeAPR(tradingVolumeUSD, liquidityUSD, lpValueUSD, feeRate);
@@ -191,7 +190,13 @@ const getFeeAPR = (
 ): Decimal => {
   const userShare = lpValueUSD.div(liquidityUSD);
   const dailyFees = tradingVolumeUSD.mul(feeRate).mul(userShare);
-  return dailyFees.div(lpValueUSD).mul(365).mul(100);
+  const apr = calculateAPR(
+    lpValueUSD.toNumber(),
+    dailyFees.mul(365).toNumber(),
+    365
+  );
+  return new Decimal(apr);
+  
 };
 
 const getIncentiveAPY = (
@@ -201,6 +206,10 @@ const getIncentiveAPY = (
   daysActive: Decimal
 ): { apy: Decimal; rewardValueUSD: Decimal } => {
   const rewardValueUSD = rewardAccrued.mul(tokenPrice);
-  const apy = rewardValueUSD.div(lpValueUSD).mul(365).div(daysActive).mul(100);
+  const apy = new Decimal(calculateAPR(
+    lpValueUSD.toNumber(),
+    rewardValueUSD.toNumber(),
+    daysActive.toNumber()
+  ));
   return { apy, rewardValueUSD };
 };

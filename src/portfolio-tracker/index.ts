@@ -8,7 +8,10 @@ import {getMagpieInfo} from "./magpie";
 import {getSiloInfo} from "./silo";
 import {getEulerInfo} from "./euler";
 import {getSpectraInfo} from "./spectra";
+import {getBeefyInfo} from './beefy';
 import {PortfolioItem} from "./types";
+import {getEquilibriaInfo} from "./equilibria";
+import moment from "moment/moment";
 
 // const userAddress = '0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A'
 
@@ -17,6 +20,7 @@ const main = async () => {
     const userAddress = process.env.npm_config_useraddress || ''
     const copyToClipboard = Boolean(process.env.npm_config_copy) || false
     const exportToTsv = Boolean(process.env.npm_config_export) || false
+    const includeTransactions = Boolean(process.env.npm_config_txs) || false
     if(!userAddress) {
       console.log(`No userAddress set. Usage example: npm run portfolio --userAddress=0x4E430992Db6F3BdDbC6A50d1513845f087E9af4A.`)
       process.exit(1)
@@ -25,20 +29,31 @@ const main = async () => {
     // let tokensInfo = await getTokensInfo(userAddress)
     // tokensInfo = await setUSDValues(tokensInfo)
 
+    let txsTsv = ''
+    if(includeTransactions) {
+      const txsInfo = await getWalletTransactionsInfo(userAddress)
+      txsTsv = arrayToTSV(txsInfo) + '\n\n'
+    }
+
+
     const [
       shadowInfo,
       swapXInfo,
       magpieInfo,
       siloInfo,
       eulerInfo,
-      spectraInfo
+      spectraInfo,
+      // beefyInfo,
+      eqInfo
     ] = await Promise.all([
       getShadowInfo(userAddress),
       getSwapXInfo(userAddress),
       getMagpieInfo(userAddress),
       getSiloInfo(userAddress),
       getEulerInfo(userAddress),
-      getSpectraInfo(userAddress)
+      getSpectraInfo(userAddress),
+      // getBeefyInfo(userAddress),
+      getEquilibriaInfo(userAddress)
     ])
 
     const exchangesTsv = arrayToTSV([
@@ -47,14 +62,12 @@ const main = async () => {
       ...magpieInfo,
       ...siloInfo,
       ...eulerInfo,
-      ...spectraInfo
+      ...spectraInfo,
+      // ...beefyInfo,
+      ...eqInfo
     ] as PortfolioItem[])
 
-    const txsTsv = ''
-    // const txsInfo = await getWalletTransactionsInfo(userAddress)
-    // const txsTsv = arrayToTSV(txsInfo)
-
-    const tsv = exchangesTsv + '\n\n' + txsTsv
+    const tsv = txsTsv + exchangesTsv
 
     console.log(tsv)
 
@@ -62,7 +75,8 @@ const main = async () => {
       clipboardy.writeSync(tsv);
     }
     if(exportToTsv) {
-      const filename = `export/portfolio_${userAddress}_${Math.round(Date.now() / 1000)}.tsv`
+      const currentDate = moment().format('YYYY-MM-DD HH:mm')
+      const filename = `export/${currentDate}-portfolio-${userAddress}.tsv`
       fs.writeFileSync(filename, tsv, 'utf8');
       console.log(`${filename} created successfully`)
     }

@@ -6,7 +6,8 @@ import {PortfolioItem} from "../types";
 import moment from "moment/moment";
 import {getSwapXVaultDeposits} from "../../api";
 import {getBlockAtTimestamp} from "../../api/llama";
-import PoolsList from './poolsList.json'
+// import PoolsList from './poolsList.json'
+import PoolsList from './poolsListV2.json'
 import SwapXPoolABI from './SwapxGaugeV2CL.json'
 import SwapXRewardsTokenABI from './SwapXRewardsToken.json'
 import ICHIVaultABI from './ICHIVault.json'
@@ -24,8 +25,10 @@ export const getSwapXInfo = async (
 ) => {
   const v3Pools = PoolsList
     .map((info: any) => {
-      const { ichiVaults, token0, token1 } = info
+      const { ichiVaults = [], token0, token1 } = info
+
       return ichiVaults.map((item: any) => {
+
         if(item.gauge) {
           return {
             address: item.gauge.id,
@@ -38,12 +41,13 @@ export const getSwapXInfo = async (
       })
     })
     .flat()
-    .filter((item: any) => item.addresss !== '');
+    .filter((item: any) => item.address !== '');
 
   let poolsWithRewards = await Promise.all(
     v3Pools.map(async (v3Pool: any) => {
       try {
         const { address: poolAddress, token0, token1 } = v3Pool
+
         const gaugeContract = new ethers.Contract(poolAddress, SwapXPoolABI, provider);
         const balanceOf = await gaugeContract.balanceOf(userAddress) as bigint;
         if(balanceOf === 0n) {
@@ -88,7 +92,7 @@ export const getSwapXInfo = async (
           .div(10 ** token0Decimals)
           .toNumber()
         const depositAmount1 = userPoolShare.mul(new Decimal(ichiTotal1.toString()))
-          .div(10 ** token0Decimals)
+          .div(10 ** token1Decimals)
           .toNumber()
 
         const rewardAmount0 = new Decimal(reward).div(Math.pow(10, decimals)).toNumber()

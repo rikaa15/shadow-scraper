@@ -1,12 +1,14 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: 'https://api.studio.thegraph.com/query/108274/eulerfinance/version/latest',
+  baseURL: 'https://api.studio.thegraph.com/query/107620/euler-apr/version/latest',
   headers: {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${process.env.SUBGRAPH_API_KEY}`
   }
 })
+
+
 
 export interface DepositEvent {
   id: string
@@ -16,11 +18,21 @@ export interface DepositEvent {
   sender: string
   assets: string
   shares: string
+  vault: string  // Added vault field
 }
 
 export const getEulerDeposits = async (
-  owner: string
+  owner: string,
+  vaultAddress?: string  // Optional parameter to filter by specific vault
 ) => {
+  // Construct the where clause based on parameters
+  let whereClause = `owner: "${owner}"`
+  
+  // Add vault filter if provided
+  if (vaultAddress) {
+    whereClause += `, vault: "${vaultAddress}"`
+  }
+  
   const { data } = await client.post<{
     data: {
       deposits: DepositEvent[]
@@ -31,10 +43,10 @@ export const getEulerDeposits = async (
         deposits(
           first: 1000,
           where: {
-            owner: "${owner}"
+            ${whereClause}
           },
-          orderBy:blockNumber,
-          orderDirection:desc
+          orderBy: blockNumber,
+          orderDirection: desc
         ) {
           id
           blockNumber
@@ -43,8 +55,9 @@ export const getEulerDeposits = async (
           sender
           assets
           shares
+          vault
         }
-    }
+      }
     `
   })
 

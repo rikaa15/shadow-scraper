@@ -17,15 +17,6 @@ type BalanceForwarderStatus @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Borrow @entity(immutable: true) {
-  id: Bytes!
-  account: Bytes! # address
-  assets: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type ConvertFees @entity(immutable: true) {
   id: Bytes!
   sender: Bytes! # address
@@ -42,17 +33,6 @@ type DebtSocialized @entity(immutable: true) {
   id: Bytes!
   account: Bytes! # address
   assets: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Deposit @entity(immutable: true) {
-  id: Bytes!
-  sender: Bytes! # address
-  owner: Bytes! # address
-  assets: BigInt! # uint256
-  shares: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -186,25 +166,6 @@ type PullDebt @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type Repay @entity(immutable: true) {
-  id: Bytes!
-  account: Bytes! # address
-  assets: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Transfer @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
-  value: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type VaultStatus @entity(immutable: true) {
   id: Bytes!
   totalShares: BigInt! # uint256
@@ -219,6 +180,68 @@ type VaultStatus @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+type EulerVault @entity(immutable: false) {
+  id: Bytes!
+  name: String
+  decimals: BigInt
+  borrowCap: BigInt
+  supplyCap: BigInt
+  dToken: Bytes
+  asset: Bytes
+  creator: Bytes
+  symbol: String
+  interestRateModel: Bytes
+  governorAdmin: Bytes
+  feeReceiver: Bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+# Update these entities to include vault field
+type Borrow @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  assets: BigInt! # uint256
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Deposit @entity(immutable: true) {
+  id: Bytes!
+  sender: Bytes! # address
+  owner: Bytes! # address
+  assets: BigInt! # uint256
+  shares: BigInt! # uint256
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Repay @entity(immutable: true) {
+  id: Bytes!
+  account: Bytes! # address
+  assets: BigInt! # uint256
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  value: BigInt! # uint256
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type Withdraw @entity(immutable: true) {
   id: Bytes!
   sender: Bytes! # address
@@ -226,6 +249,18 @@ type Withdraw @entity(immutable: true) {
   owner: Bytes! # address
   assets: BigInt! # uint256
   shares: BigInt! # uint256
+  vault: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ProxyCreated @entity(immutable: true) {
+  id: Bytes!
+  proxy: Bytes! # address
+  upgradeable: Boolean! # bool
+  implementation: Bytes! # address
+  trailingData: Bytes! # bytes
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

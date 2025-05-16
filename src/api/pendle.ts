@@ -2,7 +2,7 @@ import axios from "axios";
 
 // https://api-v2.pendle.finance/core/docs#/Dashboard/DashboardController_getUserPositions
 const client = axios.create({
-  baseURL: "https://api-v2.pendle.finance",
+  baseURL: "https://api-v2.pendle.finance"
 });
 
 interface PositionValue {

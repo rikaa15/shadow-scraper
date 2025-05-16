@@ -10,8 +10,8 @@ import BoringVaultABI from '../../abi/BoringVault.json'
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 const siloVaults = [{
-  name: 'scUSD - Re7',
-  address: '0x592D1e187729C76EfacC6dfFB9355bd7BF47B2a7'
+  name: '',
+  address: '0xe6605932e4a686534D19005BB9dB0FBA1F101272'
 }]
 
 export const getSiloInfo = async (

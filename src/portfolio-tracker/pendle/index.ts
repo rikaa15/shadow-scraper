@@ -5,7 +5,7 @@ import Decimal from "decimal.js";
 import { PortfolioItem } from "../types";
 import { portfolioItemFactory, roundToSignificantDigits, calculateAPR, calculateDaysDifference } from "../helpers";
 import { getTokenPrice } from "../../api/coingecko";
-import { fetchPendleMarketData, fetchPendleUserLPValuation } from "../../api/pendle";
+import { getPendleMarketData, getPendlePositions } from "../../api/pendle";
 import pendleMarketABI from "../../abi/PendleMarketV3.json";
 import pendleRouterABI from "../../abi/PendleRouterV4.json";
 
@@ -82,11 +82,13 @@ export const getPendleInfo = async (wallet: string): Promise<PortfolioItem[]> =>
 
 async function getPendleLPInfo(wallet: string, marketAddress: string) {
   const [marketData, userValuation] = await Promise.all([
-    fetchPendleMarketData(marketAddress),
-    fetchPendleUserLPValuation(marketAddress, wallet)
+    getPendleMarketData(marketAddress),
+    getPendleLPValuation(wallet, marketAddress)
   ]);
 
-  const { tradingVolumeUSD, liquidityUSD } = marketData;
+  const tradingVolumeUSD = new Decimal(marketData.tradingVolume.usd);
+  const liquidityUSD = new Decimal(marketData.liquidity.usd);
+
   const { lpValueUSD, lpRawBalance } = userValuation;
 
   const market = new ethers.Contract(marketAddress, pendleMarketABI, provider);
@@ -134,7 +136,7 @@ async function getPendleLPInfo(wallet: string, marketAddress: string) {
 }
 
 async function getPendlePTInfo(wallet: string, marketAddress: string, ptAddress: string) {
-  const marketData = await fetchPendleMarketData(marketAddress);
+  const marketData = await getPendleMarketData(marketAddress);
   const iface = new ethers.Interface(pendleMarketABI);
 
   const logs = await provider.getLogs({
@@ -213,3 +215,18 @@ const getIncentiveAPY = (
   ));
   return { apy, rewardValueUSD };
 };
+
+async function getPendleLPValuation(wallet: string, marketAddress: string) {
+    const positions = await getPendlePositions(wallet);
+    const pos = positions[0]?.openPositions.find((p) =>
+      p.marketId.toLowerCase().includes(marketAddress.toLowerCase())
+    );
+  
+    if (!pos) throw new Error("No LP position found for user in Pendle market");
+  
+    return {
+      lpValueUSD: new Decimal(pos.lp.valuation),
+      lpRawBalance: new Decimal(pos.lp.balance),
+    };
+  }
+  

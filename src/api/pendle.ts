@@ -1,40 +1,107 @@
-import Decimal from "decimal.js";
-import fetch from "node-fetch";
+import axios from "axios";
 
-export const fetchPendleMarketData = async (
-  marketAddress: string,
-  timestampISO?: string
-) => {
-  const url = new URL(`https://api-v2.pendle.finance/core/v2/146/markets/${marketAddress}/data`);
-  if (timestampISO) url.searchParams.append("timestamp", timestampISO);
+// https://api-v2.pendle.finance/core/docs#/Dashboard/DashboardController_getUserPositions
+const client = axios.create({
+  baseURL: "https://api-v2.pendle.finance",
+});
 
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error("Failed to fetch market data from Pendle API");
+interface PositionValue {
+  valuation: number;
+  balance: string;
+}
 
-  const data = await res.json();
-  return {
-    tradingVolumeUSD: new Decimal(data.tradingVolume.usd),
-    liquidityUSD: new Decimal(data.liquidity.usd),
-    ptDiscount: data.ptDiscount,
-    timestamp: data.timestamp,
-    raw: data
-  };
+interface LPPositionValue extends PositionValue {
+  activeBalance: string;
+}
+
+export interface PendlePosition {
+  marketId: string;
+  pt: PositionValue;
+  yt: PositionValue;
+  lp: LPPositionValue;
+}
+
+export interface PendlePositionsInfo {
+  chainId: number;
+  totalOpen: number;
+  totalClosed: number;
+  totalSy: number;
+  openPositions: PendlePosition[];
+  closedPositions: PendlePosition[];
+  syPositions: Array<{ syId: string; balance: string }>;
+  updatedAt: string;
+}
+
+export interface PendleValue {
+  usd: number;
+  acc: number;
+}
+
+export interface PendleRewardAsset {
+  id: string;
+  chainId: number;
+  address: string;
+  symbol: string;
+  decimals: number;
+  expiry: string;
+  accentColor: string;
+  price: PendleValue;
+  priceUpdatedAt: string;
+  name: string;
+}
+
+export interface PendleEstimatedReward {
+  asset: PendleRewardAsset;
+  amount: number;
+}
+
+export interface PendleMarketDataResponse {
+  timestamp: string;
+
+  liquidity: PendleValue;
+  tradingVolume: PendleValue;
+
+  underlyingInterestApy: number;
+  underlyingRewardApy: number;
+  underlyingApy: number;
+  impliedApy: number;
+  ytFloatingApy: number;
+  swapFeeApy: number;
+  voterApy: number;
+  ptDiscount: number;
+  pendleApy: number;
+  arbApy: number;
+  lpRewardApy: number;
+  aggregatedApy: number;
+  maxBoostedApy: number;
+
+  estimatedDailyPoolRewards: PendleEstimatedReward[];
+
+  totalPt: number;
+  totalSy: number;
+  totalLp: number;
+  totalActiveSupply: number;
+
+  assetPriceUsd: number;
+}
+
+export const getPendlePositions = async (walletAddress: string) => {
+  const { data } = await client.get<{
+    positions: PendlePositionsInfo[];
+  }>(`/core/v1/dashboard/positions/database/${walletAddress}?filterUsd=0.1`);
+  return data.positions;
 };
 
-
-export const fetchPendleUserLPValuation = async (marketAddress: string, walletAddress: string) => {
-  const url = `https://api-v2.pendle.finance/core/v1/dashboard/positions/database/${walletAddress}?filterUsd=0.1`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to fetch user position from Pendle API");
-  const data = await res.json();
-
-  const pos = data.positions[0]?.openPositions.find((p: any) =>
-    p.marketId.toLowerCase().includes(marketAddress.toLowerCase())
+export const getPendleMarketData = async (
+  marketAddress: string,
+  timestampISO?: string
+): Promise<PendleMarketDataResponse> => {
+  const url = new URL(
+    `/core/v2/146/markets/${marketAddress}/data`,
+    client.defaults.baseURL
   );
-  if (!pos) throw new Error("No LP position found for user in Pendle market");
+  if (timestampISO) url.searchParams.append("timestamp", timestampISO);
 
-  return {
-    lpValueUSD: new Decimal(pos.lp.valuation),
-    lpRawBalance: new Decimal(pos.lp.balance),
-  };
+  const { data } = await client.get<PendleMarketDataResponse>(url.toString());
+  return data;
 };

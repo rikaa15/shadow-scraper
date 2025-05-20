@@ -299,7 +299,6 @@ export const getClPositionMints = (params: GetEventsParams) => {
   const { first = 1000, skip = 0, filter = {}, sort = {} } = params
 
   const whereQuery = buildWhereQuery(filter)
-  console.log('whereQuery', whereQuery)
 
   return `{
     clPositionMints(

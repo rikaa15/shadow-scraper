@@ -294,3 +294,38 @@ export const getGaugeRewardClaimsQuery = (params: GetEventsParams) => {
     }
   }`
 }
+
+export const getClPositionMints = (params: GetEventsParams) => {
+  const { first = 1000, skip = 0, filter = {}, sort = {} } = params
+
+  const whereQuery = buildWhereQuery(filter)
+  console.log('whereQuery', whereQuery)
+
+  return `{
+    clPositionMints(
+      first:100,
+      where: ${whereQuery}
+      orderBy: transaction__timestamp,
+      orderDirection:desc
+    ) {
+      id
+      amount0
+      amount1
+      position {
+        id
+        depositedToken0
+        depositedToken1
+        token0 { id symbol decimals }
+        token1 { id symbol decimals }
+      }
+      liquidity
+      pool {
+        symbol
+        token0 { id symbol decimals }
+        token1 { id symbol decimals }
+      }
+      transaction { id from to blockNumber timestamp }
+    }
+  }`
+}
+

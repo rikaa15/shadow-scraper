@@ -30,9 +30,9 @@ export const CoinGeckoRates: Record<string, number> = {
   'frax-usd': 1,
   'weth': 2298.87,
   'pendle': 3.80,
-  'wrapped-bitcoin': 104401,
-  'rings-scbtc': 104401,
-  'lombard-staked-btc': 104401,
+  'wrapped-bitcoin': 108949,
+  'rings-scbtc': 108949,
+  'lombard-staked-btc': 108949,
   'gems': 32.52
 }
 

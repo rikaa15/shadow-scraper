@@ -141,9 +141,11 @@ export const getVFatInfo = async (walletAddress: string) => {
                price = await getTokenPrice(exchangeTokenId)
              } else if(symbol === 'xshadow') {
                price = (await getTokenPrice('shadow-2')) / 2
-             } else if(symbol !== 'gems') {
+             } else {
                price = await getTokenPrice(symbol, true);
              }
+
+             // console.log('reward', rewardSymbol, rewardAddress, 'earned', earned, 'price', price);
 
              if(price > 0) {
                const decimals = Number(await rewardContract.decimals())

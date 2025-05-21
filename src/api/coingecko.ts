@@ -13,7 +13,8 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'pendle': 'pendle',
   'wbtc': 'wrapped-bitcoin',
   'scbtc': 'rings-scbtc',
-  'lbtc': 'lombard-staked-btc'
+  'lbtc': 'lombard-staked-btc',
+  'gems': 'gems' // https://web3.okx.com/token/sonic/0x5555b2733602ded58d47b8d3d989e631cbee5555
 }
 
 // hardcode values for test purposes
@@ -32,6 +33,7 @@ export const CoinGeckoRates: Record<string, number> = {
   'wrapped-bitcoin': 104401,
   'rings-scbtc': 104401,
   'lombard-staked-btc': 104401,
+  'gems': 32.52
 }
 
 interface CoinGeckoPriceResponse {

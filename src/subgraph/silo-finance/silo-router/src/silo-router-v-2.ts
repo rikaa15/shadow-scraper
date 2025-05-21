@@ -1,70 +1,19 @@
 import {
-  OwnershipTransferStarted as OwnershipTransferStartedEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
-  Paused as PausedEvent,
-  Unpaused as UnpausedEvent
+  Deposit as DepositEvent,
 } from "../generated/SiloRouterV2/SiloRouterV2"
 import {
-  OwnershipTransferStarted,
-  OwnershipTransferred,
-  Paused,
-  Unpaused
+  RouterDeposit
 } from "../generated/schema"
 
-export function handleOwnershipTransferStarted(
-  event: OwnershipTransferStartedEvent
-): void {
-  let entity = new OwnershipTransferStarted(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
+export function handleDeposit(event: DepositEvent): void {
+  const id = event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  const deposit = new RouterDeposit(id)
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  deposit.user = event.params.user
+  deposit.silo = event.params.silo
+  deposit.amount = event.params.amount
+  deposit.timestamp = event.block.timestamp
+  deposit.transactionHash = event.transaction.hash
 
-  entity.save()
-}
-
-export function handleOwnershipTransferred(
-  event: OwnershipTransferredEvent
-): void {
-  let entity = new OwnershipTransferred(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handlePaused(event: PausedEvent): void {
-  let entity = new Paused(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.account = event.params.account
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleUnpaused(event: UnpausedEvent): void {
-  let entity = new Unpaused(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.account = event.params.account
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  deposit.save()
 }

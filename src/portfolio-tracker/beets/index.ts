@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { PortfolioItem } from '../types';
-import { portfolioItemFactory, roundToSignificantDigits } from '../helpers';
+import { calculateAPR, portfolioItemFactory, roundToSignificantDigits } from '../helpers';
 import moment from 'moment';
 import { getUnderlyingTokenUSDPrice } from '../../api/beets-api';
 import { getUserLiquidityInfo } from '../../api/beets-subgraph';
@@ -11,6 +11,7 @@ const vaultArray = [
   {
     name: `Lombard's Orbit: The Elliptic Dance`,
     address:'0xBA12222222228d8Ba445958a75a0704d566BF2C8',
+    gaugeAddress: '0x11c43F630b52F1271a5005839d34b07C0C125e72',
     poolId: '0x83952912178aa33c3853ee5d942c96254b235dcc', // '0x83952912178aa33c3853ee5d942c96254b235dcc0002000000000000000000ab' , //  '0x83952912178aa33c3853ee5d942c96254b235dcc',
     url: 'https://beets.fi/pools/sonic/v2/0x83952912178aa33c3853ee5d942c96254b235dcc0002000000000000000000ab',
     type: 'pool'
@@ -40,6 +41,7 @@ export const getBeetsInfo = async (walletAddress: string) => {
     let token0rewards = undefined
     let token1rewards = undefined
     let totalRewards = 0
+    let apr = 0
 
     const firstDepositTimestamp = new Date(initialDeposit?.timestamp * 1000).toISOString();
     const currentBlockNumber = await provider.getBlockNumber();
@@ -74,20 +76,21 @@ export const getBeetsInfo = async (walletAddress: string) => {
       };
     }).filter(Boolean); 
 
-
     // position no staked
-    if (userLiquidityInfo.poolShares && userLiquidityInfo.poolShares.length > 0) {
+    if (userLiquidityInfo.poolShares && userLiquidityInfo.poolShares[0].balance > 0) {
       const share = userLiquidityInfo.poolShares[0];
-      const pool = share.poolId;
 
-      const userSharePercentage = parseFloat(share.balance) / parseFloat(pool.totalShares);
+      const pool = share.poolId;
       currentBptPrice = parseFloat(pool.totalLiquidity) / parseFloat(pool.totalShares);
 
+      const userSharePercentage = parseFloat(share.balance) / parseFloat(pool.totalShares);
+      
       for (const token of pool.tokens) { 
-        const poolTokenBalance = parseFloat(token.balance)  
+        const poolTokenBalance = parseFloat(token.balance);  
         const userTokenBalance = poolTokenBalance * userSharePercentage;
         const tokenPrice = await getUnderlyingTokenUSDPrice(token.symbol);
         const tokenValue = userTokenBalance * tokenPrice;
+        
         currentPositionValue += tokenValue;
         
         currentTokenBalances.push({
@@ -100,13 +103,19 @@ export const getBeetsInfo = async (walletAddress: string) => {
           value: tokenValue
         });
       }
+
+      const bptPositionValue = parseFloat(share.balance) * currentBptPrice;
       
       const totalGain = currentPositionValue - initialDeposit.valueUSD;
       token0rewards = getTokenReward(currentTokenBalances[0], totalGain, currentPositionValue)
       token1rewards = currentTokenBalances[1] ? getTokenReward(currentTokenBalances[1], totalGain, currentPositionValue) : undefined
       totalRewards = token0rewards.rewardValue + (token1rewards?.rewardValue ?? 0)
-    }
+      apr = calculateAPR(initialDeposit.valueUSD, bptPositionValue - initialDeposit.valueUSD, daysElapsed);
+      
+    } else {
+      // staked
 
+    }
     const portfolioItem: PortfolioItem = {
           ...portfolioItemFactory(),
           type: vault.type,
@@ -129,7 +138,7 @@ export const getBeetsInfo = async (walletAddress: string) => {
           rewardValue: roundToSignificantDigits(totalRewards.toString(), 2),
           totalDays: roundToSignificantDigits(`${daysElapsed}`, 4),
           totalBlocks: `${totalBlocks}`,
-          apr: '0', // roundToSignificantDigits(apr.toString()),
+          apr: roundToSignificantDigits(apr.toString()),
           depositLink: vault.url
         };
     

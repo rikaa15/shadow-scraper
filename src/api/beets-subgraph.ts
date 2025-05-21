@@ -1,5 +1,5 @@
 import axios from "axios";
-import 'dotenv/config'
+import "dotenv/config";
 
 const API_KEY = process.env.SUBGRAPH_API_KEY;
 
@@ -8,8 +8,8 @@ const balancerSubgraphUrl = `https://gateway-arbitrum.network.thegraph.com/api/$
 const balancerClient = axios.create({
   baseURL: balancerSubgraphUrl,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 export async function getUserLiquidityInfo(
@@ -28,6 +28,7 @@ export async function getUserLiquidityInfo(
         id
         address
         totalLiquidity
+        totalLiquiditySansBPT
         totalShares
         tokens {
           address
@@ -62,17 +63,120 @@ export async function getUserLiquidityInfo(
     }
   }  
   `;
-  
-  const response = await balancerClient.post('', { query: subgraphQuery });
-  
+
+  const response = await balancerClient.post("", { query: subgraphQuery });
+
   if (response.data.errors) {
     console.error("GraphQL errors:", response.data.errors);
-    throw new Error("GraphQL query failed: " + JSON.stringify(response.data.errors));
+    throw new Error(
+      "GraphQL query failed: " + JSON.stringify(response.data.errors)
+    );
   }
-  
+
   if (!response.data.data) {
     console.error("No data returned from the GraphQL query");
     throw new Error("No data returned from the GraphQL query");
   }
-  return response.data.data
+  return response.data.data;
+}
+
+export async function getUserTokenBalances(userAddress: string): Promise<any> {
+  const subgraphQuery = `
+  {
+    userInternalBalances(
+      first: 10,
+      where: {
+        userAddress: "${userAddress.toLowerCase()}"
+      }
+    ) {
+      id
+      balance
+      token {
+        id
+        symbol
+        name
+        decimals
+      }
+      userAddress
+    }
+  }
+  `;
+
+  const response = await balancerClient.post("", { query: subgraphQuery });
+  if (response.data.errors) {
+    console.error("GraphQL errors:", response.data.errors);
+    throw new Error(
+      "GraphQL query failed: " + JSON.stringify(response.data.errors)
+    );
+  }
+
+  if (!response.data.data) {
+    console.error("No data returned from the GraphQL query");
+    throw new Error("No data returned from the GraphQL query");
+  }
+
+  return response.data.data.userInternalBalances;
+}
+
+export async function getUserPoolShares(
+  userAddress: string,
+  poolId: string
+): Promise<any> {
+  const subgraphQuery = `
+  {
+    user(id: "${userAddress.toLowerCase()}") {
+      id
+      userInternalBalances {
+        balance
+        id
+        token
+        tokenInfo {
+          address
+          decimals
+          name
+          symbol
+          totalBalanceNotional
+          totalBalanceUSD
+          totalSwapCount
+          totalVolumeNotional
+          totalVolumeUSD
+        }
+      }
+      sharesOwned {
+        id
+        poolId {
+          id
+          address
+          totalLiquidity
+          totalShares
+          tokens {
+            address
+            symbol
+            name
+            balance
+            decimals
+          }
+        }
+        balance
+        
+      }
+    }
+  }
+  `;
+
+  const response = await balancerClient.post("", { query: subgraphQuery });
+
+  if (response.data.errors) {
+    console.error("GraphQL errors:", response.data.errors);
+    throw new Error(
+      "GraphQL query failed: " + JSON.stringify(response.data.errors)
+    );
+  }
+
+  if (!response.data.data || !response.data.data.user) {
+    console.log("No user data found");
+    return [];
+  }
+
+  return response.data.data.user.sharesOwned;
 }

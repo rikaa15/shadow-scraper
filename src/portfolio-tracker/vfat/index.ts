@@ -66,10 +66,18 @@ const getClaimedRewardBySymbol = async (
 }
 
 export const getVFatInfo = async (walletAddress: string) => {
-  const positionMints = await getPositionMints({
+  let positionMints = await getPositionMints({
     filter: {
       transaction_from: walletAddress
     }
+  })
+
+  positionMints = positionMints.filter((item, _, arr) => {
+    const duplicatePositionItems = arr
+      .filter(arrItem => arrItem.position.id === item.position.id)
+
+    return duplicatePositionItems.length < 2 // no duplicate positions
+      || duplicatePositionItems[1].id !== item.id // take only first item (most recent by timestamp) from duplicates lst
   })
 
   const portfolioItems: PortfolioItem[] = []
@@ -89,132 +97,136 @@ export const getVFatInfo = async (walletAddress: string) => {
       const unclaimedRewards: PositionReward[] = []
       const claimedRewards: PositionReward[] = []
 
-     if(liquidity > 0n) {
-       // Calculate deposited value
-       let apr = 0
-       let totalDepositedValue = 0
-       let deposit0Value = 0
-       let deposit1Value = 0
-       const exchangeToken0Id = CoinGeckoTokenIdsMap[pool.token0.symbol.toLowerCase()]
-       const exchangeToken1Id = CoinGeckoTokenIdsMap[pool.token1.symbol.toLowerCase()]
-       if(exchangeToken0Id && exchangeToken1Id) {
-         const token0Price = await getTokenPrice(exchangeToken0Id)
-         const token1Price = await getTokenPrice(exchangeToken1Id)
-         deposit0Value = token0Price * Number(depositedToken0)
-         deposit1Value = token1Price * Number(depositedToken1)
-       }
-       totalDepositedValue = deposit0Value + deposit1Value
+      if(liquidity <= 0n) {
+        continue
+      }
 
-       if(totalDepositedValue > 0) {
-           // Calculate reward value
-           const gaugeAddress = mint.pool.gaugeV2.id
-           const gauge = new ethers.Contract(gaugeAddress, GaugeV3ABI, provider);
+      // Calculate deposited value
+      let apr = 0
+      let totalDepositedValue = 0
+      let deposit0Value = 0
+      let deposit1Value = 0
+      const exchangeToken0Id = CoinGeckoTokenIdsMap[pool.token0.symbol.toLowerCase()]
+      const exchangeToken1Id = CoinGeckoTokenIdsMap[pool.token1.symbol.toLowerCase()]
+      if(exchangeToken0Id && exchangeToken1Id) {
+        const token0Price = await getTokenPrice(exchangeToken0Id)
+        const token1Price = await getTokenPrice(exchangeToken1Id)
+        deposit0Value = token0Price * Number(depositedToken0)
+        deposit1Value = token1Price * Number(depositedToken1)
+      }
+      totalDepositedValue = deposit0Value + deposit1Value
 
-         const rewardClaims = await getGaugeRewardClaims({
-           filter: {
-             transaction_from: walletAddress,
-             gauge_isAlive: true
-           },
-           first: 5,
-           sort: {
-             orderBy: 'transaction__blockNumber',
-             orderDirection: 'desc'
-           }
-         })
+      if(totalDepositedValue <= 0) {
+        continue
+      }
 
-         const rewardTokens = await gauge.getRewardTokens() as string[]
-         for (const rewardAddress of rewardTokens) {
-           const earned = await gauge.earned(rewardAddress, positionId) as bigint
-           const rewardContract = new ethers.Contract(rewardAddress, ERC20ABI, provider);
-           const rewardSymbol = await rewardContract.symbol();
+      // Calculate reward value
+      const gaugeAddress = mint.pool.gaugeV2.id
+      const gauge = new ethers.Contract(gaugeAddress, GaugeV3ABI, provider);
 
-           const claimedReward = await getClaimedRewardBySymbol(position, rewardClaims, rewardSymbol)
-           claimedRewards.push(claimedReward)
+      const rewardClaims = await getGaugeRewardClaims({
+        filter: {
+          transaction_from: walletAddress,
+          gauge_isAlive: true
+        },
+        first: 5,
+        sort: {
+          orderBy: 'transaction__blockNumber',
+          orderDirection: 'desc'
+        }
+      })
 
-           if(earned > 0n) {
-             let price = 0
-             const symbol = rewardSymbol.toLowerCase();
-             const exchangeTokenId = CoinGeckoTokenIdsMap[symbol];
+      const rewardTokens = await gauge.getRewardTokens() as string[]
+      for (const rewardAddress of rewardTokens) {
+        const earned = await gauge.earned(rewardAddress, positionId) as bigint
+        const rewardContract = new ethers.Contract(rewardAddress, ERC20ABI, provider);
+        const rewardSymbol = await rewardContract.symbol();
 
-             // Ignore GEMS rewards for now
-             if(exchangeTokenId) {
-               price = await getTokenPrice(exchangeTokenId)
-             } else if(symbol === 'xshadow') {
-               price = (await getTokenPrice('shadow-2')) / 2
-             } else {
-               price = await getTokenPrice(symbol, true);
-             }
+        const claimedReward = await getClaimedRewardBySymbol(position, rewardClaims, rewardSymbol)
+        claimedRewards.push(claimedReward)
 
-             // console.log('reward', rewardSymbol, rewardAddress, 'earned', earned, 'price', price);
+        if(earned > 0n) {
+          let price = 0
+          const symbol = rewardSymbol.toLowerCase();
+          const exchangeTokenId = CoinGeckoTokenIdsMap[symbol];
 
-             if(price > 0) {
-               const decimals = Number(await rewardContract.decimals())
-               const amount = new Decimal(earned.toString()).div(Math.pow(10, decimals))
-               const value = amount.mul(price)
-               unclaimedRewards.push({
-                 asset: rewardSymbol,
-                 amount: amount.toString(),
-                 value: value.toString()
-               })
-             }
-           }
-         }
+          // Ignore GEMS rewards for now
+          if(exchangeTokenId) {
+            price = await getTokenPrice(exchangeTokenId)
+          } else if(symbol === 'xshadow') {
+            price = (await getTokenPrice('shadow-2')) / 2
+          } else {
+            price = await getTokenPrice(symbol, true);
+          }
 
-         // const rewards = mergeRewards(claimedRewards, unclaimedRewards)
-         const rewards = [...unclaimedRewards]
-         const reward0 = rewards[0]
-         const reward1 = rewards[1]
-         const rewardsTotalValue = rewards.reduce((acc, r) => acc + Number(r.value), 0).toString()
+          // console.log('reward', rewardSymbol, rewardAddress, 'earned', earned, 'price', price);
 
-         const currentBlockNumber = await provider.getBlockNumber()
-         const portfolioItem: PortfolioItem = {
-           ...portfolioItemFactory(),
-           type: `Swap pool`,
-           name: 'shadow',
-           address: pool.id,
-           depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
-           depositAsset0: position.pool.token0.symbol,
-           depositAsset1: position.pool.token1.symbol,
-           depositAmount0: roundToSignificantDigits(position.depositedToken0),
-           depositAmount1: roundToSignificantDigits(position.depositedToken1),
-           depositValue0: roundToSignificantDigits(deposit0Value.toString()),
-           depositValue1: roundToSignificantDigits(deposit1Value.toString()),
-           depositValue: roundToSignificantDigits(
-             (deposit0Value + deposit1Value).toString()
-           ),
-           rewardAsset0: reward0 ? reward0.asset : '',
-           rewardAsset1: reward1 ? reward1.asset : '',
-           rewardAmount0: reward0 ? roundToSignificantDigits(reward0.amount) : '',
-           rewardAmount1: reward1 ? roundToSignificantDigits(reward1.amount) : '',
-           rewardValue0: reward0 ? roundToSignificantDigits(reward0.value) : '',
-           rewardValue1: reward1 ? roundToSignificantDigits(reward1.value): '',
-           rewardValue: roundToSignificantDigits(rewardsTotalValue),
-           totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
-           totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
-           depositLink: `https://www.shadow.so/liquidity/${pool.id}`
-         }
+          if(price > 0) {
+            const decimals = Number(await rewardContract.decimals())
+            const amount = new Decimal(earned.toString()).div(Math.pow(10, decimals))
+            const value = amount.mul(price)
+            unclaimedRewards.push({
+              asset: rewardSymbol,
+              amount: amount.toString(),
+              value: value.toString()
+            })
+          }
+        }
+      }
 
-         apr = calculateAPR(
-           Number(portfolioItem.depositValue),
-           Number(portfolioItem.rewardValue),
-           Number(portfolioItem.totalDays)
-         )
-         portfolioItem.apr = roundToSignificantDigits(apr.toString())
-         portfolioItems.push(portfolioItem)
+      // const rewards = mergeRewards(claimedRewards, unclaimedRewards)
+      const rewards = [...unclaimedRewards]
+      const reward0 = rewards[0]
+      const reward1 = rewards[1]
+      const rewardsTotalValue = rewards.reduce((acc, r) => acc + Number(r.value), 0).toString()
 
-         console.log('VFAT',
-           pool.symbol,
-           'total deposited=',
-           totalDepositedValue,
-           'days count=',
-           portfolioItem.totalDays,
-           'reward=',
-           rewardsTotalValue,
-           'apr=',
-           portfolioItem.apr
-         )
-       }
-     }
+      const currentBlockNumber = await provider.getBlockNumber()
+      const portfolioItem: PortfolioItem = {
+        ...portfolioItemFactory(),
+        type: `Swap pool`,
+        name: 'shadow',
+        address: pool.id,
+        depositTime: moment(launchTimestamp).format('YY/MM/DD HH:MM:SS'),
+        depositAsset0: position.pool.token0.symbol,
+        depositAsset1: position.pool.token1.symbol,
+        depositAmount0: roundToSignificantDigits(position.depositedToken0),
+        depositAmount1: roundToSignificantDigits(position.depositedToken1),
+        depositValue0: roundToSignificantDigits(deposit0Value.toString()),
+        depositValue1: roundToSignificantDigits(deposit1Value.toString()),
+        depositValue: roundToSignificantDigits(
+          (deposit0Value + deposit1Value).toString()
+        ),
+        rewardAsset0: reward0 ? reward0.asset : '',
+        rewardAsset1: reward1 ? reward1.asset : '',
+        rewardAmount0: reward0 ? roundToSignificantDigits(reward0.amount) : '',
+        rewardAmount1: reward1 ? roundToSignificantDigits(reward1.amount) : '',
+        rewardValue0: reward0 ? roundToSignificantDigits(reward0.value) : '',
+        rewardValue1: reward1 ? roundToSignificantDigits(reward1.value): '',
+        rewardValue: roundToSignificantDigits(rewardsTotalValue),
+        totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
+        totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
+        depositLink: `https://www.shadow.so/liquidity/${pool.id}`
+      }
+
+      apr = calculateAPR(
+        Number(portfolioItem.depositValue),
+        Number(portfolioItem.rewardValue),
+        Number(portfolioItem.totalDays)
+      )
+      portfolioItem.apr = roundToSignificantDigits(apr.toString())
+      portfolioItems.push(portfolioItem)
+
+      console.log('VFAT',
+        pool.symbol,
+        'total deposited=',
+        totalDepositedValue,
+        'days count=',
+        portfolioItem.totalDays,
+        'reward=',
+        rewardsTotalValue,
+        'apr=',
+        portfolioItem.apr
+      )
     } catch (e) {
       // console.error('VFAT: failed to calculate rewards', e)
     }

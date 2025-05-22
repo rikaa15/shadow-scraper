@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
+import moment from 'moment';
 import { PortfolioItem } from '../types';
 import { calculateAPR, portfolioItemFactory, roundToSignificantDigits } from '../helpers';
-import moment from 'moment';
-import { getUnderlyingTokenUSDPrice } from '../../api/beets-api';
+import { getTokenReward, getUnderlyingTokenUSDPrice, getUserGaugeRewards } from '../../api/beets-api';
 import { getUserLiquidityInfo } from '../../api/beets-subgraph';
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
@@ -12,36 +12,27 @@ const vaultArray = [
     name: `Lombard's Orbit: The Elliptic Dance`,
     address:'0xBA12222222228d8Ba445958a75a0704d566BF2C8',
     gaugeAddress: '0x11c43F630b52F1271a5005839d34b07C0C125e72',
-    poolId: '0x83952912178aa33c3853ee5d942c96254b235dcc', // '0x83952912178aa33c3853ee5d942c96254b235dcc0002000000000000000000ab' , //  '0x83952912178aa33c3853ee5d942c96254b235dcc',
+    poolId: '0x83952912178aa33c3853ee5d942c96254b235dcc',
     url: 'https://beets.fi/pools/sonic/v2/0x83952912178aa33c3853ee5d942c96254b235dcc0002000000000000000000ab',
     type: 'pool'
   },  
 ];
 
-const getTokenReward = (token: any, totalGain: number, currentPositionValue: number): { rewardValue: number, rewardAmount: number} => {
-  const tokenValuePercentage = token.value / currentPositionValue;
-  const tokenRewardValue = totalGain * tokenValuePercentage;
-  const tokenRewardAmount = tokenRewardValue / token.price
-  
-  return {
-    rewardValue: tokenRewardValue,
-    rewardAmount: tokenRewardAmount
-  }
-}
-
 export const getBeetsInfo = async (walletAddress: string) => {
   const portfolioItems: PortfolioItem[] = [];
   const formattedWalletAddress = ethers.getAddress(walletAddress);
-
   const vaultPromises = vaultArray.map(async (vault) => { 
     const userLiquidityInfo = await getUserLiquidityInfo(formattedWalletAddress, vault.poolId)
     const initialDeposit = userLiquidityInfo.joinExits[0]
+    
     let currentBptPrice = 0
     let currentPositionValue = 0
+    let totalDepositValue = 0
     let token0rewards = undefined
     let token1rewards = undefined
     let totalRewards = 0
     let apr = 0
+    let staked = false
 
     const firstDepositTimestamp = new Date(initialDeposit?.timestamp * 1000).toISOString();
     const currentBlockNumber = await provider.getBlockNumber();
@@ -53,28 +44,35 @@ export const getBeetsInfo = async (walletAddress: string) => {
     const currentTokenBalances: any[] = []
 
     // Process tokens  
-    const tokensDeposited = initialDeposit.amounts.map((amount: string, index: number) => {
+    const tokensDepositedPromises = initialDeposit.amounts.map(async (amount: string, index: number) => {
       const token = initialDeposit.pool.tokens[index];
       
       if (!initialDeposit) {
         return
       }
-      // Parse amount properly
+
       const amountInTokenUnits = parseFloat(amount);
-      
+      const price = await getUnderlyingTokenUSDPrice(token.symbol.toString())
+      const tokenDepositValue = price * amountInTokenUnits
+      totalDepositValue += tokenDepositValue
+
       // Skip tokens with zero amount
       if (amountInTokenUnits === 0) {
         return null;
       }
-      console.log()
+
       return {
         symbol: token.symbol,
         name: token.name || token.symbol,
         address: token.address,
         amount: amountInTokenUnits.toString(),
-        decimals: parseInt(token.decimals)
+        decimals: parseInt(token.decimals),
+        price,
+        value: tokenDepositValue
       };
     }).filter(Boolean); 
+
+    const tokensDeposited = await Promise.all(tokensDepositedPromises);
 
     // position no staked
     if (userLiquidityInfo.poolShares && userLiquidityInfo.poolShares[0].balance > 0) {
@@ -110,10 +108,20 @@ export const getBeetsInfo = async (walletAddress: string) => {
       token0rewards = getTokenReward(currentTokenBalances[0], totalGain, currentPositionValue)
       token1rewards = currentTokenBalances[1] ? getTokenReward(currentTokenBalances[1], totalGain, currentPositionValue) : undefined
       totalRewards = token0rewards.rewardValue + (token1rewards?.rewardValue ?? 0)
-      apr = calculateAPR(initialDeposit.valueUSD, bptPositionValue - initialDeposit.valueUSD, daysElapsed);
+      apr = calculateAPR(totalDepositValue, bptPositionValue - initialDeposit.valueUSD, daysElapsed);
       
     } else {
-      // staked
+      staked = true
+      const result = await getUserGaugeRewards(vault.gaugeAddress, formattedWalletAddress)
+      const tokenRewards = result.rewards
+      const beetsReward = tokenRewards.find((t: any) => t.name = 'beets')
+      totalRewards = beetsReward?.rewardValue ?? 0
+      apr = beetsReward ? calculateAPR(totalDepositValue, beetsReward.rewardValue, daysElapsed) : 0;
+      token0rewards = {
+        rewardAmount: beetsReward?.claimable ?? '',
+        rewardValue: beetsReward?.rewardValue ?? '',
+        symbol: beetsReward?.symbol.toLowerCase() ?? ''
+      }
 
     }
     const portfolioItem: PortfolioItem = {
@@ -126,10 +134,10 @@ export const getBeetsInfo = async (walletAddress: string) => {
           depositAsset1: tokensDeposited[1] ? tokensDeposited[1].symbol :  '', //depositInfo?.depositAsset1 ?? '',
           depositAmount0: tokensDeposited[0] ? roundToSignificantDigits(`${tokensDeposited[0].amount}`) :  '',
           depositAmount1: tokensDeposited[1] ? roundToSignificantDigits(`${tokensDeposited[1].amount}`) :  '',
-          depositValue0: '',
-          depositValue1: '',
-          depositValue: roundToSignificantDigits(initialDeposit.valueUSD.toString()),
-          rewardAsset0: tokensDeposited[0] && token0rewards ? tokensDeposited[0].symbol :  '',
+          depositValue0: tokensDeposited[0] ? roundToSignificantDigits(`${tokensDeposited[0].value}`) :  '',
+          depositValue1: tokensDeposited[1] ? roundToSignificantDigits(`${tokensDeposited[1].value}`) :  '',
+          depositValue: roundToSignificantDigits(totalDepositValue.toString()),
+          rewardAsset0: staked ? token0rewards.symbol : tokensDeposited[0] && token0rewards ? tokensDeposited[0].symbol :  '',
           rewardAsset1: tokensDeposited[1] && token1rewards ? tokensDeposited[1].symbol :  '',
           rewardAmount0: token0rewards ? roundToSignificantDigits(token0rewards.rewardAmount.toString()) : '',
           rewardAmount1: token1rewards ? roundToSignificantDigits(token1rewards.rewardAmount.toString()) : '',
@@ -145,7 +153,7 @@ export const getBeetsInfo = async (walletAddress: string) => {
         return portfolioItem;
   })
   
-   const results = await Promise.all(vaultPromises);
+  const results = await Promise.all(vaultPromises);
 
   results.forEach(item => {
     if (item) portfolioItems.push(item);

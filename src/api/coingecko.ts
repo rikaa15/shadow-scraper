@@ -14,6 +14,7 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'wbtc': 'wrapped-bitcoin',
   'scbtc': 'rings-scbtc', // for beets 'scbtc': 'wrapped-bitcoin'
   'lbtc': 'lombard-staked-btc',
+  'beets': 'beets'
 }
 
 // hardcode values for test purposes

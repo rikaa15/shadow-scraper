@@ -1,17 +1,18 @@
 import {
   Deposit as DepositEvent,
-} from "../generated/SiloRouterV2/SiloRouterV2"
+} from "../generated/SiloFinanceDeployer/SiloFinanceDeployer"
 import {
-  RouterDeposit
+  VaultDeposit
 } from "../generated/schema"
 
 export function handleDeposit(event: DepositEvent): void {
   const id = event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  const deposit = new RouterDeposit(id)
+  const deposit = new VaultDeposit(id)
 
-  deposit.user = event.params.user
-  deposit.silo = event.params.silo
-  deposit.amount = event.params.amount
+  deposit.user = event.params.sender
+  deposit.silo = event.params.owner
+  deposit.amount = event.params.assets
+  deposit.shares = event.params.shares
   deposit.timestamp = event.block.timestamp
   deposit.transactionHash = event.transaction.hash
 

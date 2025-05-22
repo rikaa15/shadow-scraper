@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import ERC20_ABI from "../abi/ERC20.json";
-import { CoinGeckoTokenIdsMap, getTokenPrice } from "./coingecko";
+import { CoinGeckoTokenIdsMap, getTokenPrice, getTokenPriceDate } from "./coingecko";
 
 const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
@@ -138,7 +138,10 @@ export const getTokenReward = (token: any, totalGain: number, currentPositionVal
 }
 
 
-export const getUnderlyingTokenUSDPrice = async (symbol: string) => {
+export const getUnderlyingTokenUSDPrice = async (symbol: string, timestamp?: number) => {
   const id = await CoinGeckoTokenIdsMap[symbol.toLowerCase()];
+  if (timestamp) {
+    return getTokenPriceDate(id, timestamp)
+  }
   return await getTokenPrice(id);
 };

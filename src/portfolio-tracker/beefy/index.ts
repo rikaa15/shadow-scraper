@@ -25,6 +25,15 @@ const vaultArray = [
   },
 ];
 
+/**
+ * Beefy is an autocompounding yield optimizer where users deposit LP tokens into vaults 
+ * and receive mooTokens in return. The protocol automatically harvests rewards, swaps them, 
+ * and reinvests to compound yield. User positions are valued using pricePerFullShare (PPFS), 
+ * which represents the ratio between total assets in the vault and mooTokens in circulation.
+ * 
+ * Harvests occur periodically with fees split between the caller (0.05-0.5%), treasury, 
+ * and strategist. APY is calculated based on underlying APR, compounding frequency, and fees.
+ */
 export const getBeefyInfo = async (walletAddress: string) => {
   const portfolioItems: PortfolioItem[] = [];
   const formattedWalletAddress = ethers.getAddress(walletAddress);
@@ -96,14 +105,14 @@ export const getBeefyInfo = async (walletAddress: string) => {
       depositTime: moment(firstDepositTimestamp).format('YY/MM/DD HH:MM:SS'),
       depositAsset0: assetSymbol,
       depositAsset1: '',
-      depositAmount0: roundToSignificantDigits(`${initialTokensFormatted}`, 6), // Token amount
+      depositAmount0: roundToSignificantDigits(`${initialTokensFormatted}`), // Token amount
       depositAmount1: '',
       depositValue0: roundToSignificantDigits(`${initialDepositUSD}`, 2), // USD value
       depositValue1: '',
       depositValue: roundToSignificantDigits(`${initialDepositUSD}`, 2),
       rewardAsset0: assetSymbol,
       rewardAsset1: '',
-      rewardAmount0: roundToSignificantDigits(`${gainTokensFormatted}`, 6), // Gain in tokens
+      rewardAmount0: roundToSignificantDigits(`${gainTokensFormatted}`), // Gain in tokens
       rewardAmount1: '',
       rewardValue0: roundToSignificantDigits(`${gainUSD}`, 2), // Gain in USD
       rewardValue1: '',

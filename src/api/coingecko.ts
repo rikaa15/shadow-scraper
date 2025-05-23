@@ -16,26 +16,28 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'solvbtc': 'solv-btc',
   'lbtc': 'lombard-staked-btc',
   'xsolvbtc': 'solv-protocol-solvbtc-bbn',
+  'gems': 'gems' // https://web3.okx.com/token/sonic/0x5555b2733602ded58d47b8d3d989e631cbee5555
 }
 
 // hardcode values for test purposes
 export const CoinGeckoRates: Record<string, number> = {
   'swapx-2': 0.1329,
-  'shadow-2': 56.58,
-  'shadow-liquid-staking-token': 44.12,
-  'wrapped-sonic': 0.5905,
-  'sonic': 0.5905,
+  'shadow-2': 55.84,
+  'shadow-liquid-staking-token': 49.01,
+  'wrapped-sonic': 0.4952,
+  'sonic': 0.4952,
   'sonic-bridged-usdc-e-sonic': 1,
   'rings-scusd': 1,
   'tether': 1,
   'frax-usd': 1,
   'weth': 2298.87,
   'pendle': 3.80,
-  'wrapped-bitcoin': 103637.04,
-  'rings-scbtc': 103637.04,
-  'solv-btc': 111590.65,
-  'lombard-staked-btc': 111415.87,
+  'wrapped-bitcoin': 108949,
+  'rings-scbtc': 108949,
+  'lombard-staked-btc': 108949,
+  'gems': 32.52,
   'solv-protocol-solvbtc-bbn': 111637.53,
+  'solv-btc': 111590.65,
 }
 
 interface CoinGeckoPriceResponse {

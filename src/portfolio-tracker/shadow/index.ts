@@ -32,14 +32,14 @@ const getClaimedRewardBySymbol = async (
     .filter((item) => {
       return item.gauge.clPool.symbol.toLowerCase() === pool.symbol.toLowerCase()
         && item.rewardToken.symbol.toLowerCase() === rewardSymbol.toLowerCase()
-        && Number(item.transaction.timestamp) > Number(position.transaction.timestamp)
+        && Number(item.transaction.timestamp) >= Number(position.transaction.timestamp)
     })
 
     for (const reward of poolRewards) {
       const { rewardToken, rewardAmount } = reward;
       const symbol = rewardToken.symbol.toLowerCase();
       let tokenPrice = 0;
-    
+
       if (symbol === 'xshadow') {
         tokenPrice = (await getTokenPrice('shadow-2')) / 2;
       } else {
@@ -50,12 +50,12 @@ const getClaimedRewardBySymbol = async (
           tokenPrice = await getTokenPrice(symbol, true);
         }
       }
-    
+
       const rewardValue = Decimal(rewardAmount).mul(tokenPrice);
       value = value.add(rewardValue);
       amount = amount.add(new Decimal(rewardAmount));
     }
-    
+
 
   return {
     asset: rewardSymbol,
@@ -191,7 +191,7 @@ export const getShadowInfo = async (
         rewardValue1: roundToSignificantDigits(reward1.value),
         rewardValue: roundToSignificantDigits(
           rewards.reduce((acc, r) => acc + Number(r.value), 0).toString()
-        ),        
+        ),
         totalDays: calculateDaysDifference(new Date(launchTimestamp), new Date(), 4),
         totalBlocks: (currentBlockNumber - Number(position.transaction.blockNumber)).toString(),
         depositLink: `https://www.shadow.so/liquidity/${pool.id}`

@@ -12,8 +12,9 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'weth': 'weth',
   'pendle': 'pendle',
   'wbtc': 'wrapped-bitcoin',
-  'scbtc': 'rings-scbtc',
+  'scbtc': 'rings-scbtc', // for beets 'scbtc': 'wrapped-bitcoin'
   'lbtc': 'lombard-staked-btc',
+  'beets': 'beets',
   'gems': 'gems' // https://web3.okx.com/token/sonic/0x5555b2733602ded58d47b8d3d989e631cbee5555
 }
 
@@ -35,6 +36,18 @@ export const CoinGeckoRates: Record<string, number> = {
   'lombard-staked-btc': 108949,
   'gems': 32.52
 }
+
+// hardcoded historical rates
+export const CoinGeckoHistoricalRates: Record<string, Record<string, number>> = {
+  'rings-scbtc': {
+    '16-05-2025': 103393.983167005,
+    '15-05-2025': 103331.502813178
+  },
+  'lombard-staked-btc': {
+    '16-05-2025': 103515.8513815589,
+    '15-05-2025': 103102.080844769
+  },
+};
 
 interface CoinGeckoPriceResponse {
   [key: string]: {
@@ -73,6 +86,28 @@ export const getTokenPrice = async (
   return value
 }
 
+export const getTokenPriceDate = async (
+  tokenId: string,
+  timestamp: number,
+  fromCache = true
+)=> {
+
+  const coinGeckoDate = new Date(timestamp * 1000)
+    .toLocaleDateString('en-GB')
+    .replace(/\//g, '-');
+  if(fromCache) {
+   if (CoinGeckoHistoricalRates[tokenId]?.[coinGeckoDate]) {
+      console.log(`Using cached historical price for ${tokenId} on ${coinGeckoDate}:`, CoinGeckoHistoricalRates[tokenId][coinGeckoDate]);
+      return CoinGeckoHistoricalRates[tokenId][coinGeckoDate];
+    }
+  }
+  console.log(`Coingecko API: Get token price (${coinGeckoDate})`, tokenId)
+  const url = `https://api.coingecko.com/api/v3/coins/${tokenId}/history?date=${coinGeckoDate}`
+  const { data } = await axios.get<any>(url)
+  const value = data.market_data?.current_price?.usd || 0;
+  return value
+}
+
 export interface CoinGeckoToken {
   id: string
   symbol: string
@@ -84,3 +119,4 @@ export const getTokensList = async ()=> {
   const { data } = await axios.get<CoinGeckoToken[]>(url)
   return data
 }
+

@@ -1,4 +1,5 @@
 import axios from "axios";
+import 'dotenv/config'
 
 const client = axios.create({
   baseURL: 'https://api.studio.thegraph.com/query/107620/beefy-sonic-ppfs/version/latest',
@@ -7,7 +8,6 @@ const client = axios.create({
     'Authorization': `Bearer ${process.env.SUBGRAPH_API_KEY}`
   }
 })
-
 
 export interface BeefyTransaction {
   id: string

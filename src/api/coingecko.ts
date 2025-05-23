@@ -12,7 +12,10 @@ export const CoinGeckoTokenIdsMap: Record<string, string> = {
   'weth': 'weth',
   'pendle': 'pendle',
   'wbtc': 'wrapped-bitcoin',
-  'scbtc': 'rings-scbtc'
+  'scbtc': 'rings-scbtc',
+  'solvbtc': 'solv-btc',
+  'lbtc': 'lombard-staked-btc',
+  'xsolvbtc': 'solv-protocol-solvbtc-bbn',
 }
 
 // hardcode values for test purposes
@@ -30,6 +33,9 @@ export const CoinGeckoRates: Record<string, number> = {
   'pendle': 3.80,
   'wrapped-bitcoin': 103637.04,
   'rings-scbtc': 103637.04,
+  'solv-btc': 111590.65,
+  'lombard-staked-btc': 111415.87,
+  'solv-protocol-solvbtc-bbn': 111637.53,
 }
 
 interface CoinGeckoPriceResponse {

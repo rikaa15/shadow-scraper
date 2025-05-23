@@ -1,16 +1,20 @@
-import { Deposit as DepositEvent } from "../generated/SiloLBTCVault/SiloLBTCVault"
-import { VaultDeposit } from "../generated/schema"
+import { Deposit as DepositEvent } from "../generated/SiloLBTCVault/Silo"
+import { Deposit } from "../generated/schema"
 
 export function handleDeposit(event: DepositEvent): void {
-  const id = event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  const deposit = new VaultDeposit(id)
+  let entity = new Deposit(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
 
-  deposit.user = event.params.sender
-  deposit.silo = event.params.owner
-  deposit.amount = event.params.assets
-  deposit.shares = event.params.shares
-  deposit.timestamp = event.block.timestamp
-  deposit.transactionHash = event.transaction.hash
+  entity.sender = event.params.sender
+  entity.owner = event.params.owner
+  entity.assets = event.params.assets
+  entity.shares = event.params.shares
 
-  deposit.save()
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
 }
+

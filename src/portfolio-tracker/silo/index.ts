@@ -13,25 +13,25 @@ const provider = new ethers.JsonRpcProvider("https://rpc.soniclabs.com");
 
 const siloVaults = [
   {
-    name: 'Silo-LBTC',
+    name: 'Silo-LBTC · scBTC',
     address: '0x0dfa6b53c05b07e29b49a878fc96153cc03c3e72',
     marketPath: 'lbtc-scbtc-32',
     subgraphUrl: 'https://api.studio.thegraph.com/query/112027/silo-lbtc/version/latest'
   },
   {
-    name: 'Silo-scBTC',
+    name: 'Silo-LBTC · scBTC',
     address: '0x0A94e18bdbCcD048198806d7FF28A1B1D2590724',
     marketPath: 'lbtc-scbtc-32',
     subgraphUrl: 'https://api.studio.thegraph.com/query/112027/silo-scbtc/version/latest'
   },
   {
-    name: 'Silo-xSolvBTC',
+    name: 'Silo-xSolvBTC · SolvBTC',
     address: '0x52Fc9E0a68b6a4C9b57b9D1d99fB71449A99DCd8',
     marketPath: 'xsolvbtc-solvbtc-13',
     subgraphUrl: 'https://api.studio.thegraph.com/query/112027/silo-xsolvbtc/version/latest'
   },
   {
-    name: 'Silo-SolvBTC',
+    name: 'Silo-xSolvBTC · SolvBTC',
     address: '0x87178fe8698C7eDa8aA207083C3d66aEa569aB98',
     marketPath: 'xsolvbtc-solvbtc-13',
     subgraphUrl: 'https://api.studio.thegraph.com/query/112027/silo-solvbtc/version/latest'
